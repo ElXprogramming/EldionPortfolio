@@ -1,78 +1,69 @@
-# React + TypeScript + Vite
+# Eldion Ryan Godius - Portfolio Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Modern Single-Page UI Portfolio** for Eldion Ryan Godius — Software Engineering student at Universiti Malaysia Sabah, Full-Stack Developer, and AI/LLM solutions builder.
 
-Currently, two official plugins are available:
+[![Live Demo](https://img.shields.io/badge/Demo-Eldion%20Portfolio-indigo.svg)](https://declaraform.netlify.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-ElXprogramming-181717.svg?logo=github)](https://github.com/ElXprogramming)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Eldion%20Ryan%20Godius-0A66C2.svg?logo=linkedin)](https://www.linkedin.com/in/eldion-ryan-godius-897064235)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🌟 Key Highlights
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Modern Glassmorphic UI**: High-resolution dark aesthetic powered by Tailwind CSS v4, smooth gradients, and backdrop blur.
+- **Project Showcases**:
+  - **[Declaraform](https://declaraform.netlify.app/)**: UMS Declaration Form PDF generator with 3D WebGL background and interactive digital signature pad.
+  - **[DailyMenu](https://github.com/ElXprogramming/daily-menu-app)**: AI-driven diet & restaurant dish recommendation system with local LLM deployment (Qwen/GLM via Ollama), RAG pipeline, and PostgreSQL database.
+  - **[HaiwanGo](https://github.com/ElXprogramming/HaiwanGo)**: Responsive web application exploring component architecture.
+- **Curated Technical Stack Bento**: Categorized into Frontend, Backend & APIs, AI & LLMs, and Databases & System Tools.
+- **Education & Credentials**: Universiti Malaysia Sabah (B.CompSc Software Engineering) & Kolej Matrikulasi Labuan (Physical Science).
+- **Interactive Contact Features**: 1-click clipboard copy for email & phone, instant mail composer, and quick links to LinkedIn & GitHub.
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: React 19 + TypeScript
+- **Styling**: Tailwind CSS v4 + `@tailwindcss/vite`
+- **Build Tool**: Vite 8 with Fast HMR
+- **Icons**: Lucide React
+- **Typography**: Plus Jakarta Sans & Fira Code
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
 
+Ensure you have [Node.js](https://nodejs.org/) installed (v18+ recommended).
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/ElXprogramming/EldionPortfolio.git
+
+# Navigate into the project folder
+cd EldionPortfolio
+
+# Install dependencies
+npm install
+
+# Start local development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### Production Build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
+npm run preview
 ```
+
+---
+
+## 📬 Contact & Connect
+
+- **Email**: [nayrnoidle@gmail.com](mailto:nayrnoidle@gmail.com)
+- **LinkedIn**: [Eldion Ryan Godius](https://www.linkedin.com/in/eldion-ryan-godius-897064235)
+- **GitHub**: [@ElXprogramming](https://github.com/ElXprogramming)
