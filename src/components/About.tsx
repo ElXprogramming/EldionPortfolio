@@ -58,9 +58,8 @@ export default function About() {
               </p>
               
               <p>
-                My journey centers around practical, hands-on building: whether it's engineering 
-                <span className="text-indigo-400 font-medium"> Declaraform</span> to spare hundreds of university peers the agony of manual PDF form editing, or architecting 
-                <span className="text-sky-400 font-medium"> DailyMenu</span> to bring local restaurant offerings together with local LLM-powered diet recommendations.
+                My journey centers around practical, hands-on building: from engineering 
+                <span className="text-indigo-400 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
               </p>
 
               <p>

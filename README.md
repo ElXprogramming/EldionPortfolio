@@ -13,8 +13,6 @@
 - **Modern Glassmorphic UI**: High-resolution dark aesthetic powered by Tailwind CSS v4, smooth gradients, and backdrop blur.
 - **Project Showcases**:
   - **[Declaraform](https://declaraform.netlify.app/)**: UMS Declaration Form PDF generator with 3D WebGL background and interactive digital signature pad.
-  - **[DailyMenu](https://github.com/ElXprogramming/daily-menu-app)**: AI-driven diet & restaurant dish recommendation system with local LLM deployment (Qwen/GLM via Ollama), RAG pipeline, and PostgreSQL database.
-  - **[HaiwanGo](https://github.com/ElXprogramming/HaiwanGo)**: Responsive web application exploring component architecture.
 - **Curated Technical Stack Bento**: Categorized into Frontend, Backend & APIs, AI & LLMs, and Databases & System Tools.
 - **Education & Credentials**: Universiti Malaysia Sabah (B.CompSc Software Engineering) & Kolej Matrikulasi Labuan (Physical Science).
 - **Interactive Contact Features**: 1-click clipboard copy for email & phone, instant mail composer, and quick links to LinkedIn & GitHub.
