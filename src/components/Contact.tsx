@@ -7,9 +7,13 @@ import {
   Check, 
   MapPin, 
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  Loader2,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
+import { submitContactMessage } from '../lib/supabase';
 
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -21,6 +25,10 @@ export default function Contact() {
     subject: '',
     message: '',
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [statusMessage, setStatusMessage] = useState('');
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText('nayrnoidle@gmail.com');
@@ -34,13 +42,34 @@ export default function Contact() {
     setTimeout(() => setCopiedPhone(false), 2500);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mailtoSubject = encodeURIComponent(formData.subject || `Inquiry from ${formData.name || 'Portfolio Visitor'}`);
-    const mailtoBody = encodeURIComponent(
-      `Hi Eldion,\n\nName: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    );
-    window.location.href = `mailto:nayrnoidle@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setStatusMessage('');
+
+    try {
+      await submitContactMessage(formData);
+      setSubmitStatus('success');
+      setStatusMessage('Thank you! Your message has been sent directly to Eldion.');
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: '',
+      });
+    } catch (err: unknown) {
+      console.error('Error submitting message to Supabase:', err);
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      setSubmitStatus('error');
+      setStatusMessage(
+        errMsg.includes('relation "contact_messages" does not exist')
+          ? 'Database table "contact_messages" not created yet. Please execute the SQL table script in Supabase.'
+          : 'Failed to send message via database. You can also reach out directly via email.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -187,6 +216,26 @@ export default function Contact() {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {submitStatus === 'success' && (
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm flex items-start gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold text-white">Message Delivered!</div>
+                    <div className="text-xs text-emerald-300/90 mt-0.5">{statusMessage}</div>
+                  </div>
+                </div>
+              )}
+
+              {submitStatus === 'error' && (
+                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                  <div className="flex-grow">
+                    <div className="font-semibold text-white">Delivery Error</div>
+                    <div className="text-xs text-rose-300/90 mt-0.5">{statusMessage}</div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
@@ -195,10 +244,11 @@ export default function Contact() {
                   <input
                     type="text"
                     required
+                    disabled={isSubmitting}
                     placeholder="e.g. Alex Tan"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -208,10 +258,11 @@ export default function Contact() {
                   <input
                     type="email"
                     required
+                    disabled={isSubmitting}
                     placeholder="alex@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -223,10 +274,11 @@ export default function Contact() {
                 <input
                   type="text"
                   required
+                  disabled={isSubmitting}
                   placeholder="Internship opportunity / Project inquiry"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
                 />
               </div>
 
@@ -237,19 +289,30 @@ export default function Contact() {
                 <textarea
                   rows={4}
                   required
+                  disabled={isSubmitting}
                   placeholder="Hi Eldion, I'd like to talk about..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none disabled:opacity-50"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <Send className="w-4 h-4" />
-                <span>Compose &amp; Send Message</span>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Sending to Eldion...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>Send Message</span>
+                  </>
+                )}
               </button>
             </form>
           </div>

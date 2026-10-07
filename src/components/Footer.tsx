@@ -1,4 +1,4 @@
-import { ArrowUp, Mail } from 'lucide-react';
+import { ArrowUp, Mail, Lock } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 
 export default function Footer() {
@@ -13,9 +13,13 @@ export default function Footer() {
           
           {/* Logo & Bio info */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-400">
+            <a
+              href="#inbox"
+              className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-400 hover:scale-105 transition-transform"
+              title="EG Portal"
+            >
               EG
-            </div>
+            </a>
             <div>
               <div className="text-sm font-bold text-white">Eldion Ryan Godius</div>
               <div className="text-xs text-slate-300">Software Engineering Student @ UMS</div>
@@ -73,9 +77,17 @@ export default function Footer() {
 
         <div className="mt-8 pt-8 border-t border-slate-900 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>© {new Date().getFullYear()} Eldion Ryan Godius. All rights reserved.</p>
-          <p className="flex items-center gap-1.5 text-slate-400">
-            Built with React, TypeScript &amp; Tailwind CSS
-          </p>
+          <div className="flex items-center gap-2 text-slate-400">
+            <span>Built with React, TypeScript &amp; Tailwind CSS</span>
+            <a
+              href="#inbox"
+              className="opacity-25 hover:opacity-100 hover:text-indigo-400 transition-all p-1"
+              title="Secret Messages Inbox"
+              aria-label="Secret Inbox"
+            >
+              <Lock className="w-3 h-3" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
