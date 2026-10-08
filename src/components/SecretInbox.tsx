@@ -64,6 +64,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       loadMessages();
     }
   }, [isAuthenticated]);
