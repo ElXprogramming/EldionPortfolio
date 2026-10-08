@@ -7,10 +7,14 @@ import {
   Check, 
   Sparkles,
   MapPin,
-  GraduationCap
+  GraduationCap,
+  RotateCcw,
+  Layers,
+  BrainCircuit
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
-import eldionAvatar from '../assets/eldion.png';
+import eldionPortrait from '../assets/eldion-portrait.jpg';
+import FlipCard from './FlipCard';
 
 export default function Hero() {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -154,53 +158,172 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column: High-Res Profile Card */}
+          {/* Right Column: Interactive 3D FlipCard with Portrait & Info */}
           <div className="lg:col-span-5 flex justify-center items-center">
-            <div className="relative group max-w-[340px] sm:max-w-[380px] w-full">
-              
-              {/* Outer decorative ambient glow ring */}
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-purple-500 via-[#B497CF] to-indigo-500 rounded-3xl blur-xl opacity-60 group-hover:opacity-85 transition duration-700 group-hover:duration-300"></div>
+            <div className="relative group">
+              {/* Outer decorative ambient glow ring behind card */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-purple-600/30 via-[#B497CF]/25 to-indigo-600/30 rounded-[30px] blur-xl opacity-75 group-hover:opacity-100 transition duration-500 pointer-events-none" />
 
-              {/* Main Card Shell */}
-              <div className="relative rounded-3xl bg-slate-900/90 border border-slate-700/60 p-4 sm:p-5 shadow-2xl backdrop-blur-xl">
-                
-                {/* Photo frame with rounded corners and gradient border */}
-                <div className="relative aspect-[4/4.5] w-full overflow-hidden rounded-2xl bg-slate-950 border border-slate-800">
-                  <img
-                    src={eldionAvatar}
-                    alt="Eldion Ryan Godius"
-                    className="w-full h-full object-cover object-top filter brightness-[1.02] contrast-[1.03] transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-                  
-                  {/* Floating badge inside photo */}
-                  <div className="absolute bottom-3 left-3 right-3 p-3 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800/80">
-                    <p className="text-xs font-bold text-white tracking-wide">
-                      Eldion Ryan Godius
-                    </p>
-                    <p className="text-[11px] text-purple-300 font-medium">
-                      B.CompSc (Software Engineering) • UMS
-                    </p>
-                  </div>
-                </div>
+              <FlipCard
+                axis="y"
+                flipOnClick
+                draggable
+                tilt
+                tiltMax={14}
+                glare
+                glareOpacity={0.28}
+                hoverScale={1.03}
+                perspective={1100}
+                stiffness={180}
+                damping={20}
+                width={340}
+                height={460}
+                radius={24}
+                background="#0d0818"
+                color="#f8fafc"
+                shadow
+                shadowColor="#a855f7"
+                shadowOpacity={0.35}
+                ariaLabel="Eldion Ryan Godius 3D Profile Card"
+                front={
+                  <div className="relative w-full h-full flex flex-col justify-between p-4.5 select-none overflow-hidden">
+                    {/* Portrait Photo */}
+                    <img
+                      src={eldionPortrait}
+                      alt="Eldion Ryan Godius"
+                      className="absolute inset-0 w-full h-full object-cover object-top filter brightness-[1.02] contrast-[1.03]"
+                      draggable={false}
+                    />
+                    
+                    {/* Cinematic vignettes for maximum contrast and aesthetics */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080511] via-[#080511]/30 to-[#080511]/20 pointer-events-none" />
 
-                {/* Quick stats mini-bar */}
-                <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-800/80 text-center">
-                  <div className="p-2 rounded-xl bg-slate-950/60 border border-slate-800/50">
-                    <div className="text-base font-bold text-white">2023+</div>
-                    <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">UMS SE</div>
-                  </div>
-                  <div className="p-2 rounded-xl bg-slate-950/60 border border-slate-800/50">
-                    <div className="text-base font-bold text-purple-400">Full Stack</div>
-                    <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">Focus</div>
-                  </div>
-                  <div className="p-2 rounded-xl bg-slate-950/60 border border-slate-800/50">
-                    <div className="text-base font-bold text-[#B497CF]">LLM &amp; RAG</div>
-                    <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">AI Solns</div>
-                  </div>
-                </div>
+                    {/* Top corner pills */}
+                    <div className="relative z-10 flex items-center justify-between w-full">
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#080511]/75 backdrop-blur-md border border-purple-500/30 text-[11px] text-purple-200 font-medium shadow-md">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span>Software Engineer</span>
+                      </div>
 
-              </div>
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#080511]/75 backdrop-blur-md border border-purple-500/30 text-[10px] text-purple-300 font-semibold tracking-wider uppercase shadow-md">
+                        <RotateCcw className="w-3 h-3 text-[#B497CF]" />
+                        <span>Flip 3D</span>
+                      </div>
+                    </div>
+
+                    {/* Bottom identity plaque */}
+                    <div className="relative z-10 p-3.5 rounded-2xl bg-[#080511]/85 backdrop-blur-md border border-purple-500/25 shadow-2xl">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-base font-bold text-white tracking-wide">
+                            Eldion Ryan Godius
+                          </h3>
+                          <p className="text-[11px] text-[#B497CF] font-medium mt-0.5">
+                            B.CompSc (Software Engineering) • UMS
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 pt-2 border-t border-purple-500/20 flex items-center justify-between text-[10px] text-slate-300">
+                        <span className="flex items-center gap-1 text-purple-300">
+                          <Sparkles className="w-3 h-3 text-[#B497CF]" />
+                          Full-Stack &amp; AI Solns
+                        </span>
+                        <span className="text-slate-400">Drag or click to turn →</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+                back={
+                  <div className="relative w-full h-full flex flex-col justify-between p-5 select-none bg-gradient-to-b from-[#130b24] via-[#0d0718] to-[#080511] border border-purple-500/30 rounded-[24px] overflow-hidden text-left">
+                    {/* Atmospheric glow inside back face */}
+                    <div className="absolute -top-12 -right-12 w-44 h-44 bg-purple-600/20 rounded-full blur-2xl pointer-events-none" />
+                    <div className="absolute -bottom-12 -left-12 w-44 h-44 bg-indigo-600/20 rounded-full blur-2xl pointer-events-none" />
+
+                    <div>
+                      {/* Card Header */}
+                      <div className="flex items-center justify-between pb-3 border-b border-purple-500/20">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center font-bold text-sm text-purple-200">
+                            EG
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-white">Eldion Ryan Godius</h4>
+                            <p className="text-[10px] text-purple-300">Developer Profile &amp; Focus</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-[10px] text-purple-300 bg-purple-950/60 px-2 py-1 rounded-md border border-purple-700/40 font-medium">
+                          <RotateCcw className="w-3 h-3 text-[#B497CF]" />
+                          <span>Flip</span>
+                        </div>
+                      </div>
+
+                      {/* Bio & Education highlights */}
+                      <div className="space-y-2.5 mt-3.5 text-xs">
+                        <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80">
+                          <div className="flex items-center gap-1.5 text-purple-300 font-semibold mb-0.5 text-[11px]">
+                            <GraduationCap className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                            <span>Universiti Malaysia Sabah</span>
+                          </div>
+                          <p className="text-[10px] text-slate-300 leading-snug">
+                            B.CompSc (Software Engineering) • 2023–Present
+                          </p>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80">
+                          <div className="flex items-center gap-1.5 text-[#B497CF] font-semibold mb-0.5 text-[11px]">
+                            <Layers className="w-3.5 h-3.5 text-[#B497CF] shrink-0" />
+                            <span>Full-Stack Engineering</span>
+                          </div>
+                          <p className="text-[10px] text-slate-300 leading-snug">
+                            React, TypeScript, Node.js, PostgreSQL, Tailwind, REST APIs
+                          </p>
+                        </div>
+
+                        <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/80">
+                          <div className="flex items-center gap-1.5 text-amber-300 font-semibold mb-0.5 text-[11px]">
+                            <BrainCircuit className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>AI &amp; RAG Systems</span>
+                          </div>
+                          <p className="text-[10px] text-slate-300 leading-snug">
+                            RAG pipelines, Ollama local models (Qwen, GLM), JSON schemas
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick stats mini-bar & direct info */}
+                    <div className="pt-3 border-t border-purple-500/20">
+                      <div className="grid grid-cols-3 gap-1.5 text-center mb-2.5">
+                        <div className="p-1.5 rounded-lg bg-slate-950/90 border border-purple-500/20">
+                          <div className="text-xs font-bold text-white">2023+</div>
+                          <div className="text-[9px] text-purple-300 uppercase tracking-wider">UMS SE</div>
+                        </div>
+                        <div className="p-1.5 rounded-lg bg-slate-950/90 border border-purple-500/20">
+                          <div className="text-xs font-bold text-[#B497CF]">Full Stack</div>
+                          <div className="text-[9px] text-slate-300 uppercase tracking-wider">Focus</div>
+                        </div>
+                        <div className="p-1.5 rounded-lg bg-slate-950/90 border border-purple-500/20">
+                          <div className="text-xs font-bold text-emerald-400">RAG / AI</div>
+                          <div className="text-[9px] text-slate-300 uppercase tracking-wider">Solns</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px] text-slate-400 px-1">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-rose-400" />
+                          Sabah, Malaysia
+                        </span>
+                        <span className="text-[#B497CF] font-medium">nayrnoidle@gmail.com</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              />
             </div>
           </div>
 
