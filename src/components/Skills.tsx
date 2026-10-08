@@ -89,12 +89,12 @@ export default function Skills() {
   ];
 
   return (
-    <section id="skills" className="py-24 relative bg-slate-950/40">
+    <section id="skills" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Title */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Layers className="w-3.5 h-3.5" />
             Technical Stack
           </div>
@@ -124,7 +124,7 @@ export default function Skills() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
+                      <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
                         {cat.title}
                       </h3>
                       <span className="text-xs text-slate-400 font-medium">
@@ -145,12 +145,12 @@ export default function Skills() {
                       key={sIdx}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         skill.highlight
-                          ? 'bg-indigo-950/70 text-indigo-200 border border-indigo-700/50 shadow-xs'
+                          ? 'bg-purple-950/70 text-purple-200 border border-purple-700/50 shadow-xs'
                           : 'bg-slate-950/80 text-slate-300 border border-slate-800/80 hover:border-slate-700'
                       }`}
                     >
                       {skill.highlight && (
-                        <CheckCircle2 className="w-3 h-3 text-indigo-400 shrink-0" />
+                        <CheckCircle2 className="w-3 h-3 text-[#B497CF] shrink-0" />
                       )}
                       <span>{skill.name}</span>
                     </span>

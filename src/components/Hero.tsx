@@ -22,23 +22,23 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
-      {/* Background radial glow accents */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-indigo-600/15 rounded-full blur-[130px] pointer-events-none -z-10" />
-      <div className="absolute top-1/3 left-1/4 w-[350px] h-[350px] bg-sky-500/10 rounded-full blur-[110px] pointer-events-none -z-10" />
-      <div className="absolute top-1/2 right-1/4 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
-
-      {/* Decorative background grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none -z-10" />
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[660px]">
+      {/* Ambient subtle glow lights for the Hero area */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute top-1/4 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-[#B497CF]/10 rounded-full blur-[130px] pointer-events-none" />
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
           {/* Left Column: Bio & Introduction */}
-          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-            
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left relative z-10">
+            {/* Soft dark aura behind text for clean readability while letting pixels shine around */}
+            <div className="absolute -inset-6 -z-10 bg-gradient-to-r from-[#080511]/90 via-[#080511]/60 to-transparent blur-2xl pointer-events-none rounded-3xl" />
+
             {/* Status pill badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-indigo-500/30 text-indigo-300 text-xs sm:text-sm font-medium mb-6 shadow-sm backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-purple-500/30 text-purple-300 text-xs sm:text-sm font-medium mb-6 shadow-sm backdrop-blur-md">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -47,7 +47,7 @@ export default function Hero() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_2px_12px_rgba(8,5,17,0.9)]">
               Hi, I'm{' '}
               <span className="text-gradient">
                 Eldion Ryan
@@ -56,17 +56,17 @@ export default function Hero() {
             </h1>
 
             {/* Core Summary */}
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-6 max-w-2xl">
+            <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-6 max-w-2xl drop-shadow-[0_1px_6px_rgba(8,5,17,0.9)]">
               Software engineering student eager to learn and gather new experiences through solving real-world problems. 
-              Experienced in <span className="text-indigo-400 font-semibold">full-stack web development</span> and 
-              implementing <span className="text-sky-400 font-semibold">LLM solutions</span>, with strong proficiency in 
+              Experienced in <span className="text-purple-300 font-semibold">full-stack web development</span> and 
+              implementing <span className="text-[#B497CF] font-semibold">LLM solutions</span>, with strong proficiency in 
               modern JavaScript, TypeScript, CSS, SQL, and Python.
             </p>
 
             {/* Academic & Location Quick Badges */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-8 text-xs sm:text-sm text-slate-300">
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
-                <GraduationCap className="w-4 h-4 text-indigo-400" />
+                <GraduationCap className="w-4 h-4 text-purple-400" />
                 <span>Universiti Malaysia Sabah</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
@@ -74,7 +74,7 @@ export default function Hero() {
                 <span>Sabah, Malaysia</span>
               </div>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/80 border border-slate-800">
-                <Sparkles className="w-4 h-4 text-amber-400" />
+                <Sparkles className="w-4 h-4 text-[#B497CF]" />
                 <span>RAG &amp; Full-Stack Builder</span>
               </div>
             </div>
@@ -83,7 +83,7 @@ export default function Hero() {
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 mb-8 w-full sm:w-auto">
               <a
                 href="#projects"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/50 transition-all duration-200 group text-sm sm:text-base w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 transition-all duration-200 group text-sm sm:text-base w-full sm:w-auto cursor-pointer"
               >
                 Explore Projects
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -92,9 +92,9 @@ export default function Hero() {
               <a
                 href="/Eldion_Ryan_Godius_Resume.pdf"
                 download="Eldion_Ryan_Godius_Resume.pdf"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 transition-all duration-200 shadow-sm text-sm sm:text-base w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 transition-all duration-200 shadow-sm text-sm sm:text-base w-full sm:w-auto cursor-pointer"
               >
-                <Download className="w-4 h-4 text-indigo-400" />
+                <Download className="w-4 h-4 text-purple-400" />
                 Download CV
               </a>
             </div>
@@ -111,7 +111,7 @@ export default function Hero() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
               >
-                <GithubIcon className="w-3.5 h-3.5 text-indigo-400" />
+                <GithubIcon className="w-3.5 h-3.5 text-purple-400" />
                 GitHub
               </a>
 
@@ -121,7 +121,7 @@ export default function Hero() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
               >
-                <LinkedinIcon className="w-3.5 h-3.5 text-sky-400" />
+                <LinkedinIcon className="w-3.5 h-3.5 text-[#B497CF]" />
                 LinkedIn
               </a>
 
@@ -159,7 +159,7 @@ export default function Hero() {
             <div className="relative group max-w-[340px] sm:max-w-[380px] w-full">
               
               {/* Outer decorative ambient glow ring */}
-              <div className="absolute -inset-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-600 rounded-3xl blur-xl opacity-60 group-hover:opacity-85 transition duration-700 group-hover:duration-300"></div>
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-purple-500 via-[#B497CF] to-indigo-500 rounded-3xl blur-xl opacity-60 group-hover:opacity-85 transition duration-700 group-hover:duration-300"></div>
 
               {/* Main Card Shell */}
               <div className="relative rounded-3xl bg-slate-900/90 border border-slate-700/60 p-4 sm:p-5 shadow-2xl backdrop-blur-xl">
@@ -178,7 +178,7 @@ export default function Hero() {
                     <p className="text-xs font-bold text-white tracking-wide">
                       Eldion Ryan Godius
                     </p>
-                    <p className="text-[11px] text-indigo-300 font-medium">
+                    <p className="text-[11px] text-purple-300 font-medium">
                       B.CompSc (Software Engineering) • UMS
                     </p>
                   </div>
@@ -191,11 +191,11 @@ export default function Hero() {
                     <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">UMS SE</div>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-950/60 border border-slate-800/50">
-                    <div className="text-base font-bold text-indigo-400">Full Stack</div>
+                    <div className="text-base font-bold text-purple-400">Full Stack</div>
                     <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">Focus</div>
                   </div>
                   <div className="p-2 rounded-xl bg-slate-950/60 border border-slate-800/50">
-                    <div className="text-base font-bold text-sky-400">LLM &amp; RAG</div>
+                    <div className="text-base font-bold text-[#B497CF]">LLM &amp; RAG</div>
                     <div className="text-[10px] text-slate-300 font-medium uppercase tracking-wider">AI Solns</div>
                   </div>
                 </div>

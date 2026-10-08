@@ -39,8 +39,8 @@ export default function Navbar({ activeSection }: NavbarProps) {
           href="#"
           className="group flex items-center gap-3 text-slate-100 hover:text-white transition-colors"
         >
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-sky-400 p-[1px] shadow-md shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow">
-            <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">
+          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-[#B497CF] to-indigo-400 p-[1px] shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+            <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-[#B497CF] to-purple-300">
               EG
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 href={link.href}
                 className={`px-3.5 py-1.5 text-xs lg:text-sm font-medium rounded-full transition-all duration-200 ${
                   isActive
-                    ? 'text-white bg-indigo-600/30 text-indigo-300 shadow-sm'
+                    ? 'text-white bg-purple-600/30 text-purple-300 border border-purple-500/30 shadow-sm'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
                 }`}
               >
@@ -83,15 +83,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
             href="/Eldion_Ryan_Godius_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 transition-all duration-200 shadow-sm group"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 transition-all duration-200 shadow-sm group cursor-pointer"
           >
-            <FileText className="w-4 h-4 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
+            <FileText className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-colors" />
             Resume
             <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
           <a
             href="#contact"
-            className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-all duration-200 shadow-md shadow-indigo-600/25 hover:shadow-indigo-600/40"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-md shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
           >
             Get in Touch
           </a>
@@ -127,15 +127,15 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-200 bg-slate-900 border border-slate-700/80"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-200 bg-slate-900 border border-slate-700/80 cursor-pointer"
               >
-                <FileText className="w-4 h-4 text-indigo-400" />
+                <FileText className="w-4 h-4 text-purple-400" />
                 View Resume (PDF)
               </a>
               <a
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600"
+                className="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 cursor-pointer"
               >
                 Get in Touch
               </a>

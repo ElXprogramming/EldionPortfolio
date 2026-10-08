@@ -8,6 +8,7 @@ import Education from './components/Education';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import SecretInbox from './components/SecretInbox';
+import PixelBlast from './components/PixelBlast';
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
@@ -103,10 +104,38 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="min-h-screen bg-[#080511] text-slate-100 flex flex-col selection:bg-[#B497CF]/30 selection:text-purple-200 relative">
+      {/* Whole-page Fixed Background Canvas & Soft Atmospheric Lighting */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <PixelBlast
+          variant="circle"
+          pixelSize={6}
+          color="#B497CF"
+          patternScale={3}
+          patternDensity={1.2}
+          pixelSizeJitter={0.5}
+          enableRipples
+          rippleSpeed={0.4}
+          rippleThickness={0.12}
+          rippleIntensityScale={1.5}
+          liquid
+          liquidStrength={0.12}
+          liquidRadius={1.2}
+          liquidWobbleSpeed={5}
+          speed={0.5}
+          edgeFade={0.25}
+          transparent
+        />
+
+        {/* Ambient atmospheric glow orbs positioned across the page height */}
+        <div className="absolute top-[5%] left-[10%] w-[500px] h-[500px] bg-purple-700/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-[40%] right-[5%] w-[600px] h-[600px] bg-indigo-700/10 rounded-full blur-[160px] pointer-events-none" />
+        <div className="absolute top-[75%] left-[15%] w-[550px] h-[550px] bg-purple-600/10 rounded-full blur-[150px] pointer-events-none" />
+      </div>
+
       <Navbar activeSection={activeSection} />
       
-      <main className="flex-grow">
+      <main className="flex-grow relative z-10">
         <Hero />
         <About />
         <Skills />
@@ -115,7 +144,9 @@ export default function App() {
         <Contact />
       </main>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function Projects() {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             Featured Work
           </div>
@@ -27,7 +27,7 @@ export default function Projects() {
         </div>
 
         {/* Flagship Project: Declaraform */}
-        <div className="glass-card rounded-2xl overflow-hidden border border-slate-800/80 bg-slate-900/60 transition-all duration-300 hover:border-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/5 group mb-8">
+        <div className="glass-card rounded-2xl overflow-hidden border border-slate-800/80 bg-slate-900/60 transition-all duration-300 hover:border-purple-500/40 hover:shadow-2xl hover:shadow-purple-500/10 group mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
             
             {/* Visual Preview Column */}
@@ -46,7 +46,7 @@ export default function Projects() {
                     href="https://declaraform.netlify.app/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600/90 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-600/90 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:bg-purple-500 transition-colors"
                   >
                     <span>Visit Live Site</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -78,11 +78,11 @@ export default function Projects() {
                   </span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight group-hover:text-indigo-300 transition-colors">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
                   Declaraform
                 </h3>
                 
-                <p className="text-sm font-semibold text-indigo-400/90 mb-4">
+                <p className="text-sm font-semibold text-purple-300/90 mb-4">
                   Automated UMS Declaration Form PDF Generator
                 </p>
 
@@ -142,7 +142,7 @@ export default function Projects() {
                   href="https://declaraform.netlify.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all duration-200"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-purple-600 hover:bg-purple-500 shadow-md shadow-purple-600/25 transition-all duration-200 cursor-pointer"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Launch Application
@@ -152,7 +152,7 @@ export default function Projects() {
                   href="https://github.com/ElXprogramming/declaration-form-filler"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
                 >
                   <GithubIcon className="w-4 h-4 text-slate-300" />
                   View Source Code
@@ -167,7 +167,7 @@ export default function Projects() {
         {/* Future / In Development Callout Card */}
         <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/40 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3.5">
-            <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
@@ -184,9 +184,9 @@ export default function Projects() {
             href="https://github.com/ElXprogramming"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-colors shrink-0"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-colors shrink-0 cursor-pointer"
           >
-            <GithubIcon className="w-4 h-4 text-indigo-400" />
+            <GithubIcon className="w-4 h-4 text-purple-400" />
             <span>Follow on GitHub</span>
           </a>
         </div>

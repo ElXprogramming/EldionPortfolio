@@ -141,11 +141,11 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   // Render Lock Screen if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative selection:bg-[#B497CF]/30 selection:text-purple-200">
         <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
 
         <div className="glass-panel max-w-md w-full p-8 rounded-3xl border border-slate-800/80 shadow-2xl relative z-10">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center mx-auto mb-6 text-indigo-400">
+          <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mx-auto mb-6 text-purple-300">
             <Lock className="w-7 h-7" />
           </div>
 
@@ -170,7 +170,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                 className={`w-full px-4 py-3 rounded-xl bg-slate-900 border text-center tracking-widest text-lg font-mono text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
                   pinError
                     ? 'border-rose-500 ring-1 ring-rose-500'
-                    : 'border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500'
+                    : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
                 }`}
               />
               {pinError && (
@@ -182,7 +182,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-white shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Unlock className="w-4 h-4" />
               <span>Unlock Messages</span>
@@ -190,7 +190,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-            <span>Passcode can be changed via <code className="text-indigo-400">VITE_ADMIN_PIN</code></span>
+            <span>Passcode can be changed via <code className="text-purple-400">VITE_ADMIN_PIN</code></span>
             <button
               onClick={onBackToHome}
               className="text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
@@ -206,7 +206,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   // Render Inbox Dashboard
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-[#B497CF]/30 selection:text-purple-200">
       <div className="fixed inset-0 bg-grid-pattern opacity-15 pointer-events-none" />
 
       {/* Top Navigation Bar */}
@@ -225,12 +225,12 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
             <div className="h-5 w-px bg-slate-800" />
 
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+              <div className="p-1.5 rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <h1 className="font-bold text-white text-base sm:text-lg">Secret Inbox</h1>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-500 text-white">
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-purple-600 text-white">
                   {unreadCount} new
                 </span>
               )}
@@ -244,7 +244,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer disabled:opacity-50"
               title="Refresh messages"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-indigo-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-purple-400' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
@@ -272,7 +272,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               placeholder="Search sender, email, subject, or message..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
             />
           </div>
 
@@ -281,7 +281,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               onClick={() => setFilterMode('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'all'
-                  ? 'bg-indigo-600 text-white font-semibold'
+                  ? 'bg-purple-600 text-white font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -291,7 +291,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               onClick={() => setFilterMode('unread')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'unread'
-                  ? 'bg-indigo-600 text-white font-semibold'
+                  ? 'bg-purple-600 text-white font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -301,7 +301,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               onClick={() => setFilterMode('read')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'read'
-                  ? 'bg-indigo-600 text-white font-semibold'
+                  ? 'bg-purple-600 text-white font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -364,7 +364,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                 className={`glass-panel rounded-2xl p-5 sm:p-6 border transition-all ${
                   msg.is_read
                     ? 'border-slate-800/60 bg-slate-950/40 opacity-80 hover:opacity-100'
-                    : 'border-indigo-500/40 bg-slate-900/60 shadow-lg shadow-indigo-950/20 ring-1 ring-indigo-500/20'
+                    : 'border-purple-500/40 bg-slate-900/60 shadow-lg shadow-purple-950/20 ring-1 ring-purple-500/20'
                 }`}
               >
                 {/* Header: Sender & Meta */}
@@ -374,7 +374,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                       className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
                         msg.is_read
                           ? 'bg-slate-800 text-slate-400'
-                          : 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                          : 'bg-purple-600/20 text-purple-300 border border-purple-500/30'
                       }`}
                     >
                       {msg.name.slice(0, 2).toUpperCase()}
@@ -383,7 +383,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-white text-base">{msg.name}</span>
                         {!msg.is_read && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">
                             New
                           </span>
                         )}
@@ -391,7 +391,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                       <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
                         <a
                           href={`mailto:${msg.email}`}
-                          className="hover:text-indigo-400 transition-colors"
+                          className="hover:text-purple-300 transition-colors"
                         >
                           {msg.email}
                         </a>
@@ -421,7 +421,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                   <div className="text-xs uppercase font-bold tracking-wider text-slate-400 mb-0.5">
                     Subject
                   </div>
-                  <h4 className="text-sm font-semibold text-indigo-300">{msg.subject}</h4>
+                  <h4 className="text-sm font-semibold text-purple-300">{msg.subject}</h4>
                 </div>
 
                 {/* Message Body */}
@@ -456,7 +456,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
                   <a
                     href={mailtoReply}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/20 transition-all cursor-pointer"
                   >
                     <Mail className="w-3.5 h-3.5" />
                     <span>Reply via Email</span>

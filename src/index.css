@@ -8,7 +8,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #030712; /* gray-950 */
+  background-color: #080511; /* deep dark violet-black */
   color: #f3f4f6;
   overflow-x: hidden;
 }
@@ -34,14 +34,14 @@ code, pre, .font-mono {
 }
 
 .glass-card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
+  border-color: rgba(180, 151, 207, 0.45);
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 12px 30px -10px rgba(180, 151, 207, 0.2);
 }
 
 /* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+  background: linear-gradient(135deg, #e9d5ff 0%, #B497CF 45%, #a855f7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

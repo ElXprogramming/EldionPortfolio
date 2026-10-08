@@ -31,7 +31,7 @@ export default function About() {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <User className="w-3.5 h-3.5" />
             Background &amp; Philosophy
           </div>
@@ -59,7 +59,7 @@ export default function About() {
               
               <p>
                 My journey centers around practical, hands-on building: from engineering 
-                <span className="text-indigo-400 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
+                <span className="text-purple-400 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
               </p>
 
               <p>
@@ -90,10 +90,10 @@ export default function About() {
               return (
                 <div
                   key={idx}
-                  className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 transition-all hover:border-indigo-500/40"
+                  className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 transition-all hover:border-purple-500/40"
                 >
                   <div className="flex items-start gap-3.5">
-                    <div className="p-2.5 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 shrink-0 mt-0.5">
+                    <div className="p-2.5 rounded-xl bg-purple-600/20 text-purple-300 border border-purple-500/30 shrink-0 mt-0.5">
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>

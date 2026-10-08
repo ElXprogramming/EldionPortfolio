@@ -78,7 +78,7 @@ export default function Contact() {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Mail className="w-3.5 h-3.5" />
             Get in Touch
           </div>
@@ -105,7 +105,7 @@ export default function Contact() {
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Email</div>
                   <a
                     href="mailto:nayrnoidle@gmail.com"
-                    className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors truncate block"
+                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
                   >
                     nayrnoidle@gmail.com
                   </a>
@@ -134,7 +134,7 @@ export default function Contact() {
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Phone / WhatsApp</div>
                   <a
                     href="tel:0178201365"
-                    className="text-sm font-semibold text-white hover:text-indigo-400 transition-colors truncate block"
+                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
                   >
                     017-820 1365
                   </a>
@@ -158,7 +158,7 @@ export default function Contact() {
               href="https://www.linkedin.com/in/eldion-ryan-godius-897064235"
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block"
+              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div className="p-3 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
@@ -179,15 +179,15 @@ export default function Contact() {
               href="https://github.com/ElXprogramming"
               target="_blank"
               rel="noopener noreferrer"
-              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block"
+              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+                <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
                   <GithubIcon className="w-5 h-5" />
                 </div>
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">GitHub</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors truncate">
+                  <div className="text-sm font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
                     @ElXprogramming
                   </div>
                 </div>
@@ -206,7 +206,7 @@ export default function Contact() {
           {/* Quick Interactive Message Form (7 cols) */}
           <div className="lg:col-span-7 glass-panel rounded-2xl p-7 sm:p-9 border border-slate-800/80 shadow-xl">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
+              <Sparkles className="w-4 h-4 text-purple-400" />
               <h3 className="text-xl font-bold text-white">
                 Send a Message
               </h3>
@@ -248,7 +248,7 @@ export default function Contact() {
                     placeholder="e.g. Alex Tan"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
                 <div>
@@ -262,7 +262,7 @@ export default function Contact() {
                     placeholder="alex@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -278,7 +278,7 @@ export default function Contact() {
                   placeholder="Internship opportunity / Project inquiry"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                 />
               </div>
 
@@ -293,14 +293,14 @@ export default function Contact() {
                   placeholder="Hi Eldion, I'd like to talk about..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors resize-none disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors resize-none disabled:opacity-50"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-purple-600 hover:bg-purple-500 shadow-md shadow-purple-600/25 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <>

@@ -7,7 +7,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-t border-slate-800/80 bg-slate-950 py-12 relative">
+    <footer className="border-t border-slate-800/80 bg-slate-950/70 backdrop-blur-md py-12 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           
@@ -15,7 +15,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <a
               href="#inbox"
-              className="w-8 h-8 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-bold text-sm text-indigo-400 hover:scale-105 transition-transform"
+              className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center font-bold text-sm text-purple-300 hover:scale-105 transition-transform"
               title="EG Portal"
             >
               EG
@@ -65,7 +65,7 @@ export default function Footer() {
 
             <button
               onClick={scrollToTop}
-              className="p-2 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-600 hover:text-white transition-all ml-2 cursor-pointer"
+              className="p-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 hover:bg-purple-600 hover:text-white transition-all ml-2 cursor-pointer"
               aria-label="Scroll to top"
               title="Back to top"
             >
@@ -81,7 +81,7 @@ export default function Footer() {
             <span>Built with React, TypeScript &amp; Tailwind CSS</span>
             <a
               href="#inbox"
-              className="opacity-25 hover:opacity-100 hover:text-indigo-400 transition-all p-1"
+              className="opacity-25 hover:opacity-100 hover:text-purple-400 transition-all p-1"
               title="Secret Messages Inbox"
               aria-label="Secret Inbox"
             >
