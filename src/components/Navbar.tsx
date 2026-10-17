@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, FileText, ArrowUpRight } from 'lucide-react';
+import { sanitizeInternalRoute } from '../lib/security';
 
 interface NavbarProps {
   activeSection: string;
 }
+
+const RESUME_PATH = sanitizeInternalRoute('/Eldion_Ryan_Godius_Resume.pdf');
 
 export default function Navbar({ activeSection }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,11 +21,11 @@ export default function Navbar({ activeSection }: NavbarProps) {
   }, []);
 
   const navLinks = [
-    { label: 'About', href: '#about' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Education', href: '#education' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'About', href: sanitizeInternalRoute('#about') },
+    { label: 'Skills', href: sanitizeInternalRoute('#skills') },
+    { label: 'Projects', href: sanitizeInternalRoute('#projects') },
+    { label: 'Education', href: sanitizeInternalRoute('#education') },
+    { label: 'Contact', href: sanitizeInternalRoute('#contact') },
   ];
 
   return (
@@ -80,7 +83,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
         {/* Actions */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="/Eldion_Ryan_Godius_Resume.pdf"
+            href={RESUME_PATH}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 hover:border-slate-600 transition-all duration-200 shadow-sm group cursor-pointer"
@@ -90,7 +93,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
             <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </a>
           <a
-            href="#contact"
+            href={sanitizeInternalRoute('#contact')}
             className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-md shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
           >
             Get in Touch
@@ -123,7 +126,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
             ))}
             <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
               <a
-                href="/Eldion_Ryan_Godius_Resume.pdf"
+                href={RESUME_PATH}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
@@ -133,7 +136,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 View Resume (PDF)
               </a>
               <a
-                href="#contact"
+                href={sanitizeInternalRoute('#contact')}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 cursor-pointer"
               >

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Lock,
   Unlock,
@@ -14,27 +14,28 @@ import {
   AlertCircle,
   Copy,
   Check,
-  Inbox as InboxIcon
+  Inbox as InboxIcon,
 } from 'lucide-react';
 import {
   fetchContactMessages,
   toggleMessageReadStatus,
   deleteContactMessage,
+  signInAdmin,
+  signOutAdmin,
+  getAdminSessionEmail,
   type ContactMessage,
 } from '../lib/supabase';
+import { createSafeErrorMessage, sanitizeMailtoUrl } from '../lib/security';
 
 interface SecretInboxProps {
   onBackToHome: () => void;
 }
 
-const DEFAULT_PIN = import.meta.env.VITE_ADMIN_PIN || 'eldion';
-
 export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem('eldion_inbox_authenticated') === 'true';
-  });
-  const [pinInput, setPinInput] = useState('');
-  const [pinError, setPinError] = useState(false);
+  const [authenticatedEmail, setAuthenticatedEmail] = useState<string | null>(null);
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,60 +44,76 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   const [filterMode, setFilterMode] = useState<'all' | 'unread' | 'read'>('all');
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
       const data = await fetchContactMessages();
       setMessages(data);
     } catch (err: unknown) {
-      console.error('Failed to load messages:', err);
-      const message = err instanceof Error ? err.message : 'Unknown error';
       setErrorMessage(
-        message.includes('relation "contact_messages" does not exist')
-          ? 'Table "contact_messages" was not found in your Supabase database. Please run the SQL schema in Supabase SQL Editor.'
-          : `Failed to load messages: ${message}`
+        createSafeErrorMessage(
+          err,
+          'Unable to load inbox messages. Verify your authenticated session and database policies.'
+        )
       );
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      loadMessages();
-    }
-  }, [isAuthenticated]);
+    let isMounted = true;
+    getAdminSessionEmail()
+      .then(async (email) => {
+        if (isMounted && email) {
+          setAuthenticatedEmail(email);
+          await loadMessages();
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setAuthenticatedEmail(null);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [loadMessages]);
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.trim() === DEFAULT_PIN) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('eldion_inbox_authenticated', 'true');
-      setPinError(false);
-      setPinInput('');
-    } else {
-      setPinError(true);
+    setIsAuthenticating(true);
+    setAuthErrorMessage(null);
+
+    try {
+      const email = await signInAdmin(credentials);
+      setAuthenticatedEmail(email);
+      setCredentials({ email: '', password: '' });
+      await loadMessages();
+    } catch (err: unknown) {
+      setAuthErrorMessage(
+        createSafeErrorMessage(err, 'Authentication failed. Please check your credentials.')
+      );
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
-  const handleLock = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('eldion_inbox_authenticated');
+  const handleLock = async () => {
+    await signOutAdmin();
+    setAuthenticatedEmail(null);
+    setMessages([]);
   };
 
   const handleToggleRead = async (message: ContactMessage) => {
     const newStatus = !message.is_read;
     try {
-      // Optimistic update
       setMessages((prev) =>
         prev.map((m) => (m.id === message.id ? { ...m, is_read: newStatus } : m))
       );
       await toggleMessageReadStatus(message.id, newStatus);
-    } catch (err) {
-      console.error('Failed to update read status:', err);
-      // Revert on error
+    } catch {
       loadMessages();
     }
   };
@@ -106,8 +123,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
     try {
       setMessages((prev) => prev.filter((m) => m.id !== id));
       await deleteContactMessage(id);
-    } catch (err) {
-      console.error('Failed to delete message:', err);
+    } catch {
       loadMessages();
     }
   };
@@ -119,12 +135,13 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   };
 
   const filteredMessages = useMemo(() => {
+    const normalizedQuery = searchQuery.toLowerCase();
     return messages.filter((msg) => {
       const matchesSearch =
-        msg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        msg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        msg.message.toLowerCase().includes(searchQuery.toLowerCase());
+        msg.name.toLowerCase().includes(normalizedQuery) ||
+        msg.email.toLowerCase().includes(normalizedQuery) ||
+        msg.subject.toLowerCase().includes(normalizedQuery) ||
+        msg.message.toLowerCase().includes(normalizedQuery);
 
       if (!matchesSearch) return false;
 
@@ -138,8 +155,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
     return messages.filter((m) => !m.is_read).length;
   }, [messages]);
 
-  // Render Lock Screen if not authenticated
-  if (!isAuthenticated) {
+  if (!authenticatedEmail) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative selection:bg-[#B497CF]/30 selection:text-purple-200">
         <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
@@ -152,46 +168,82 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           <div className="text-center mb-6">
             <h1 className="text-2xl font-extrabold text-white">Secret Inbox</h1>
             <p className="text-slate-400 text-xs sm:text-sm mt-1">
-              Enter your admin passcode to access portfolio messages
+              Sign in with your Supabase administrator account to view messages
             </p>
           </div>
 
           <form onSubmit={handleUnlock} className="space-y-4">
             <div>
+              <label
+                htmlFor="admin-email"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+              >
+                Admin Email
+              </label>
               <input
-                type="password"
+                id="admin-email"
+                type="email"
+                required
                 autoFocus
-                placeholder="Enter passcode..."
-                value={pinInput}
+                maxLength={254}
+                disabled={isAuthenticating}
+                placeholder="admin@example.com"
+                value={credentials.email}
                 onChange={(e) => {
-                  setPinInput(e.target.value);
-                  if (pinError) setPinError(false);
+                  setCredentials((prev) => ({ ...prev, email: e.target.value }));
+                  if (authErrorMessage) setAuthErrorMessage(null);
                 }}
-                className={`w-full px-4 py-3 rounded-xl bg-slate-900 border text-center tracking-widest text-lg font-mono text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
-                  pinError
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="admin-password"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+              >
+                Password
+              </label>
+              <input
+                id="admin-password"
+                type="password"
+                required
+                minLength={8}
+                maxLength={128}
+                disabled={isAuthenticating}
+                placeholder="Enter admin password..."
+                value={credentials.password}
+                onChange={(e) => {
+                  setCredentials((prev) => ({ ...prev, password: e.target.value }));
+                  if (authErrorMessage) setAuthErrorMessage(null);
+                }}
+                className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
+                  authErrorMessage
                     ? 'border-rose-500 ring-1 ring-rose-500'
                     : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
                 }`}
               />
-              {pinError && (
+              {authErrorMessage && (
                 <p className="text-rose-400 text-xs mt-2 text-center">
-                  Incorrect passcode. Please try again.
+                  {authErrorMessage}
                 </p>
               )}
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isAuthenticating}
+              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               <Unlock className="w-4 h-4" />
-              <span>Unlock Messages</span>
+              <span>{isAuthenticating ? 'Verifying...' : 'Unlock Messages'}</span>
             </button>
           </form>
 
           <div className="mt-6 pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-            <span>Passcode can be changed via <code className="text-purple-400">VITE_ADMIN_PIN</code></span>
+            <span>Protected by Supabase Auth &amp; RLS</span>
             <button
+              type="button"
               onClick={onBackToHome}
               className="text-slate-300 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
             >
@@ -204,7 +256,6 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
     );
   }
 
-  // Render Inbox Dashboard
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-[#B497CF]/30 selection:text-purple-200">
       <div className="fixed inset-0 bg-grid-pattern opacity-15 pointer-events-none" />
@@ -214,6 +265,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={onBackToHome}
               className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer"
               title="Return to Portfolio"
@@ -239,6 +291,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={loadMessages}
               disabled={isLoading}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer disabled:opacity-50"
@@ -249,9 +302,10 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
             </button>
 
             <button
+              type="button"
               onClick={handleLock}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer"
-              title="Lock inbox session"
+              title="Sign out and lock inbox session"
             >
               <Lock className="w-4 h-4" />
               <span className="hidden sm:inline">Lock</span>
@@ -262,13 +316,13 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
       {/* Main Content Area */}
       <main className="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        
         {/* Controls: Search & Filter Tabs */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
           <div className="relative flex-grow max-w-md">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
+              maxLength={150}
               placeholder="Search sender, email, subject, or message..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -278,6 +332,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-slate-800 self-start sm:self-auto">
             <button
+              type="button"
               onClick={() => setFilterMode('all')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'all'
@@ -288,6 +343,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               All ({messages.length})
             </button>
             <button
+              type="button"
               onClick={() => setFilterMode('unread')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'unread'
@@ -298,6 +354,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               Unread ({unreadCount})
             </button>
             <button
+              type="button"
               onClick={() => setFilterMode('read')}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 filterMode === 'read'
@@ -315,7 +372,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3 text-sm text-rose-300">
             <AlertCircle className="w-5 h-5 shrink-0 text-rose-400 mt-0.5" />
             <div>
-              <p className="font-semibold text-rose-200">Database Connection Notice</p>
+              <p className="font-semibold text-rose-200">Inbox Notice</p>
               <p className="mt-1 text-xs sm:text-sm text-rose-300/90">{errorMessage}</p>
             </div>
           </div>
@@ -325,7 +382,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         {isLoading && messages.length === 0 && (
           <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
             <RefreshCw className="w-8 h-8 animate-spin text-indigo-400" />
-            <p className="text-sm">Fetching messages from Supabase...</p>
+            <p className="text-sm">Fetching messages...</p>
           </div>
         )}
 
@@ -355,8 +412,8 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               minute: '2-digit',
             });
 
-            const replySubject = encodeURIComponent(`Re: ${msg.subject}`);
-            const mailtoReply = `mailto:${msg.email}?subject=${replySubject}`;
+            const safeSenderMailto = sanitizeMailtoUrl(msg.email);
+            const safeReplyMailto = sanitizeMailtoUrl(msg.email, msg.subject);
 
             return (
               <div
@@ -390,12 +447,13 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                       </div>
                       <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
                         <a
-                          href={`mailto:${msg.email}`}
+                          href={safeSenderMailto}
                           className="hover:text-purple-300 transition-colors"
                         >
                           {msg.email}
                         </a>
                         <button
+                          type="button"
                           onClick={() => handleCopyEmail(msg.email)}
                           className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
                           title="Copy email address"
@@ -433,6 +491,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/60">
                   <div className="flex items-center gap-2">
                     <button
+                      type="button"
                       onClick={() => handleToggleRead(msg)}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                         msg.is_read
@@ -445,6 +504,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleDelete(msg.id)}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                       title="Delete this message"
@@ -455,7 +515,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                   </div>
 
                   <a
-                    href={mailtoReply}
+                    href={safeReplyMailto}
                     className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/20 transition-all cursor-pointer"
                   >
                     <Mail className="w-3.5 h-3.5" />

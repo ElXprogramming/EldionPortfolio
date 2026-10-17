@@ -23,28 +23,41 @@ function loadEnv() {
 
 loadEnv();
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+const rawSupabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!rawSupabaseUrl || !supabaseAnonKey) {
   console.error('❌ Error: Missing SUPABASE_URL (or VITE_SUPABASE_URL) and SUPABASE_ANON_KEY (or VITE_SUPABASE_ANON_KEY).');
   console.error('Please ensure they are defined in your environment or in .env.local.');
   process.exit(1);
 }
 
-const targetEndpoint = `${supabaseUrl.replace(/\/+$/, '')}/rest/v1/contact_messages?select=id&limit=1`;
+let parsedBaseUrl;
+try {
+  parsedBaseUrl = new URL(rawSupabaseUrl);
+  if (parsedBaseUrl.protocol !== 'https:' || !parsedBaseUrl.hostname.endsWith('.supabase.co')) {
+    throw new Error('URL must be an https://*.supabase.co origin.');
+  }
+} catch {
+  console.error('❌ Error: Invalid SUPABASE_URL. Must be a valid https://*.supabase.co origin.');
+  process.exit(1);
+}
 
-console.log(`📡 Pinging Supabase REST API at: ${targetEndpoint}`);
+const rpcEndpoint = `${parsedBaseUrl.origin}/rest/v1/rpc/ping_keep_alive`;
+console.log(`📡 Pinging Supabase Keep-Alive RPC at: ${parsedBaseUrl.origin}/rest/v1/rpc/ping_keep_alive`);
 
 const startTime = Date.now();
 
 try {
-  const response = await fetch(targetEndpoint, {
-    method: 'GET',
+  const response = await fetch(rpcEndpoint, {
+    method: 'POST',
+    signal: AbortSignal.timeout(15_000),
     headers: {
       apikey: supabaseAnonKey,
       Authorization: `Bearer ${supabaseAnonKey}`,
+      'Content-Type': 'application/json',
     },
+    body: JSON.stringify({}),
   });
 
   const durationMs = Date.now() - startTime;
@@ -52,20 +65,16 @@ try {
   console.log(`📊 HTTP Status: ${response.status} ${response.statusText}`);
 
   if (response.ok) {
-    const data = await response.json();
     console.log('✅ Supabase database is UP and active! Pausing countdown timer reset.');
-    console.log('Sample response:', data);
   } else if (response.status === 404) {
-    console.log('⚠️ PostgREST is online, but table "contact_messages" was not found (HTTP 404).');
-    console.log('Instance is awake, but you should create the contact_messages table in Supabase SQL editor.');
+    console.log('⚠️ PostgREST is online, but RPC "ping_keep_alive" was not found (HTTP 404).');
+    console.log('Instance is awake, and you can create the RPC by running supabase_schema.sql in the Supabase SQL editor.');
   } else {
-    const text = await response.text();
-    console.warn(`⚠️ Received status ${response.status}: ${text}`);
+    console.warn(`⚠️ Received status ${response.status}. Verify RLS and anon key configuration.`);
   }
-} catch (error) {
+} catch {
   console.error('❌ Ping failed! Possible reasons:');
-  console.error('1. The Supabase project is currently paused in the Supabase Dashboard (DNS fails to resolve).');
+  console.error('1. The Supabase project is currently paused in the Supabase Dashboard.');
   console.error('2. Network or internet connectivity issues.');
-  console.error(`Details: ${error instanceof Error ? error.message : String(error)}`);
   process.exit(1);
 }

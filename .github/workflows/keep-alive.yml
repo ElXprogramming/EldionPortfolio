@@ -13,23 +13,31 @@ jobs:
     steps:
       - name: Send keep-alive ping to Supabase REST API
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL || 'https://dntvghdlynxhtqglvmne.supabase.co' }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
-          if [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "⚠️ Warning: SUPABASE_ANON_KEY (or VITE_SUPABASE_ANON_KEY) is not set in GitHub Secrets."
-            echo "To enable automated pings:"
-            echo "1. Go to repository Settings -> Secrets and variables -> Actions"
-            echo "2. Add 'VITE_SUPABASE_ANON_KEY' (and optionally 'VITE_SUPABASE_URL') from your .env.local"
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "⚠️ Warning: SUPABASE_URL and SUPABASE_ANON_KEY must be set in GitHub Secrets."
             exit 1
           fi
 
-          TARGET_URL="${SUPABASE_URL%/}/rest/v1/contact_messages?select=id&limit=1"
-          echo "Pinging: $TARGET_URL"
+          case "$SUPABASE_URL" in
+            https://*.supabase.co|https://*.supabase.co/) ;;
+            *)
+              echo "❌ Invalid SUPABASE_URL format. Must match https://*.supabase.co"
+              exit 1
+              ;;
+          esac
 
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          TARGET_URL="${SUPABASE_URL%/}/rest/v1/rpc/ping_keep_alive"
+          echo "Pinging Supabase Keep-Alive RPC endpoint..."
+
+          HTTP_STATUS=$(curl -s --max-time 15 -o /dev/null -w "%{http_code}" \
+            -X POST \
             -H "apikey: $SUPABASE_ANON_KEY" \
             -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{}" \
             "$TARGET_URL")
 
           echo "Supabase HTTP response status: $HTTP_STATUS"
@@ -37,9 +45,8 @@ jobs:
           if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
             echo "✅ Successfully pinged Supabase! Inactivity timer has been reset."
           elif [ "$HTTP_STATUS" -eq 404 ]; then
-            echo "⚠️ PostgREST is reachable, but table 'contact_messages' was not found."
-            echo "The database received traffic and is kept alive, but make sure to run the SQL migration."
+            echo "⚠️ PostgREST is reachable (timer reset), but RPC 'ping_keep_alive' is not yet installed."
           else
-            echo "❌ Unexpected response ($HTTP_STATUS). Database might still be paused or keys are invalid."
+            echo "❌ Unexpected response ($HTTP_STATUS). Database might be paused or credentials are invalid."
             exit 1
           fi

@@ -1,24 +1,41 @@
 import { useState } from 'react';
-import { 
-  Mail, 
-  Phone, 
-  Send, 
-  Copy, 
-  Check, 
-  MapPin, 
+import {
+  Mail,
+  Phone,
+  Send,
+  Copy,
+  Check,
+  MapPin,
   Sparkles,
   ArrowUpRight,
   Loader2,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 import { submitContactMessage } from '../lib/supabase';
+import {
+  createSafeErrorMessage,
+  sanitizeExternalUrl,
+  sanitizeMailtoUrl,
+  sanitizeTelUrl,
+} from '../lib/security';
+
+const CONTACT_EMAIL = 'nayrnoidle@gmail.com';
+const CONTACT_PHONE = '0178201365';
+const LINKEDIN_URL =
+  sanitizeExternalUrl('https://www.linkedin.com/in/eldion-ryan-godius-897064235', [
+    'www.linkedin.com',
+  ]) ?? '#';
+const GITHUB_URL =
+  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
+const SAFE_MAILTO_URL = sanitizeMailtoUrl(CONTACT_EMAIL);
+const SAFE_TEL_URL = sanitizeTelUrl(CONTACT_PHONE);
 
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -31,13 +48,13 @@ export default function Contact() {
   const [statusMessage, setStatusMessage] = useState('');
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText('nayrnoidle@gmail.com');
+    navigator.clipboard.writeText(CONTACT_EMAIL);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
 
   const handleCopyPhone = () => {
-    navigator.clipboard.writeText('0178201365');
+    navigator.clipboard.writeText(CONTACT_PHONE);
     setCopiedPhone(true);
     setTimeout(() => setCopiedPhone(false), 2500);
   };
@@ -59,13 +76,12 @@ export default function Contact() {
         message: '',
       });
     } catch (err: unknown) {
-      console.error('Error submitting message to Supabase:', err);
-      const errMsg = err instanceof Error ? err.message : 'Unknown error';
       setSubmitStatus('error');
       setStatusMessage(
-        errMsg.includes('relation "contact_messages" does not exist')
-          ? 'Database table "contact_messages" not created yet. Please execute the SQL table script in Supabase.'
-          : 'Failed to send message via database. You can also reach out directly via email.'
+        createSafeErrorMessage(
+          err,
+          'Unable to send message right now. You can reach out directly via email.'
+        )
       );
     } finally {
       setIsSubmitting(false);
@@ -75,7 +91,6 @@ export default function Contact() {
   return (
     <section id="contact" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
@@ -91,10 +106,8 @@ export default function Contact() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
           {/* Direct Contact Cards (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            
             {/* Email Card */}
             <div className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
               <div className="flex items-center gap-3.5 min-w-0">
@@ -104,14 +117,15 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Email</div>
                   <a
-                    href="mailto:nayrnoidle@gmail.com"
+                    href={SAFE_MAILTO_URL}
                     className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
                   >
-                    nayrnoidle@gmail.com
+                    {CONTACT_EMAIL}
                   </a>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={handleCopyEmail}
                 className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors ml-2 shrink-0 cursor-pointer"
                 title="Copy email to clipboard"
@@ -133,7 +147,7 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Phone / WhatsApp</div>
                   <a
-                    href="tel:0178201365"
+                    href={SAFE_TEL_URL}
                     className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
                   >
                     017-820 1365
@@ -141,6 +155,7 @@ export default function Contact() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={handleCopyPhone}
                 className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors ml-2 shrink-0 cursor-pointer"
                 title="Copy phone number"
@@ -155,7 +170,7 @@ export default function Contact() {
 
             {/* LinkedIn Card */}
             <a
-              href="https://www.linkedin.com/in/eldion-ryan-godius-897064235"
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
@@ -176,7 +191,7 @@ export default function Contact() {
 
             {/* GitHub Card */}
             <a
-              href="https://github.com/ElXprogramming"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
@@ -200,7 +215,6 @@ export default function Contact() {
               <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
               <span>Based in Universiti Malaysia Sabah, Kota Kinabalu, Sabah</span>
             </div>
-
           </div>
 
           {/* Quick Interactive Message Form (7 cols) */}
@@ -230,7 +244,7 @@ export default function Contact() {
                 <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                   <div className="flex-grow">
-                    <div className="font-semibold text-white">Delivery Error</div>
+                    <div className="font-semibold text-white">Delivery Notice</div>
                     <div className="text-xs text-rose-300/90 mt-0.5">{statusMessage}</div>
                   </div>
                 </div>
@@ -238,61 +252,89 @@ export default function Contact() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label
+                    htmlFor="contact-name"
+                    className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                  >
                     Your Name
                   </label>
                   <input
+                    id="contact-name"
                     type="text"
                     required
+                    maxLength={100}
                     disabled={isSubmitting}
                     placeholder="e.g. Alex Tan"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, name: e.target.value }))
+                    }
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                  <label
+                    htmlFor="contact-email"
+                    className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                  >
                     Your Email
                   </label>
                   <input
+                    id="contact-email"
                     type="email"
                     required
+                    maxLength={254}
                     disabled={isSubmitting}
                     placeholder="alex@example.com"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, email: e.target.value }))
+                    }
                     className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label
+                  htmlFor="contact-subject"
+                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                >
                   Subject
                 </label>
                 <input
+                  id="contact-subject"
                   type="text"
                   required
+                  maxLength={150}
                   disabled={isSubmitting}
                   placeholder="Internship opportunity / Project inquiry"
                   value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, subject: e.target.value }))
+                  }
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+                <label
+                  htmlFor="contact-message"
+                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                >
                   Message
                 </label>
                 <textarea
+                  id="contact-message"
                   rows={4}
                   required
+                  maxLength={2000}
                   disabled={isSubmitting}
                   placeholder="Hi Eldion, I'd like to talk about..."
                   value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, message: e.target.value }))
+                  }
                   className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors resize-none disabled:opacity-50"
                 />
               </div>
@@ -316,9 +358,7 @@ export default function Contact() {
               </button>
             </form>
           </div>
-
         </div>
-
       </div>
     </section>
   );

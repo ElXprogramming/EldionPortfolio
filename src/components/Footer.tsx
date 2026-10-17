@@ -1,5 +1,19 @@
 import { ArrowUp, Mail, Lock } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
+import {
+  sanitizeExternalUrl,
+  sanitizeInternalRoute,
+  sanitizeMailtoUrl,
+} from '../lib/security';
+
+const FOOTER_GITHUB_URL =
+  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
+const FOOTER_LINKEDIN_URL =
+  sanitizeExternalUrl('https://www.linkedin.com/in/eldion-ryan-godius-897064235', [
+    'www.linkedin.com',
+  ]) ?? '#';
+const FOOTER_MAILTO_URL = sanitizeMailtoUrl('nayrnoidle@gmail.com');
+const FOOTER_INBOX_ROUTE = sanitizeInternalRoute('#inbox');
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -14,7 +28,7 @@ export default function Footer() {
           {/* Logo & Bio info */}
           <div className="flex items-center gap-3">
             <a
-              href="#inbox"
+              href={FOOTER_INBOX_ROUTE}
               className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center font-bold text-sm text-purple-300 hover:scale-105 transition-transform"
               title="EG Portal"
             >
@@ -28,17 +42,17 @@ export default function Footer() {
 
           {/* Center Navigation */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-300">
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#skills" className="hover:text-white transition-colors">Skills</a>
-            <a href="#projects" className="hover:text-white transition-colors">Projects</a>
-            <a href="#education" className="hover:text-white transition-colors">Education</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <a href={sanitizeInternalRoute('#about')} className="hover:text-white transition-colors">About</a>
+            <a href={sanitizeInternalRoute('#skills')} className="hover:text-white transition-colors">Skills</a>
+            <a href={sanitizeInternalRoute('#projects')} className="hover:text-white transition-colors">Projects</a>
+            <a href={sanitizeInternalRoute('#education')} className="hover:text-white transition-colors">Education</a>
+            <a href={sanitizeInternalRoute('#contact')} className="hover:text-white transition-colors">Contact</a>
           </div>
 
           {/* Socials & Back to Top */}
           <div className="flex items-center gap-3">
             <a
-              href="https://github.com/ElXprogramming"
+              href={FOOTER_GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
@@ -47,7 +61,7 @@ export default function Footer() {
               <GithubIcon className="w-4 h-4" />
             </a>
             <a
-              href="https://www.linkedin.com/in/eldion-ryan-godius-897064235"
+              href={FOOTER_LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
@@ -56,7 +70,7 @@ export default function Footer() {
               <LinkedinIcon className="w-4 h-4" />
             </a>
             <a
-              href="mailto:nayrnoidle@gmail.com"
+              href={FOOTER_MAILTO_URL}
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
               aria-label="Send Email"
             >

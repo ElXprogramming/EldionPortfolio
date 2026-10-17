@@ -15,6 +15,21 @@ import {
 import { GithubIcon, LinkedinIcon } from './Icons';
 import eldionPortrait from '../assets/eldion-portrait.jpg';
 import FlipCard from './FlipCard';
+import {
+  sanitizeExternalUrl,
+  sanitizeInternalRoute,
+  sanitizeTelUrl,
+} from '../lib/security';
+
+const HERO_GITHUB_URL =
+  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
+const HERO_LINKEDIN_URL =
+  sanitizeExternalUrl('https://www.linkedin.com/in/eldion-ryan-godius-897064235', [
+    'www.linkedin.com',
+  ]) ?? '#';
+const HERO_RESUME_PATH = sanitizeInternalRoute('/Eldion_Ryan_Godius_Resume.pdf');
+const HERO_PROJECTS_ROUTE = sanitizeInternalRoute('#projects');
+const HERO_TEL_URL = sanitizeTelUrl('0178201365');
 
 export default function Hero() {
   const [copiedEmail, setCopiedEmail] = useState(false);
@@ -86,7 +101,7 @@ export default function Hero() {
             {/* Primary Action Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 mb-8 w-full sm:w-auto">
               <a
-                href="#projects"
+                href={HERO_PROJECTS_ROUTE}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 transition-all duration-200 group text-sm sm:text-base w-full sm:w-auto cursor-pointer"
               >
                 Explore Projects
@@ -94,7 +109,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="/Eldion_Ryan_Godius_Resume.pdf"
+                href={HERO_RESUME_PATH}
                 download="Eldion_Ryan_Godius_Resume.pdf"
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 transition-all duration-200 shadow-sm text-sm sm:text-base w-full sm:w-auto cursor-pointer"
               >
@@ -110,7 +125,7 @@ export default function Hero() {
               </span>
 
               <a
-                href="https://github.com/ElXprogramming"
+                href={HERO_GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
@@ -120,7 +135,7 @@ export default function Hero() {
               </a>
 
               <a
-                href="https://www.linkedin.com/in/eldion-ryan-godius-897064235"
+                href={HERO_LINKEDIN_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
@@ -130,6 +145,7 @@ export default function Hero() {
               </a>
 
               <button
+                type="button"
                 onClick={handleCopyEmail}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
                 title="Click to copy email"
@@ -148,7 +164,7 @@ export default function Hero() {
               </button>
 
               <a
-                href="tel:0178201365"
+                href={HERO_TEL_URL}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
               >
                 <Phone className="w-3.5 h-3.5 text-emerald-400" />

@@ -9,36 +9,27 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import SecretInbox from './components/SecretInbox';
 import PixelBlast from './components/PixelBlast';
+import { sanitizeInternalRoute } from './lib/security';
+
+function resolveCurrentView(): 'home' | 'inbox' {
+  const safeHash = sanitizeInternalRoute(window.location.hash.toLowerCase());
+  const safePath = sanitizeInternalRoute(window.location.pathname.toLowerCase());
+  return safeHash === '#inbox' ||
+    safeHash === '#admin' ||
+    safeHash === '#secret-inbox' ||
+    safePath === '/inbox' ||
+    safePath === '/admin'
+    ? 'inbox'
+    : 'home';
+}
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentView, setCurrentView] = useState<'home' | 'inbox'>(() => {
-    const hash = window.location.hash.toLowerCase();
-    const path = window.location.pathname.toLowerCase();
-    return hash === '#inbox' ||
-      hash === '#admin' ||
-      hash === '#secret-inbox' ||
-      path === '/inbox' ||
-      path === '/admin'
-      ? 'inbox'
-      : 'home';
-  });
+  const [currentView, setCurrentView] = useState<'home' | 'inbox'>(resolveCurrentView);
 
   useEffect(() => {
     const handleNavigation = () => {
-      const hash = window.location.hash.toLowerCase();
-      const path = window.location.pathname.toLowerCase();
-      if (
-        hash === '#inbox' ||
-        hash === '#admin' ||
-        hash === '#secret-inbox' ||
-        path === '/inbox' ||
-        path === '/admin'
-      ) {
-        setCurrentView('inbox');
-      } else {
-        setCurrentView('home');
-      }
+      setCurrentView(resolveCurrentView());
     };
 
     window.addEventListener('hashchange', handleNavigation);
@@ -96,6 +87,9 @@ export default function App() {
     return (
       <SecretInbox
         onBackToHome={() => {
+          if (window.location.pathname !== '/') {
+            window.history.replaceState(null, '', '/');
+          }
           window.location.hash = '';
           setCurrentView('home');
         }}
