@@ -43,4 +43,16 @@ export default defineConfig({
     allowedHosts: ['localhost', '127.0.0.1'],
     headers: SECURITY_HEADERS,
   },
+
+  server: {
+    host: true,           // listen on 0.0.0.0 (required for tunnel)
+    port: 5173,
+    allowedHosts: true,   // allow all hosts including cloudflared tunnel domain
+  },
+  preview: {
+    host: true,           // listen on 0.0.0.0
+    port: 4173,
+    allowedHosts: true,   // allow all hosts including cloudflared tunnel domain in preview mode
+  },
+
 });

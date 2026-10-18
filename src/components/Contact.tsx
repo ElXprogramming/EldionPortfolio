@@ -97,10 +97,10 @@ export default function Contact() {
             <Mail className="w-3.5 h-3.5" />
             Get in Touch
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             Let's Build Something Great
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
+          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
             I am currently open to internship opportunities, junior software engineering roles, and innovative projects. Feel free to reach out directly!
           </p>
         </div>
@@ -115,10 +115,10 @@ export default function Contact() {
                   <Mail className="w-5 h-5" />
                 </div>
                 <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Email</div>
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Email</div>
                   <a
                     href={SAFE_MAILTO_URL}
-                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
+                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
                   >
                     {CONTACT_EMAIL}
                   </a>
@@ -145,10 +145,10 @@ export default function Contact() {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">Phone / WhatsApp</div>
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Phone / WhatsApp</div>
                   <a
                     href={SAFE_TEL_URL}
-                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block"
+                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
                   >
                     017-820 1365
                   </a>
@@ -180,8 +180,8 @@ export default function Contact() {
                   <LinkedinIcon className="w-5 h-5" />
                 </div>
                 <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">LinkedIn</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-sky-400 transition-colors truncate">
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">LinkedIn</div>
+                  <div className="text-sm font-semibold text-white group-hover:text-sky-400 transition-colors truncate text-readable-subheading">
                     Eldion Ryan Godius
                   </div>
                 </div>
@@ -201,8 +201,8 @@ export default function Contact() {
                   <GithubIcon className="w-5 h-5" />
                 </div>
                 <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">GitHub</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
+                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">GitHub</div>
+                  <div className="text-sm font-semibold text-white group-hover:text-purple-300 transition-colors truncate text-readable-subheading">
                     @ElXprogramming
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function Contact() {
             </a>
 
             {/* Location Pill */}
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/60 flex items-center gap-3 text-xs text-slate-300">
+            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/60 flex items-center gap-3 text-xs text-slate-200 text-readable-body">
               <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
               <span>Based in Universiti Malaysia Sabah, Kota Kinabalu, Sabah</span>
             </div>
@@ -221,11 +221,11 @@ export default function Contact() {
           <div className="lg:col-span-7 glass-panel rounded-2xl p-7 sm:p-9 border border-slate-800/80 shadow-xl">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-purple-400" />
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-white text-readable-subheading">
                 Send a Message
               </h3>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300 mb-6">
+            <p className="text-xs sm:text-sm text-slate-200 mb-6 text-readable-body">
               Have an idea, project, or role to discuss? Send a direct note to my inbox.
             </p>
 

@@ -28,10 +28,10 @@ export default function Projects() {
             <Sparkles className="w-3.5 h-3.5" />
             Featured Work
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             Projects &amp; Applications
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
+          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
             Production-ready software built to solve real-world problems with modern web technologies.
           </p>
         </div>
@@ -88,24 +88,24 @@ export default function Projects() {
                   </span>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight group-hover:text-purple-300 transition-colors text-readable-subheading">
                   Declaraform
                 </h3>
                 
-                <p className="text-sm font-semibold text-purple-300/90 mb-4">
+                <p className="text-sm font-semibold text-purple-300 mb-4 text-readable-body">
                   Automated UMS Declaration Form PDF Generator
                 </p>
 
-                <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                <p className="text-slate-200 text-sm sm:text-base leading-relaxed mb-6 text-readable-body">
                   A system built for Universiti Malaysia Sabah students that accepts structured user input and automatically parses it into official, print-ready declaration PDFs. Eliminates the extra manual labor of transforming static PDF templates into editable files, paired with a playful interactive 3D background.
                 </p>
 
                 {/* Key Highlights */}
-                <div className="mb-6 space-y-2.5">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
+                <div className="mb-6 space-y-2.5 text-readable-body">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-2">
                     Key Engineering Features:
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200">
                     <div className="flex items-start gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
                       <span>Instant client-side PDF synthesis with <code>pdf-lib</code></span>
@@ -175,16 +175,16 @@ export default function Projects() {
         </div>
 
         {/* Future / In Development Callout Card */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/40 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/65 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3.5">
             <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm sm:text-base font-bold text-white">
+              <h4 className="text-sm sm:text-base font-bold text-white text-readable-subheading">
                 More Projects Under Active Development
               </h4>
-              <p className="text-xs sm:text-sm text-slate-300">
+              <p className="text-xs sm:text-sm text-slate-200 text-readable-body">
                 Currently exploring new applications in full-stack web engineering, local AI pipelines, and student productivity tools.
               </p>
             </div>

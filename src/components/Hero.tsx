@@ -66,7 +66,7 @@ export default function Hero() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_2px_12px_rgba(8,5,17,0.9)]">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6 text-readable-heading">
               Hi, I'm{' '}
               <span className="text-gradient">
                 Eldion Ryan
@@ -75,10 +75,10 @@ export default function Hero() {
             </h1>
 
             {/* Core Summary */}
-            <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-6 max-w-2xl drop-shadow-[0_1px_6px_rgba(8,5,17,0.9)]">
+            <p className="text-base sm:text-lg text-slate-100 leading-relaxed mb-6 max-w-2xl text-readable-body">
               Software engineering student eager to learn and gather new experiences through solving real-world problems. 
               Experienced in <span className="text-purple-300 font-semibold">full-stack web development</span> and 
-              implementing <span className="text-[#B497CF] font-semibold">LLM solutions</span>, with strong proficiency in 
+              implementing <span className="text-[#d8b4fe] font-semibold">LLM solutions</span>, with strong proficiency in 
               modern JavaScript, TypeScript, CSS, SQL, and Python.
             </p>
 
@@ -120,7 +120,7 @@ export default function Hero() {
 
             {/* Social Links & Direct Contacts */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-4 border-t border-slate-800/80 w-full">
-              <span className="text-xs uppercase font-bold tracking-wider text-slate-300 mr-2">
+              <span className="text-xs uppercase font-bold tracking-wider text-slate-200 mr-2 text-readable-body">
                 Connect:
               </span>
 

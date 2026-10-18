@@ -35,10 +35,10 @@ export default function About() {
             <User className="w-3.5 h-3.5" />
             Background &amp; Philosophy
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             About Eldion
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
+          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
             Software engineering student with a drive for creating intuitive tools and exploring emerging technologies.
           </p>
         </div>
@@ -48,18 +48,18 @@ export default function About() {
           
           {/* Left Narrative Box */}
           <div className="lg:col-span-7 glass-panel rounded-2xl p-7 sm:p-9 border border-slate-800/80 shadow-xl">
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 text-readable-subheading">
               Turning Ideas into High-Quality Software
             </h3>
             
-            <div className="space-y-4 text-slate-300 text-sm sm:text-base leading-relaxed">
+            <div className="space-y-4 text-slate-200 text-sm sm:text-base leading-relaxed text-readable-body">
               <p>
                 I am a Software Engineering student at <span className="text-white font-medium">Universiti Malaysia Sabah</span> with a passion for software design, modern web architectures, and intelligent systems.
               </p>
               
               <p>
                 My journey centers around practical, hands-on building: from engineering 
-                <span className="text-purple-400 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
+                <span className="text-purple-300 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
               </p>
 
               <p>
@@ -67,7 +67,7 @@ export default function About() {
               </p>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-800/80 flex flex-wrap gap-4 text-xs font-medium text-slate-300">
+            <div className="mt-6 pt-6 border-t border-slate-800/80 flex flex-wrap gap-4 text-xs font-medium text-slate-200 text-readable-body">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Fast Learner &amp; Adaptable</span>
@@ -97,10 +97,10 @@ export default function About() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-base font-bold text-white mb-1">
+                      <h4 className="text-base font-bold text-white mb-1 text-readable-subheading">
                         {val.title}
                       </h4>
-                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-slate-200 leading-relaxed text-readable-body">
                         {val.desc}
                       </p>
                     </div>

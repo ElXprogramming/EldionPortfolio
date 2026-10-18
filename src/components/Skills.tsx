@@ -98,10 +98,10 @@ export default function Skills() {
             <Layers className="w-3.5 h-3.5" />
             Technical Stack
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             Skills &amp; Capabilities
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
+          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
             Equipped with modern full-stack development tools, database engineering, and practical AI integrations.
           </p>
         </div>
@@ -124,17 +124,17 @@ export default function Skills() {
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
+                      <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors text-readable-subheading">
                         {cat.title}
                       </h3>
-                      <span className="text-xs text-slate-400 font-medium">
+                      <span className="text-xs text-slate-300 font-medium text-readable-body">
                         {cat.badge}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 mb-5 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-200 mb-5 leading-relaxed text-readable-body">
                   {cat.description}
                 </p>
 

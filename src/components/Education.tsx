@@ -70,10 +70,10 @@ export default function Education() {
             <GraduationCap className="w-3.5 h-3.5" />
             Academic Background
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             Education &amp; Languages
           </h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
+          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
             Academic qualifications, coursework foundation, and language proficiencies.
           </p>
         </div>
@@ -92,15 +92,15 @@ export default function Education() {
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${item.statusColor}`}>
                       {item.status}
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mt-2">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mt-2 text-readable-subheading">
                       {item.institution}
                     </h3>
-                    <p className="text-sm font-semibold text-purple-300">
+                    <p className="text-sm font-semibold text-purple-300 text-readable-body">
                       {item.degree}
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:items-end text-xs text-slate-300 gap-1 font-mono">
+                  <div className="flex flex-col sm:items-end text-xs text-slate-200 gap-1 font-mono text-readable-body">
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-purple-400" />
                       <span>{item.period}</span>
@@ -112,13 +112,13 @@ export default function Education() {
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed mb-4 text-readable-body">
                   {item.description}
                 </p>
 
                 {/* Relevant Coursework */}
                 <div>
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-2 flex items-center gap-1.5 text-readable-body">
                     <BookOpen className="w-3.5 h-3.5 text-purple-400" />
                     <span>Key Study Areas:</span>
                   </div>
@@ -146,10 +146,10 @@ export default function Education() {
                   <Languages className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-base font-bold text-white text-readable-subheading">
                     Languages
                   </h3>
-                  <p className="text-xs text-slate-300">
+                  <p className="text-xs text-slate-200 text-readable-body">
                     Bilingual communication skills
                   </p>
                 </div>
@@ -159,10 +159,10 @@ export default function Education() {
                 {languages.map((lang, idx) => (
                   <div key={idx} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/60">
                     <div className="flex justify-between items-center mb-1.5">
-                      <span className="text-sm font-bold text-white">
+                      <span className="text-sm font-bold text-white text-readable-subheading">
                         {lang.name}
                       </span>
-                      <span className="text-xs font-semibold text-purple-300">
+                      <span className="text-xs font-semibold text-purple-300 text-readable-body">
                         {lang.level}
                       </span>
                     </div>
@@ -175,7 +175,7 @@ export default function Education() {
                       />
                     </div>
 
-                    <p className="text-xs text-slate-300">
+                    <p className="text-xs text-slate-200 text-readable-body">
                       {lang.desc}
                     </p>
                   </div>

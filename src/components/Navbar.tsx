@@ -48,12 +48,12 @@ export default function Navbar({ activeSection }: NavbarProps) {
             </div>
           </div>
           <div>
-            <div className="font-bold tracking-tight text-sm sm:text-base leading-none">
+            <div className="font-bold tracking-tight text-sm sm:text-base leading-none text-readable-subheading">
               Eldion Ryan Godius
             </div>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-[11px] text-slate-400 font-medium leading-none">
+              <span className="text-[11px] text-slate-300 font-medium leading-none text-readable-body">
                 Software Engineering
               </span>
             </div>
