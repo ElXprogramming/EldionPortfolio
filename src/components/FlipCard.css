@@ -62,6 +62,15 @@
   border-radius: var(--fc-radius);
   background: var(--fc-bg);
   color: var(--fc-ink);
+  transform-style: flat;
+  isolation: isolate;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-card__face *,
+.flip-card__face *::before,
+.flip-card__face *::after {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
@@ -70,12 +79,20 @@
   -webkit-user-drag: none;
 }
 
+.flip-card__face--front {
+  transform: rotateY(0deg) translateZ(1px);
+}
+
+.flip-card[data-axis='x'] .flip-card__face--front {
+  transform: rotateX(0deg) translateZ(1px);
+}
+
 .flip-card__face--back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
 }
 
 .flip-card[data-axis='x'] .flip-card__face--back {
-  transform: rotateX(180deg);
+  transform: rotateX(180deg) translateZ(1px);
 }
 
 .flip-card__glare {
@@ -98,12 +115,16 @@
 .flip-card[data-fade] .flip-card__face {
   transform: none;
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   backface-visibility: visible;
   -webkit-backface-visibility: visible;
-  transition: opacity 200ms ease;
+  transition: opacity 200ms ease, visibility 200ms ease;
 }
 
 .flip-card[data-fade='front'] .flip-card__face--front,
 .flip-card[data-fade='back'] .flip-card__face--back {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }

@@ -9,16 +9,13 @@ import {
   useTransform
 } from 'motion/react';
 import './FlipCard.css';
+import { clamp, isBack, isFrontFacing, snap } from '../lib/flipCardMath';
 
 const SLOP = { fine: 4, coarse: 8 };
 const TILT_SPRING = { stiffness: 240, damping: 24, mass: 0.6 };
 const LIFT_SPRING = { stiffness: 320, damping: 26 };
 const FLING = 0.16;
 const HISTORY_MS = 90;
-
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const snap = (deg: number) => Math.round(deg / 180) * 180;
-const isBack = (deg: number) => Math.abs(Math.round(deg / 180)) % 2 === 1;
 
 export interface FlipCardProps {
   front?: React.ReactNode;
@@ -52,13 +49,13 @@ export interface FlipCardProps {
 }
 
 interface GripState {
-  id: number;
-  x: number;
-  y: number;
-  base: number;
-  moved: boolean;
-  slop: number;
-  hist: { t: number; v: number }[];
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly base: number;
+  readonly moved: boolean;
+  readonly slop: number;
+  readonly hist: readonly { readonly t: number; readonly v: number }[];
 }
 
 export default function FlipCard({
@@ -115,6 +112,7 @@ export default function FlipCard({
 
   const sumX = useTransform([turn, tiltX], ([t, x]) => (t as number) + (x as number));
   const sumY = useTransform([turn, tiltY], ([t, y]) => (t as number) + (y as number));
+  const activeAngle = axis === 'x' ? sumX : sumY;
   const turnY = useMotionTemplate`perspective(${perspective}px) scale(${lift}) rotateX(${tiltX}deg) rotateY(${sumY}deg)`;
   const turnX = useMotionTemplate`perspective(${perspective}px) scale(${lift}) rotateY(${tiltY}deg) rotateX(${sumX}deg)`;
   const facing = useTransform(turn, t => Math.abs(Math.cos(((t as number) * Math.PI) / 180)));
@@ -122,6 +120,21 @@ export default function FlipCard({
   const shade = useTransform(facing, f => 0.1 + 0.9 * f * f);
   const gxPct = useMotionTemplate`${gx}%`;
   const gyPct = useMotionTemplate`${gy}%`;
+
+  const frontOpacity = useTransform(activeAngle, deg => (isFrontFacing(deg) ? 1 : 0));
+  const backOpacity = useTransform(activeAngle, deg => (isFrontFacing(deg) ? 0 : 1));
+  const frontVisibility = useTransform(activeAngle, deg =>
+    isFrontFacing(deg) ? 'visible' : 'hidden'
+  );
+  const backVisibility = useTransform(activeAngle, deg =>
+    isFrontFacing(deg) ? 'hidden' : 'visible'
+  );
+  const frontPointerEvents = useTransform(activeAngle, deg =>
+    isFrontFacing(deg) ? 'auto' : 'none'
+  );
+  const backPointerEvents = useTransform(activeAngle, deg =>
+    isFrontFacing(deg) ? 'none' : 'auto'
+  );
 
   const settle = (to: number, velocity: number, instant: boolean) => {
     spin.current?.stop();
@@ -185,7 +198,6 @@ export default function FlipCard({
       const d = axis === 'x' ? e.clientY - g.y : e.clientX - g.x;
       if (!g.moved) {
         if (Math.abs(d) < g.slop || !draggable || reduce) return;
-        g.moved = true;
         setDragging(true);
         tiltX.set(0);
         tiltY.set(0);
@@ -195,8 +207,16 @@ export default function FlipCard({
       const deg = g.base + (axis === 'x' ? -1 : 1) * (d / span) * 180;
       turn.set(deg);
       const now = performance.now();
-      g.hist.push({ t: now, v: deg });
-      while (g.hist.length > 2 && now - g.hist[0].t > HISTORY_MS) g.hist.shift();
+      const nextHist = [...g.hist, { t: now, v: deg }];
+      let trimIdx = 0;
+      while (nextHist.length - trimIdx > 2 && now - nextHist[trimIdx].t > HISTORY_MS) {
+        trimIdx += 1;
+      }
+      grip.current = {
+        ...g,
+        moved: true,
+        hist: trimIdx > 0 ? nextHist.slice(trimIdx) : nextHist
+      };
       return;
     }
     if (!tilt || reduce || disabled || e.pointerType === 'touch') return;
@@ -299,22 +319,40 @@ export default function FlipCard({
         />
       ) : null}
       <motion.div className="flip-card__rotor" style={reduce ? undefined : rotorStyle}>
-        <div
+        <motion.div
           className="flip-card__face flip-card__face--front"
           aria-hidden={shown}
           inert={shown}
+          style={
+            reduce
+              ? undefined
+              : {
+                  opacity: frontOpacity,
+                  visibility: frontVisibility,
+                  pointerEvents: frontPointerEvents
+                }
+          }
         >
           {front}
           {glare ? <span className="flip-card__glare" aria-hidden="true" /> : null}
-        </div>
-        <div
+        </motion.div>
+        <motion.div
           className="flip-card__face flip-card__face--back"
           aria-hidden={!shown}
           inert={!shown}
+          style={
+            reduce
+              ? undefined
+              : {
+                  opacity: backOpacity,
+                  visibility: backVisibility,
+                  pointerEvents: backPointerEvents
+                }
+          }
         >
           {back}
           {glare ? <span className="flip-card__glare" aria-hidden="true" /> : null}
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
