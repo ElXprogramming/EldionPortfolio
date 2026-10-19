@@ -26,9 +26,9 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    host: '127.0.0.1',
+    host: true, // listen on 0.0.0.0 (required for tunnel)
     port: 5173,
-    allowedHosts: ['localhost', '127.0.0.1'],
+    allowedHosts: true, // allow all hosts including cloudflared tunnel domain
     headers: SECURITY_HEADERS,
     proxy: {
       '/api': {
@@ -38,21 +38,9 @@ export default defineConfig({
     },
   },
   preview: {
-    host: '127.0.0.1',
+    host: true, // listen on 0.0.0.0
     port: 4173,
-    allowedHosts: ['localhost', '127.0.0.1'],
+    allowedHosts: true, // allow all hosts including cloudflared tunnel domain in preview mode
     headers: SECURITY_HEADERS,
   },
-
-  server: {
-    host: true,           // listen on 0.0.0.0 (required for tunnel)
-    port: 5173,
-    allowedHosts: true,   // allow all hosts including cloudflared tunnel domain
-  },
-  preview: {
-    host: true,           // listen on 0.0.0.0
-    port: 4173,
-    allowedHosts: true,   // allow all hosts including cloudflared tunnel domain in preview mode
-  },
-
 });
