@@ -235,4 +235,27 @@ describe('supabase security & data layer', () => {
       await expect(service.deleteContactMessage(validId)).resolves.toBeUndefined();
     });
   });
+
+  describe('verifyInboxPasscode', () => {
+    it('verifies correct passcode and resets rate limiter on success', () => {
+      const { client } = createMockSupabaseClient();
+      const service = createSupabaseService({ client, isConfigured: true });
+
+      expect(service.verifyInboxPasscode('eldion')).toBe(true);
+      expect(service.verifyInboxPasscode('  eldion  ')).toBe(true);
+    });
+
+    it('rejects incorrect passcode and rate-limits after 5 failed attempts', () => {
+      const { client } = createMockSupabaseClient();
+      const service = createSupabaseService({ client, isConfigured: true });
+
+      for (let i = 0; i < 5; i++) {
+        expect(() => service.verifyInboxPasscode('wrong-passcode')).toThrow('Incorrect passcode.');
+      }
+
+      expect(() => service.verifyInboxPasscode('wrong-passcode')).toThrow(
+        /Too many unlock attempts/
+      );
+    });
+  });
 });

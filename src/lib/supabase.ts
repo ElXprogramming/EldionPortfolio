@@ -3,6 +3,7 @@ import {
   adminLoginInputSchema,
   contactMessageInputSchema,
   contactMessageResponseSchema,
+  inboxPasscodeSchema,
   messageIdSchema,
   toggleReadInputSchema,
   validateClientEnv,
@@ -135,6 +136,28 @@ export function createSupabaseService({ client, isConfigured }: SupabaseServiceO
     await client.auth.signOut();
   };
 
+  const verifyInboxPasscode = (passcode: string): boolean => {
+    const rateCheck = adminAuthLimiter.tryConsume('admin_passcode');
+    if (!rateCheck.allowed) {
+      throw new SafeUserError(
+        `Too many unlock attempts. Please wait ${rateCheck.retryAfterSeconds} seconds before retrying.`
+      );
+    }
+
+    const parseResult = inboxPasscodeSchema.safeParse(passcode);
+    if (!parseResult.success) {
+      throw new SafeUserError('Invalid passcode format.');
+    }
+
+    const isValid = parseResult.data === 'eldion';
+    if (!isValid) {
+      throw new SafeUserError('Incorrect passcode.');
+    }
+
+    adminAuthLimiter.reset('admin_passcode');
+    return true;
+  };
+
   const getAdminSessionEmail = async (): Promise<string | null> => {
     if (!isConfigured) {
       return null;
@@ -206,6 +229,7 @@ export function createSupabaseService({ client, isConfigured }: SupabaseServiceO
 
   return {
     submitContactMessage,
+    verifyInboxPasscode,
     signInAdmin,
     signOutAdmin,
     getAdminSessionEmail,
@@ -237,6 +261,7 @@ const defaultService = createSupabaseService({
 });
 
 export const submitContactMessage = defaultService.submitContactMessage;
+export const verifyInboxPasscode = defaultService.verifyInboxPasscode;
 export const signInAdmin = defaultService.signInAdmin;
 export const signOutAdmin = defaultService.signOutAdmin;
 export const getAdminSessionEmail = defaultService.getAdminSessionEmail;

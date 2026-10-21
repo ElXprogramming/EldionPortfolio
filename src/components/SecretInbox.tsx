@@ -14,12 +14,14 @@ import {
   AlertCircle,
   Copy,
   Check,
+  KeyRound,
   Inbox as InboxIcon,
 } from 'lucide-react';
 import {
   fetchContactMessages,
   toggleMessageReadStatus,
   deleteContactMessage,
+  verifyInboxPasscode,
   signInAdmin,
   signOutAdmin,
   getAdminSessionEmail,
@@ -31,14 +33,26 @@ interface SecretInboxProps {
   onBackToHome: () => void;
 }
 
+const SESSION_AUTH_KEY = 'eldion_inbox_authenticated';
+
 export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
-  const [authenticatedEmail, setAuthenticatedEmail] = useState<string | null>(null);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(SESSION_AUTH_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [passcode, setPasscode] = useState('');
+  const [unlockErrorMessage, setUnlockErrorMessage] = useState<string | null>(null);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [authenticatedEmail, setAuthenticatedEmail] = useState<string | null>(null);
 
   const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(isUnlocked);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterMode, setFilterMode] = useState<'all' | 'unread' | 'read'>('all');
@@ -54,7 +68,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
       setErrorMessage(
         createSafeErrorMessage(
           err,
-          'Unable to load inbox messages. Verify your authenticated session and database policies.'
+          'Unable to load inbox messages. Please verify your database connection.'
         )
       );
     } finally {
@@ -64,46 +78,108 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   useEffect(() => {
     let isMounted = true;
-    getAdminSessionEmail()
-      .then(async (email) => {
-        if (isMounted && email) {
-          setAuthenticatedEmail(email);
-          await loadMessages();
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setAuthenticatedEmail(null);
-        }
-      });
+    if (isUnlocked) {
+      fetchContactMessages()
+        .then((data) => {
+          if (isMounted) {
+            setMessages(data);
+          }
+        })
+        .catch((err: unknown) => {
+          if (isMounted) {
+            setErrorMessage(
+              createSafeErrorMessage(
+                err,
+                'Unable to load inbox messages. Please verify your database connection.'
+              )
+            );
+          }
+        })
+        .finally(() => {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        });
+    } else {
+      getAdminSessionEmail()
+        .then((email) => {
+          if (isMounted && email) {
+            setAuthenticatedEmail(email);
+            setIsUnlocked(true);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setAuthenticatedEmail(null);
+          }
+        });
+    }
     return () => {
       isMounted = false;
     };
-  }, [loadMessages]);
+  }, [isUnlocked]);
 
-  const handleUnlock = async (e: React.FormEvent) => {
+  const handlePasscodeUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsAuthenticating(true);
-    setAuthErrorMessage(null);
+    setIsUnlocking(true);
+    setUnlockErrorMessage(null);
+
+    try {
+      verifyInboxPasscode(passcode);
+      try {
+        sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
+      } catch {
+        // Safe fallback if storage unavailable
+      }
+      setIsUnlocked(true);
+      setPasscode('');
+      await loadMessages();
+    } catch (err: unknown) {
+      setUnlockErrorMessage(
+        createSafeErrorMessage(err, 'Incorrect passcode. Please try again.')
+      );
+    } finally {
+      setIsUnlocking(false);
+    }
+  };
+
+  const handleAdminAuthUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUnlocking(true);
+    setUnlockErrorMessage(null);
 
     try {
       const email = await signInAdmin(credentials);
       setAuthenticatedEmail(email);
+      try {
+        sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
+      } catch {
+        // Safe fallback
+      }
+      setIsUnlocked(true);
       setCredentials({ email: '', password: '' });
       await loadMessages();
     } catch (err: unknown) {
-      setAuthErrorMessage(
+      setUnlockErrorMessage(
         createSafeErrorMessage(err, 'Authentication failed. Please check your credentials.')
       );
     } finally {
-      setIsAuthenticating(false);
+      setIsUnlocking(false);
     }
   };
 
   const handleLock = async () => {
+    try {
+      sessionStorage.removeItem(SESSION_AUTH_KEY);
+    } catch {
+      // Safe fallback
+    }
     await signOutAdmin();
     setAuthenticatedEmail(null);
+    setIsUnlocked(false);
     setMessages([]);
+    setPasscode('');
+    setUnlockErrorMessage(null);
   };
 
   const handleToggleRead = async (message: ContactMessage) => {
@@ -114,7 +190,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
       );
       await toggleMessageReadStatus(message.id, newStatus);
     } catch {
-      loadMessages();
+      void loadMessages();
     }
   };
 
@@ -124,7 +200,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
       setMessages((prev) => prev.filter((m) => m.id !== id));
       await deleteContactMessage(id);
     } catch {
-      loadMessages();
+      void loadMessages();
     }
   };
 
@@ -155,93 +231,167 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
     return messages.filter((m) => !m.is_read).length;
   }, [messages]);
 
-  if (!authenticatedEmail) {
+  if (!isUnlocked) {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative selection:bg-[#B497CF]/30 selection:text-purple-200">
         <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
 
         <div className="glass-panel max-w-md w-full p-8 rounded-3xl border border-slate-800/80 shadow-2xl relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mx-auto mb-6 text-purple-300">
-            <Lock className="w-7 h-7" />
+            {showAdminLogin ? <Lock className="w-7 h-7" /> : <KeyRound className="w-7 h-7" />}
           </div>
 
           <div className="text-center mb-6">
             <h1 className="text-2xl font-extrabold text-white">Secret Inbox</h1>
             <p className="text-slate-400 text-xs sm:text-sm mt-1">
-              Sign in with your Supabase administrator account to view messages
+              {showAdminLogin
+                ? 'Sign in with your Supabase administrator account'
+                : 'Enter the secret passcode to unlock inbox messages'}
             </p>
           </div>
 
-          <form onSubmit={handleUnlock} className="space-y-4">
-            <div>
-              <label
-                htmlFor="admin-email"
-                className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
-              >
-                Admin Email
-              </label>
-              <input
-                id="admin-email"
-                type="email"
-                required
-                autoFocus
-                maxLength={254}
-                disabled={isAuthenticating}
-                placeholder="admin@example.com"
-                value={credentials.email}
-                onChange={(e) => {
-                  setCredentials((prev) => ({ ...prev, email: e.target.value }));
-                  if (authErrorMessage) setAuthErrorMessage(null);
-                }}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
-              />
-            </div>
+          {!showAdminLogin ? (
+            <form onSubmit={handlePasscodeUnlock} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="inbox-passcode"
+                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                >
+                  Passcode
+                </label>
+                <input
+                  id="inbox-passcode"
+                  type="password"
+                  required
+                  autoFocus
+                  maxLength={100}
+                  disabled={isUnlocking}
+                  placeholder="Enter passcode (default: eldion)..."
+                  value={passcode}
+                  onChange={(e) => {
+                    setPasscode(e.target.value);
+                    if (unlockErrorMessage) setUnlockErrorMessage(null);
+                  }}
+                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
+                    unlockErrorMessage
+                      ? 'border-rose-500 ring-1 ring-rose-500'
+                      : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
+                  }`}
+                />
+                {unlockErrorMessage && (
+                  <p className="text-rose-400 text-xs mt-2 text-center">
+                    {unlockErrorMessage}
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <label
-                htmlFor="admin-password"
-                className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+              <button
+                type="submit"
+                disabled={isUnlocking}
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
-                Password
-              </label>
-              <input
-                id="admin-password"
-                type="password"
-                required
-                minLength={8}
-                maxLength={128}
-                disabled={isAuthenticating}
-                placeholder="Enter admin password..."
-                value={credentials.password}
-                onChange={(e) => {
-                  setCredentials((prev) => ({ ...prev, password: e.target.value }));
-                  if (authErrorMessage) setAuthErrorMessage(null);
-                }}
-                className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
-                  authErrorMessage
-                    ? 'border-rose-500 ring-1 ring-rose-500'
-                    : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
-                }`}
-              />
-              {authErrorMessage && (
-                <p className="text-rose-400 text-xs mt-2 text-center">
-                  {authErrorMessage}
-                </p>
-              )}
-            </div>
+                <Unlock className="w-4 h-4" />
+                <span>{isUnlocking ? 'Unlocking...' : 'Unlock Messages'}</span>
+              </button>
 
-            <button
-              type="submit"
-              disabled={isAuthenticating}
-              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-            >
-              <Unlock className="w-4 h-4" />
-              <span>{isAuthenticating ? 'Verifying...' : 'Unlock Messages'}</span>
-            </button>
-          </form>
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAdminLogin(true);
+                    setUnlockErrorMessage(null);
+                  }}
+                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
+                >
+                  Or sign in with Supabase Admin account
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleAdminAuthUnlock} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="admin-email"
+                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                >
+                  Admin Email
+                </label>
+                <input
+                  id="admin-email"
+                  type="email"
+                  required
+                  autoFocus
+                  maxLength={254}
+                  disabled={isUnlocking}
+                  placeholder="admin@example.com"
+                  value={credentials.email}
+                  onChange={(e) => {
+                    setCredentials((prev) => ({ ...prev, email: e.target.value }));
+                    if (unlockErrorMessage) setUnlockErrorMessage(null);
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="admin-password"
+                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                >
+                  Password
+                </label>
+                <input
+                  id="admin-password"
+                  type="password"
+                  required
+                  minLength={8}
+                  maxLength={128}
+                  disabled={isUnlocking}
+                  placeholder="Enter admin password..."
+                  value={credentials.password}
+                  onChange={(e) => {
+                    setCredentials((prev) => ({ ...prev, password: e.target.value }));
+                    if (unlockErrorMessage) setUnlockErrorMessage(null);
+                  }}
+                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
+                    unlockErrorMessage
+                      ? 'border-rose-500 ring-1 ring-rose-500'
+                      : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
+                  }`}
+                />
+                {unlockErrorMessage && (
+                  <p className="text-rose-400 text-xs mt-2 text-center">
+                    {unlockErrorMessage}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isUnlocking}
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                <Unlock className="w-4 h-4" />
+                <span>{isUnlocking ? 'Verifying...' : 'Unlock Messages'}</span>
+              </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAdminLogin(false);
+                    setUnlockErrorMessage(null);
+                  }}
+                  className="text-xs text-purple-400 hover:text-purple-300 transition-colors cursor-pointer"
+                >
+                  Back to Passcode unlock
+                </button>
+              </div>
+            </form>
+          )}
 
           <div className="mt-6 pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-            <span>Protected by Supabase Auth &amp; RLS</span>
+            <span>Protected by Supabase &amp; Passcode</span>
             <button
               type="button"
               onClick={onBackToHome}
@@ -281,6 +431,11 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <h1 className="font-bold text-white text-base sm:text-lg">Secret Inbox</h1>
+              {authenticatedEmail && (
+                <span className="hidden md:inline text-xs text-purple-300 font-medium bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
+                  {authenticatedEmail}
+                </span>
+              )}
               {unreadCount > 0 && (
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-purple-600 text-white">
                   {unreadCount} new

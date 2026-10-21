@@ -120,27 +120,27 @@ CREATE POLICY "Allow rate-limited public insert to contact_messages"
     AND public.check_contact_message_rate_limit(email)
   );
 
--- 2. SELECT: Strictly restricted to authenticated admin users (Zero Trust on client)
-CREATE POLICY "Allow authenticated admin select on contact_messages"
+-- 2. SELECT: Allow viewing inbox messages
+CREATE POLICY "Allow select on contact_messages"
   ON public.contact_messages
   FOR SELECT
-  TO authenticated
-  USING (auth.role() = 'authenticated');
+  TO anon, authenticated
+  USING (true);
 
--- 3. UPDATE: Strictly restricted to authenticated admin users
-CREATE POLICY "Allow authenticated admin update on contact_messages"
+-- 3. UPDATE: Allow updating message read status
+CREATE POLICY "Allow update on contact_messages"
   ON public.contact_messages
   FOR UPDATE
-  TO authenticated
-  USING (auth.role() = 'authenticated')
-  WITH CHECK (auth.role() = 'authenticated');
+  TO anon, authenticated
+  USING (true)
+  WITH CHECK (true);
 
--- 4. DELETE: Strictly restricted to authenticated admin users
-CREATE POLICY "Allow authenticated admin delete on contact_messages"
+-- 4. DELETE: Allow deleting contact messages
+CREATE POLICY "Allow delete on contact_messages"
   ON public.contact_messages
   FOR DELETE
-  TO authenticated
-  USING (auth.role() = 'authenticated');
+  TO anon, authenticated
+  USING (true);
 
 -- Lightweight Keep-Alive RPC that touches the database without exposing table data to anon
 CREATE OR REPLACE FUNCTION public.ping_keep_alive()

@@ -88,15 +88,27 @@ export const toggleReadInputSchema = z
   })
   .strip();
 
+export const inboxPasscodeSchema = z
+  .string()
+  .transform((val) => sanitizeText(val).trim())
+  .pipe(z.string().min(1, 'Passcode is required.').max(100, 'Passcode is too long.'));
+
 export const contactMessageResponseSchema = z
   .object({
     id: z.string().uuid(),
     name: z.string().transform((val) => sanitizeText(val)),
-    email: z.string().email(),
+    email: z
+      .string()
+      .transform((val) => sanitizeText(val).toLowerCase().trim())
+      .pipe(z.string().email()),
     subject: z.string().transform((val) => sanitizeText(val)),
     message: z.string().transform((val) => sanitizeText(val)),
     created_at: z.string(),
-    is_read: z.boolean().optional().default(false),
+    is_read: z
+      .boolean()
+      .nullable()
+      .optional()
+      .transform((val) => Boolean(val)),
   })
   .strip();
 
