@@ -7,16 +7,17 @@ import {
 import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
-import { sanitizeExternalUrl } from '../lib/security';
+import { EXTERNAL_LINKS } from '../lib/constants';
 
-const DECLARAFORM_LIVE_URL =
-  sanitizeExternalUrl('https://declaraform.netlify.app/', ['declaraform.netlify.app']) ?? '#';
-const DECLARAFORM_REPO_URL =
-  sanitizeExternalUrl('https://github.com/ElXprogramming/declaration-form-filler', [
-    'github.com',
-  ]) ?? '#';
-const GITHUB_PROFILE_URL =
-  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
+const DECLARAFORM_TECHS = [
+  'React.js',
+  'Tailwind CSS',
+  'WebGL (Three.js)',
+  'HTML Canvas',
+  'pdf-lib',
+  'Vite',
+  'Netlify',
+] as const;
 
 export default function Projects() {
   return (
@@ -54,7 +55,7 @@ export default function Projects() {
                 {/* Floating badge inside visual */}
                 <div className="absolute top-4 right-4">
                   <a
-                    href={DECLARAFORM_LIVE_URL}
+                    href={EXTERNAL_LINKS.declaraformLive}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-600/90 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:bg-purple-500 transition-colors"
@@ -68,7 +69,7 @@ export default function Projects() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-300 font-medium">Domain: declaraform.netlify.app</span>
                     <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Online
                     </span>
                   </div>
@@ -128,15 +129,7 @@ export default function Projects() {
 
                 {/* Technologies */}
                 <div className="flex flex-wrap gap-1.5 mb-8">
-                  {[
-                    'React.js',
-                    'Tailwind CSS',
-                    'WebGL (Three.js)',
-                    'HTML Canvas',
-                    'pdf-lib',
-                    'Vite',
-                    'Netlify'
-                  ].map((tech) => (
+                  {DECLARAFORM_TECHS.map((tech) => (
                     <span
                       key={tech}
                       className="px-2.5 py-1 rounded-md bg-slate-800/90 text-slate-300 border border-slate-700/60 text-xs font-mono"
@@ -150,7 +143,7 @@ export default function Projects() {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-slate-800/80">
                 <a
-                  href={DECLARAFORM_LIVE_URL}
+                  href={EXTERNAL_LINKS.declaraformLive}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-purple-600 hover:bg-purple-500 shadow-md shadow-purple-600/25 transition-all duration-200 cursor-pointer"
@@ -160,7 +153,7 @@ export default function Projects() {
                 </a>
 
                 <a
-                  href={DECLARAFORM_REPO_URL}
+                  href={EXTERNAL_LINKS.declaraformRepo}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
@@ -195,7 +188,7 @@ export default function Projects() {
           </div>
           
           <a
-            href={GITHUB_PROFILE_URL}
+            href={EXTERNAL_LINKS.github}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-colors shrink-0 cursor-pointer"

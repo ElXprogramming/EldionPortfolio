@@ -1,19 +1,14 @@
 import { ArrowUp, Mail, Lock } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
-import {
-  sanitizeExternalUrl,
-  sanitizeInternalRoute,
-  sanitizeMailtoUrl,
-} from '../lib/security';
+import { PROFILE, ROUTES, EXTERNAL_LINKS } from '../lib/constants';
 
-const FOOTER_GITHUB_URL =
-  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
-const FOOTER_LINKEDIN_URL =
-  sanitizeExternalUrl('https://www.linkedin.com/in/eldion-ryan-godius-897064235', [
-    'www.linkedin.com',
-  ]) ?? '#';
-const FOOTER_MAILTO_URL = sanitizeMailtoUrl('nayrnoidle@gmail.com');
-const FOOTER_INBOX_ROUTE = sanitizeInternalRoute('#inbox');
+const FOOTER_LINKS = [
+  { label: 'About', href: ROUTES.about },
+  { label: 'Skills', href: ROUTES.skills },
+  { label: 'Projects', href: ROUTES.projects },
+  { label: 'Education', href: ROUTES.education },
+  { label: 'Contact', href: ROUTES.contact },
+] as const;
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -28,31 +23,35 @@ export default function Footer() {
           {/* Logo & Bio info */}
           <div className="flex items-center gap-3">
             <a
-              href={FOOTER_INBOX_ROUTE}
+              href={ROUTES.inbox}
               className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center font-bold text-sm text-purple-300 hover:scale-105 transition-transform"
               title="EG Portal"
             >
-              EG
+              {PROFILE.initials}
             </a>
             <div>
-              <div className="text-sm font-bold text-white">Eldion Ryan Godius</div>
+              <div className="text-sm font-bold text-white">{PROFILE.name}</div>
               <div className="text-xs text-slate-300">Software Engineering Student @ UMS</div>
             </div>
           </div>
 
           {/* Center Navigation */}
           <div className="flex flex-wrap justify-center gap-6 text-xs text-slate-300">
-            <a href={sanitizeInternalRoute('#about')} className="hover:text-white transition-colors">About</a>
-            <a href={sanitizeInternalRoute('#skills')} className="hover:text-white transition-colors">Skills</a>
-            <a href={sanitizeInternalRoute('#projects')} className="hover:text-white transition-colors">Projects</a>
-            <a href={sanitizeInternalRoute('#education')} className="hover:text-white transition-colors">Education</a>
-            <a href={sanitizeInternalRoute('#contact')} className="hover:text-white transition-colors">Contact</a>
+            {FOOTER_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="hover:text-white transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
 
           {/* Socials & Back to Top */}
           <div className="flex items-center gap-3">
             <a
-              href={FOOTER_GITHUB_URL}
+              href={EXTERNAL_LINKS.github}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
@@ -61,7 +60,7 @@ export default function Footer() {
               <GithubIcon className="w-4 h-4" />
             </a>
             <a
-              href={FOOTER_LINKEDIN_URL}
+              href={EXTERNAL_LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
@@ -70,7 +69,7 @@ export default function Footer() {
               <LinkedinIcon className="w-4 h-4" />
             </a>
             <a
-              href={FOOTER_MAILTO_URL}
+              href={EXTERNAL_LINKS.mailto}
               className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
               aria-label="Send Email"
             >
@@ -90,11 +89,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-900 text-center text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© {new Date().getFullYear()} Eldion Ryan Godius. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {PROFILE.name}. All rights reserved.</p>
           <div className="flex items-center gap-2 text-slate-400">
             <span>Built with React, TypeScript &amp; Tailwind CSS</span>
             <a
-              href="#inbox"
+              href={ROUTES.inbox}
               className="opacity-25 hover:opacity-100 hover:text-purple-400 transition-all p-1"
               title="Secret Messages Inbox"
               aria-label="Secret Inbox"

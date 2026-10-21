@@ -43,4 +43,22 @@ export default defineConfig({
     allowedHosts: true, // allow all hosts including cloudflared tunnel domain in preview mode
     headers: SECURITY_HEADERS,
   },
+  build: {
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules/three') || id.includes('node_modules/postprocessing')) {
+            return 'three-vendor';
+          }
+          if (id.includes('node_modules/motion')) {
+            return 'motion-vendor';
+          }
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase-vendor';
+          }
+        },
+      },
+    },
+  },
 });

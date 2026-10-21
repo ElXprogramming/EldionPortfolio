@@ -16,8 +16,7 @@ interface SkillCategory {
   skills: { name: string; highlight?: boolean }[];
 }
 
-export default function Skills() {
-  const skillCategories: SkillCategory[] = [
+const SKILL_CATEGORIES: readonly SkillCategory[] = [
     {
       title: 'Frontend Development',
       icon: Code2,
@@ -88,6 +87,7 @@ export default function Skills() {
     },
   ];
 
+export default function Skills() {
   return (
     <section id="skills" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -108,7 +108,7 @@ export default function Skills() {
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {skillCategories.map((cat, idx) => {
+          {SKILL_CATEGORIES.map((cat, idx) => {
             const Icon = cat.icon;
             return (
               <div

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Flame,
   Trophy,
@@ -26,10 +26,7 @@ import type {
   GithubContributionDay,
   GithubUserProfile,
 } from '../lib/schemas';
-import { sanitizeExternalUrl } from '../lib/security';
-
-const PROFILE_URL =
-  sanitizeExternalUrl(`https://github.com/${GITHUB_USERNAME}`, ['github.com']) ?? '#';
+import { EXTERNAL_LINKS } from '../lib/constants';
 
 const AVAILABLE_YEARS = [
   { label: 'Last 12 Months', value: 'last' },
@@ -38,6 +35,8 @@ const AVAILABLE_YEARS = [
   { label: '2024', value: '2024' },
   { label: '2022', value: '2022' },
 ] as const;
+
+const DAY_NAMES = ['', 'Mon', '', 'Wed', '', 'Fri', ''] as const;
 
 type ThemeMode = 'purple' | 'emerald';
 
@@ -53,33 +52,39 @@ export default function GithubContributions() {
   const [isUsingFallback, setIsUsingFallback] = useState<boolean>(false);
   const [hoveredDay, setHoveredDay] = useState<GithubContributionDay | null>(null);
 
+  const [reloadKey, setReloadKey] = useState<number>(0);
+
   useEffect(() => {
     let isMounted = true;
-
     fetchGithubContributions(selectedYear)
       .then((data) => {
-        if (!isMounted) return;
-        setContributionsData(data);
-        setIsUsingFallback(false);
-        setError(null);
-        setIsLoading(false);
+        if (isMounted) {
+          setContributionsData(data);
+          setIsUsingFallback(false);
+          setError(null);
+        }
       })
       .catch(() => {
-        if (!isMounted) return;
-        if (selectedYear === 'last' || selectedYear === '2026') {
-          setContributionsData(GITHUB_CONTRIBUTIONS_FALLBACK);
-          setIsUsingFallback(true);
-          setError(null);
-        } else {
-          setError('Could not load activity for this year. Please try again.');
+        if (isMounted) {
+          if (selectedYear === 'last' || selectedYear === '2026') {
+            setContributionsData(GITHUB_CONTRIBUTIONS_FALLBACK);
+            setIsUsingFallback(true);
+            setError(null);
+          } else {
+            setError('Could not load activity for this year. Please try again.');
+          }
         }
-        setIsLoading(false);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       });
 
     return () => {
       isMounted = false;
     };
-  }, [selectedYear]);
+  }, [selectedYear, reloadKey]);
 
   const handleSelectYear = (year: string) => {
     if (year === selectedYear) return;
@@ -87,27 +92,10 @@ export default function GithubContributions() {
     setSelectedYear(year);
   };
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = () => {
     setIsLoading(true);
-    fetchGithubContributions(selectedYear)
-      .then((data) => {
-        setContributionsData(data);
-        setIsUsingFallback(false);
-        setError(null);
-      })
-      .catch(() => {
-        if (selectedYear === 'last' || selectedYear === '2026') {
-          setContributionsData(GITHUB_CONTRIBUTIONS_FALLBACK);
-          setIsUsingFallback(true);
-          setError(null);
-        } else {
-          setError('Could not load activity for this year. Please try again.');
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [selectedYear]);
+    setReloadKey((prev) => prev + 1);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -166,8 +154,6 @@ export default function GithubContributions() {
     }
   };
 
-  const dayNames = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
-
   return (
     <div id="contributions" className="mt-16 sm:mt-20 scroll-mt-24">
       <div className="glass-card rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden">
@@ -191,7 +177,7 @@ export default function GithubContributions() {
             <p className="mt-1 text-slate-300 text-xs sm:text-sm text-readable-body">
               Live contributions, commit streaks, and repositories tracked from{' '}
               <a
-                href={PROFILE_URL}
+                href={EXTERNAL_LINKS.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-purple-300 hover:text-white font-mono underline decoration-purple-500/40 underline-offset-2 transition-colors inline-flex items-center gap-1"
@@ -368,7 +354,7 @@ export default function GithubContributions() {
               <div className="flex items-start">
                 {/* Day Labels Column */}
                 <div className="flex flex-col gap-1 pr-2 pt-0.5 select-none shrink-0 w-6">
-                  {dayNames.map((name, dIdx) => (
+                  {DAY_NAMES.map((name, dIdx) => (
                     <div
                       key={dIdx}
                       className="h-3 sm:h-3.5 text-[9px] font-mono text-slate-400 leading-none flex items-center"
@@ -494,7 +480,7 @@ export default function GithubContributions() {
           </div>
 
           <a
-            href={PROFILE_URL}
+            href={EXTERNAL_LINKS.github}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-200 bg-slate-800/90 hover:bg-slate-700 hover:text-white border border-slate-700/80 hover:border-slate-600 transition-all shadow-sm cursor-pointer"

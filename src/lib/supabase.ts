@@ -23,22 +23,15 @@ const EXPLICIT_MESSAGE_COLUMNS =
   'id, name, email, subject, message, is_read, created_at' as const;
 
 export function createInMemoryAuthStorage(): SupportedStorage {
-  let store: Readonly<Record<string, string>> = {};
+  const store = new Map<string, string>();
 
   return {
-    getItem: (key: string): string | null => {
-      return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
-    },
+    getItem: (key: string): string | null => store.get(key) ?? null,
     setItem: (key: string, value: string): void => {
-      store = {
-        ...store,
-        [key]: value,
-      };
+      store.set(key, value);
     },
     removeItem: (key: string): void => {
-      const { [key]: _removed, ...remaining } = store;
-      void _removed;
-      store = remaining;
+      store.delete(key);
     },
   };
 }

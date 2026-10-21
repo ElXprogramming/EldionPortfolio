@@ -27,7 +27,7 @@ import {
   getAdminSessionEmail,
   type ContactMessage,
 } from '../lib/supabase';
-import { createSafeErrorMessage, sanitizeMailtoUrl } from '../lib/security';
+import { createSafeErrorMessage, sanitizeMailtoUrl, copyToClipboard } from '../lib/security';
 
 interface SecretInboxProps {
   onBackToHome: () => void;
@@ -59,11 +59,10 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   const loadMessages = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
     try {
       const data = await fetchContactMessages();
       setMessages(data);
+      setErrorMessage(null);
     } catch (err: unknown) {
       setErrorMessage(
         createSafeErrorMessage(
@@ -83,6 +82,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         .then((data) => {
           if (isMounted) {
             setMessages(data);
+            setErrorMessage(null);
           }
         })
         .catch((err: unknown) => {
@@ -132,6 +132,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         // Safe fallback if storage unavailable
       }
       setIsUnlocked(true);
+      setIsLoading(true);
       setPasscode('');
       await loadMessages();
     } catch (err: unknown) {
@@ -157,6 +158,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         // Safe fallback
       }
       setIsUnlocked(true);
+      setIsLoading(true);
       setCredentials({ email: '', password: '' });
       await loadMessages();
     } catch (err: unknown) {
@@ -190,6 +192,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
       );
       await toggleMessageReadStatus(message.id, newStatus);
     } catch {
+      setIsLoading(true);
       void loadMessages();
     }
   };
@@ -200,14 +203,22 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
       setMessages((prev) => prev.filter((m) => m.id !== id));
       await deleteContactMessage(id);
     } catch {
+      setIsLoading(true);
       void loadMessages();
     }
   };
 
-  const handleCopyEmail = (email: string) => {
-    navigator.clipboard.writeText(email);
-    setCopiedEmail(email);
-    setTimeout(() => setCopiedEmail(null), 2000);
+  const handleRefreshMessages = () => {
+    setIsLoading(true);
+    void loadMessages();
+  };
+
+  const handleCopyEmail = async (email: string) => {
+    const success = await copyToClipboard(email);
+    if (success) {
+      setCopiedEmail(email);
+      setTimeout(() => setCopiedEmail(null), 2000);
+    }
   };
 
   const filteredMessages = useMemo(() => {
@@ -447,7 +458,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={loadMessages}
+              onClick={handleRefreshMessages}
               disabled={isLoading}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer disabled:opacity-50"
               title="Refresh messages"

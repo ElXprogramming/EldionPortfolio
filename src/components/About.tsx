@@ -6,24 +6,25 @@ import {
   CheckCircle2 
 } from 'lucide-react';
 
+const CORE_VALUES = [
+  {
+    icon: Code,
+    title: 'Full-Stack Engineering',
+    desc: 'Crafting responsive client interfaces with React and robust backend APIs with Node.js and PostgreSQL.',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Pragmatic AI & LLMs',
+    desc: 'Implementing practical AI features — from local open-source models (Qwen, GLM) to RAG and deterministic JSON workflows.',
+  },
+  {
+    icon: Rocket,
+    title: 'Real-World Impact',
+    desc: 'Building tools that eliminate everyday user friction, such as automated academic PDF generators and diet assistants.',
+  },
+] as const;
+
 export default function About() {
-  const coreValues = [
-    {
-      icon: Code,
-      title: 'Full-Stack Engineering',
-      desc: 'Crafting responsive client interfaces with React and robust backend APIs with Node.js and PostgreSQL.',
-    },
-    {
-      icon: Lightbulb,
-      title: 'Pragmatic AI & LLMs',
-      desc: 'Implementing practical AI features — from local open-source models (Qwen, GLM) to RAG and deterministic JSON workflows.',
-    },
-    {
-      icon: Rocket,
-      title: 'Real-World Impact',
-      desc: 'Building tools that eliminate everyday user friction, such as automated academic PDF generators and diet assistants.',
-    },
-  ];
 
   return (
     <section id="about" className="py-24 relative">
@@ -85,7 +86,7 @@ export default function About() {
 
           {/* Right Core Pillars */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            {coreValues.map((val, idx) => {
+            {CORE_VALUES.map((val, idx) => {
               const Icon = val.icon;
               return (
                 <div

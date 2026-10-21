@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -7,9 +7,10 @@ import Projects from './components/Projects';
 import Education from './components/Education';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import SecretInbox from './components/SecretInbox';
 import PixelBlast from './components/PixelBlast';
 import { sanitizeInternalRoute } from './lib/security';
+
+const SecretInbox = lazy(() => import('./components/SecretInbox'));
 
 function resolveCurrentView(): 'home' | 'inbox' {
   const safeHash = sanitizeInternalRoute(window.location.hash.toLowerCase());
@@ -85,15 +86,25 @@ export default function App() {
 
   if (currentView === 'inbox') {
     return (
-      <SecretInbox
-        onBackToHome={() => {
-          if (window.location.pathname !== '/') {
-            window.history.replaceState(null, '', '/');
-          }
-          window.location.hash = '';
-          setCurrentView('home');
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-slate-950 text-purple-300 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-sm font-medium animate-pulse">
+              <span>Loading Secret Inbox...</span>
+            </div>
+          </div>
+        }
+      >
+        <SecretInbox
+          onBackToHome={() => {
+            if (window.location.pathname !== '/') {
+              window.history.replaceState(null, '', '/');
+            }
+            window.location.hash = '';
+            setCurrentView('home');
+          }}
+        />
+      </Suspense>
     );
   }
 

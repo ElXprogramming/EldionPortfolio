@@ -14,49 +14,40 @@ import {
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 import { submitContactMessage } from '../lib/supabase';
-import {
-  createSafeErrorMessage,
-  sanitizeExternalUrl,
-  sanitizeMailtoUrl,
-  sanitizeTelUrl,
-} from '../lib/security';
+import { createSafeErrorMessage, copyToClipboard } from '../lib/security';
+import { PROFILE, EXTERNAL_LINKS } from '../lib/constants';
 
-const CONTACT_EMAIL = 'nayrnoidle@gmail.com';
-const CONTACT_PHONE = '0178201365';
-const LINKEDIN_URL =
-  sanitizeExternalUrl('https://www.linkedin.com/in/eldion-ryan-godius-897064235', [
-    'www.linkedin.com',
-  ]) ?? '#';
-const GITHUB_URL =
-  sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com']) ?? '#';
-const SAFE_MAILTO_URL = sanitizeMailtoUrl(CONTACT_EMAIL);
-const SAFE_TEL_URL = sanitizeTelUrl(CONTACT_PHONE);
+const INITIAL_FORM_DATA = {
+  name: '',
+  email: '',
+  subject: '',
+  message: '',
+};
 
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(CONTACT_EMAIL);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2500);
+  const handleCopyEmail = async () => {
+    const success = await copyToClipboard(PROFILE.email);
+    if (success) {
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2500);
+    }
   };
 
-  const handleCopyPhone = () => {
-    navigator.clipboard.writeText(CONTACT_PHONE);
-    setCopiedPhone(true);
-    setTimeout(() => setCopiedPhone(false), 2500);
+  const handleCopyPhone = async () => {
+    const success = await copyToClipboard(PROFILE.phone);
+    if (success) {
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2500);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,12 +60,7 @@ export default function Contact() {
       await submitContactMessage(formData);
       setSubmitStatus('success');
       setStatusMessage('Thank you! Your message has been sent directly to Eldion.');
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-      });
+      setFormData(INITIAL_FORM_DATA);
     } catch (err: unknown) {
       setSubmitStatus('error');
       setStatusMessage(
@@ -117,10 +103,10 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Email</div>
                   <a
-                    href={SAFE_MAILTO_URL}
+                    href={EXTERNAL_LINKS.mailto}
                     className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
                   >
-                    {CONTACT_EMAIL}
+                    {PROFILE.email}
                   </a>
                 </div>
               </div>
@@ -147,10 +133,10 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Phone / WhatsApp</div>
                   <a
-                    href={SAFE_TEL_URL}
+                    href={EXTERNAL_LINKS.tel}
                     className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
                   >
-                    017-820 1365
+                    {PROFILE.phoneDisplay}
                   </a>
                 </div>
               </div>
@@ -170,7 +156,7 @@ export default function Contact() {
 
             {/* LinkedIn Card */}
             <a
-              href={LINKEDIN_URL}
+              href={EXTERNAL_LINKS.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
@@ -182,7 +168,7 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">LinkedIn</div>
                   <div className="text-sm font-semibold text-white group-hover:text-sky-400 transition-colors truncate text-readable-subheading">
-                    Eldion Ryan Godius
+                    {PROFILE.name}
                   </div>
                 </div>
               </div>
@@ -191,7 +177,7 @@ export default function Contact() {
 
             {/* GitHub Card */}
             <a
-              href={GITHUB_URL}
+              href={EXTERNAL_LINKS.github}
               target="_blank"
               rel="noopener noreferrer"
               className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
@@ -203,7 +189,7 @@ export default function Contact() {
                 <div className="truncate">
                   <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">GitHub</div>
                   <div className="text-sm font-semibold text-white group-hover:text-purple-300 transition-colors truncate text-readable-subheading">
-                    @ElXprogramming
+                    @{PROFILE.githubUsername}
                   </div>
                 </div>
               </div>
@@ -213,7 +199,7 @@ export default function Contact() {
             {/* Location Pill */}
             <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/60 flex items-center gap-3 text-xs text-slate-200 text-readable-body">
               <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>Based in Universiti Malaysia Sabah, Kota Kinabalu, Sabah</span>
+              <span>Based in {PROFILE.fullLocation}</span>
             </div>
           </div>
 

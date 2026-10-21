@@ -168,12 +168,13 @@ export function createRateLimiter({
   windowMs,
   nowFn = () => Date.now(),
 }: RateLimiterOptions): RateLimiter {
-  let buckets: Readonly<Record<string, readonly number[]>> = {};
+  const buckets = new Map<string, number[]>();
 
   const tryConsume = (key: string): RateLimitResult => {
     const now = nowFn();
     const windowStart = now - windowMs;
-    const recentTimestamps = (buckets[key] ?? []).filter((ts) => ts > windowStart);
+    const existing = buckets.get(key);
+    const recentTimestamps = existing ? existing.filter((ts) => ts > windowStart) : [];
 
     if (recentTimestamps.length >= maxRequests) {
       const oldestTimestamp = recentTimestamps[0] ?? now;
@@ -184,10 +185,8 @@ export function createRateLimiter({
       };
     }
 
-    buckets = {
-      ...buckets,
-      [key]: [...recentTimestamps, now],
-    };
+    recentTimestamps.push(now);
+    buckets.set(key, recentTimestamps);
 
     return {
       allowed: true,
@@ -196,9 +195,7 @@ export function createRateLimiter({
   };
 
   const reset = (key: string): void => {
-    const { [key]: _removed, ...remaining } = buckets;
-    void _removed;
-    buckets = remaining;
+    buckets.delete(key);
   };
 
   return { tryConsume, reset };
@@ -209,4 +206,16 @@ export function createSafeErrorMessage(error: unknown, fallbackMessage: string):
     return error.message;
   }
   return fallbackMessage;
+}
+
+export async function copyToClipboard(text: string): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+    return false;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
 }

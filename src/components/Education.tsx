@@ -7,59 +7,59 @@ import {
   BookOpen 
 } from 'lucide-react';
 
+const EDUCATION_ITEMS = [
+  {
+    institution: 'Universiti Malaysia Sabah (UMS)',
+    degree: 'Bachelor of Computer Science with Honours (Software Engineering)',
+    period: '2023 — Present',
+    location: 'Sabah, Malaysia',
+    status: 'Current Student',
+    statusColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+    description:
+      'Pursuing formal Software Engineering curriculum emphasizing software architecture, requirements engineering, relational database design, testing & quality assurance, and modern distributed systems.',
+    coursework: [
+      'Software Engineering Lifecycle & QA',
+      'Relational Database Systems (PostgreSQL / SQL)',
+      'Object-Oriented Design & Testing',
+      'Web & Mobile Application Development',
+      'Data Structures & Algorithm Analysis',
+    ],
+  },
+  {
+    institution: 'Kolej Matrikulasi Labuan (KML)',
+    degree: 'Physical Science',
+    period: '2022 — 2023',
+    location: 'Labuan, Malaysia',
+    status: 'Completed',
+    statusColor: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
+    description:
+      'Completed rigorous pre-university physical science program building strong analytical mathematical foundation, scientific methodology, and computational problem solving.',
+    coursework: [
+      'Advanced Calculus & Algebra',
+      'Applied Physics',
+      'Analytical Logic & Computing Foundation',
+    ],
+  },
+] as const;
+
+const LANGUAGES = [
+  {
+    name: 'English',
+    level: 'Fluent / Full Professional',
+    desc: 'Technical documentation, code commenting, written & verbal collaboration.',
+    percent: 95,
+    color: 'from-indigo-500 to-sky-400',
+  },
+  {
+    name: 'Malay',
+    level: 'Native Speaker',
+    desc: 'Mother tongue, effective native communication in diverse bilingual teams.',
+    percent: 100,
+    color: 'from-emerald-500 to-teal-400',
+  },
+] as const;
+
 export default function Education() {
-  const educationItems = [
-    {
-      institution: 'Universiti Malaysia Sabah (UMS)',
-      degree: 'Bachelor of Computer Science with Honours (Software Engineering)',
-      period: '2023 — Present',
-      location: 'Sabah, Malaysia',
-      status: 'Current Student',
-      statusColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-      description:
-        'Pursuing formal Software Engineering curriculum emphasizing software architecture, requirements engineering, relational database design, testing & quality assurance, and modern distributed systems.',
-      coursework: [
-        'Software Engineering Lifecycle & QA',
-        'Relational Database Systems (PostgreSQL / SQL)',
-        'Object-Oriented Design & Testing',
-        'Web & Mobile Application Development',
-        'Data Structures & Algorithm Analysis',
-      ],
-    },
-    {
-      institution: 'Kolej Matrikulasi Labuan (KML)',
-      degree: 'Physical Science',
-      period: '2022 — 2023',
-      location: 'Labuan, Malaysia',
-      status: 'Completed',
-      statusColor: 'bg-sky-500/10 text-sky-400 border-sky-500/30',
-      description:
-        'Completed rigorous pre-university physical science program building strong analytical mathematical foundation, scientific methodology, and computational problem solving.',
-      coursework: [
-        'Advanced Calculus & Algebra',
-        'Applied Physics',
-        'Analytical Logic & Computing Foundation',
-      ],
-    },
-  ];
-
-  const languages = [
-    {
-      name: 'English',
-      level: 'Fluent / Full Professional',
-      desc: 'Technical documentation, code commenting, written & verbal collaboration.',
-      percent: 95,
-      color: 'from-indigo-500 to-sky-400',
-    },
-    {
-      name: 'Malay',
-      level: 'Native Speaker',
-      desc: 'Mother tongue, effective native communication in diverse bilingual teams.',
-      percent: 100,
-      color: 'from-emerald-500 to-teal-400',
-    },
-  ];
-
   return (
     <section id="education" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +82,7 @@ export default function Education() {
           
           {/* Education Timeline (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
-            {educationItems.map((item, idx) => (
+            {EDUCATION_ITEMS.map((item, idx) => (
               <div
                 key={idx}
                 className="glass-card rounded-2xl p-6 sm:p-7 border border-slate-800/80 bg-slate-900/60 relative overflow-hidden"
@@ -156,7 +156,7 @@ export default function Education() {
               </div>
 
               <div className="space-y-5">
-                {languages.map((lang, idx) => (
+                {LANGUAGES.map((lang, idx) => (
                   <div key={idx} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/60">
                     <div className="flex justify-between items-center mb-1.5">
                       <span className="text-sm font-bold text-white text-readable-subheading">
