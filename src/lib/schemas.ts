@@ -142,3 +142,37 @@ export function validateClientEnv(rawEnv: Record<string, unknown>): ClientEnvCon
     isConfigured,
   };
 }
+
+export const githubContributionDaySchema = z
+  .object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
+    count: z.number().int().nonnegative(),
+    level: z.number().int().min(0).max(4),
+  })
+  .strip();
+
+export type GithubContributionDay = z.infer<typeof githubContributionDaySchema>;
+
+export const githubContributionsResponseSchema = z
+  .object({
+    total: z.record(z.string(), z.number().int().nonnegative()),
+    contributions: z.array(githubContributionDaySchema),
+  })
+  .strip();
+
+export type GithubContributionsResponse = z.infer<typeof githubContributionsResponseSchema>;
+
+export const githubUserProfileSchema = z
+  .object({
+    login: z.string(),
+    name: z.string().nullable().optional(),
+    avatar_url: z.string().url(),
+    html_url: z.string().url().optional(),
+    public_repos: z.number().int().nonnegative().optional(),
+    followers: z.number().int().nonnegative().optional(),
+    bio: z.string().nullable().optional(),
+  })
+  .strip();
+
+export type GithubUserProfile = z.infer<typeof githubUserProfileSchema>;
+

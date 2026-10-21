@@ -5,6 +5,7 @@ import {
   Clock
 } from 'lucide-react';
 import { GithubIcon } from './Icons';
+import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
 import { sanitizeExternalUrl } from '../lib/security';
 
@@ -174,8 +175,11 @@ export default function Projects() {
           </div>
         </div>
 
+        {/* GitHub Contributions & Open Source Activity */}
+        <GithubContributions />
+
         {/* Future / In Development Callout Card */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-slate-900/65 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        <div className="mt-8 p-6 sm:p-7 rounded-2xl bg-slate-900/65 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3.5">
             <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
               <Clock className="w-5 h-5" />
