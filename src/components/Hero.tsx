@@ -15,6 +15,7 @@ import {
 import { GithubIcon, LinkedinIcon } from './Icons';
 import eldionPortrait from '../assets/eldion-portrait.jpg';
 import FlipCard from './FlipCard';
+import TechText from './TechText';
 import { copyToClipboard } from '../lib/security';
 import { PROFILE, ROUTES, EXTERNAL_LINKS } from '../lib/constants';
 
@@ -55,13 +56,26 @@ export default function Hero() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6 text-readable-heading">
-              Hi, I'm{' '}
-              <span className="text-gradient">
-                Eldion Ryan
-              </span>{' '}
-              Godius.
-            </h1>
+            <div className="w-full relative mb-4 sm:mb-6">
+              <h1 className="sr-only">Eldion Ryan Godius</h1>
+              <div className="w-full h-20 sm:h-24 md:h-28 lg:h-32 relative" aria-hidden="true">
+                <TechText
+                  text="Eldion Ryan Godius"
+                  fontWeight={800}
+                  fontSize={85}
+                  color="#ffffff"
+                  accentColor="#c084fc"
+                  reveal="letter"
+                  dashLength={4}
+                  dashGap={2}
+                  specks={15}
+                  intro="none"
+                  introDuration={2}
+                  clickKick
+                  guides={false}
+                />
+              </div>
+            </div>
 
             {/* Core Summary */}
             <p className="text-base sm:text-lg text-slate-100 leading-relaxed mb-6 max-w-2xl text-readable-body">
