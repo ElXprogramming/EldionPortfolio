@@ -72,9 +72,14 @@ try {
   } else {
     console.warn(`⚠️ Received status ${response.status}. Verify RLS and anon key configuration.`);
   }
-} catch {
-  console.error('❌ Ping failed! Possible reasons:');
-  console.error('1. The Supabase project is currently paused in the Supabase Dashboard.');
-  console.error('2. Network or internet connectivity issues.');
+} catch (err) {
+  const projectRef = parsedBaseUrl.hostname.split('.')[0];
+  console.error('❌ Ping failed! Cause:', err?.cause?.message || err?.message || String(err));
+  console.error('\nActionable troubleshooting steps:');
+  console.error('1. The Supabase project is likely PAUSED due to free-tier inactivity (DNS ENOTFOUND).');
+  console.error(`   Direct link to restore: https://supabase.com/dashboard/project/${projectRef}`);
+  console.error('   Click "Restore project" to reactivate the database and restore DNS resolution.');
+  console.error('2. If you recreated or migrated the project, update VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local and GitHub Secrets.');
+  console.error('3. Check network and DNS resolution.');
   process.exit(1);
 }

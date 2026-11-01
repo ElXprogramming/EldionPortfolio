@@ -277,7 +277,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                   autoFocus
                   maxLength={100}
                   disabled={isUnlocking}
-                  placeholder="Enter passcode (default: eldion)..."
+                  placeholder="Enter passcode..."
                   value={passcode}
                   onChange={(e) => {
                     setPasscode(e.target.value);

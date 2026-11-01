@@ -34,5 +34,9 @@ Never write insecure "placeholder" code. Apply the following mandatory security 
 * **No Information Leakage:** Never return stack traces, raw database errors, or internal system paths to the client. Log detailed errors securely on the server and return generic, safe error messages with proper HTTP status codes to React.
 * **Response Filtering:** Explicitly select and return only the fields required by the frontend UI. Never return full database user objects (e.g., password hashes, internal flags, or other users' metadata).
 
+### 6. Git Workflow & Version Control
+* **Always Commit and Push Modifications:** Always stage, commit with clear descriptive commit messages, and push any modifications to the remote git repository upon completing any task, fix, or feature. Never leave working trees uncommitted or unpushed.
+
 ### Execution Rule for Every Task:
 Before outputting code, silently audit your implementation against these 5 pillars. After generating the code, include a brief **"Security Verification"** bullet list confirming which specific protections were applied to the new code.
+
