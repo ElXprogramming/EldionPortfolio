@@ -9,6 +9,7 @@ import {
   sanitizeTelUrl,
   sanitizeText,
 } from '../security';
+import { EXTERNAL_LINKS } from '../constants';
 
 describe('security utilities', () => {
   describe('sanitizeText', () => {
@@ -57,6 +58,16 @@ describe('security utilities', () => {
       expect(
         sanitizeExternalUrl('https://github.com/ElXprogramming', ['github.com'])
       ).toBe('https://github.com/ElXprogramming');
+    });
+
+    it('correctly validates production project links in EXTERNAL_LINKS', () => {
+      expect(EXTERNAL_LINKS.declaraformLive).toContain('https://declaraform.netlify.app');
+      expect(EXTERNAL_LINKS.declaraformRepo).toContain('https://github.com/ElXprogramming/declaration-form-filler');
+      expect(EXTERNAL_LINKS.doomscrollSirenLive).toContain('https://doomscroll-siren.netlify.app');
+      expect(EXTERNAL_LINKS.doomscrollSirenRepo).toContain('https://github.com/ElXprogramming/doomscroll-siren');
+      expect(EXTERNAL_LINKS.gymposeCameraLive).toContain('https://gymposecamera.vercel.app');
+      expect(EXTERNAL_LINKS.gymposeCameraRepo).toContain('https://github.com/ElXprogramming/auracam-majestic-pose');
+      expect(EXTERNAL_LINKS.neurosortRepo).toContain('https://github.com/ElXprogramming/neurosort');
     });
   });
 

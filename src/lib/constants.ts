@@ -46,6 +46,25 @@ export const EXTERNAL_LINKS = {
       'https://github.com/ElXprogramming/declaration-form-filler',
       ['github.com']
     ) ?? '#',
+  doomscrollSirenLive:
+    sanitizeExternalUrl('https://doomscroll-siren.netlify.app/', ['doomscroll-siren.netlify.app']) ?? '#',
+  doomscrollSirenRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/doomscroll-siren',
+      ['github.com']
+    ) ?? '#',
+  gymposeCameraLive:
+    sanitizeExternalUrl('https://gymposecamera.vercel.app/', ['gymposecamera.vercel.app']) ?? '#',
+  gymposeCameraRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/auracam-majestic-pose',
+      ['github.com']
+    ) ?? '#',
+  neurosortRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/neurosort',
+      ['github.com']
+    ) ?? '#',
   mailto: sanitizeMailtoUrl(PROFILE.email),
   tel: sanitizeTelUrl(PROFILE.phone),
 } as const;

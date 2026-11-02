@@ -60,7 +60,7 @@ export default function About() {
               
               <p>
                 My journey centers around practical, hands-on building: from engineering 
-                <span className="text-purple-300 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for university peers, to implementing modern full-stack web applications and intelligent data-driven solutions.
+                <span className="text-purple-300 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for Computer Science peers in FKI KK, to implementing modern full-stack web applications and intelligent data-driven solutions.
               </p>
 
               <p>
