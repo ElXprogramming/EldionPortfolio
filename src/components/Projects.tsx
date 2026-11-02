@@ -48,6 +48,50 @@ interface ProjectItem {
 
 const PROJECTS_DATA: readonly ProjectItem[] = [
   {
+    id: 'neurosort',
+    title: 'NeuroSort',
+    subtitle: 'Autonomous Local-First File Organization Daemon Powered by Ollama',
+    description:
+      'A local-first, safe, and intelligent automatic file management daemon and CLI powered by Ollama (Llama 3.2 / Phi 3.5). Features a built-in local web dashboard with a read-only "Future Sight" explorer that extracts metadata from documents, images (EXIF), and code to simulate destinations before moving, accompanied by an audit-grade SQLite WAL ledger guaranteeing instant transaction rollback and zero data loss.',
+    accentHoverBorder: 'hover:border-indigo-500/40',
+    accentHoverShadow: 'hover:shadow-indigo-500/10',
+    titleHoverColor: 'group-hover:text-indigo-300',
+    subtitleColor: 'text-indigo-300',
+    badges: [
+      {
+        label: 'Open Source Daemon & CLI',
+        className: 'border-indigo-500/40 text-indigo-400 bg-indigo-500/10',
+      },
+      {
+        label: 'Local LLMs & SQLite WAL',
+        className: 'border-purple-500/40 text-purple-300 bg-purple-500/10',
+      },
+    ],
+    domainBadge: {
+      label: 'Localhost: 127.0.0.1:8765',
+      status: 'Local Daemon',
+      isOnline: true,
+    },
+    image: neurosortImg,
+    imageAlt: 'NeuroSort Future Sight Dashboard Preview',
+    githubUrl: EXTERNAL_LINKS.neurosortRepo,
+    features: [
+      { label: 'Read-only "Future Sight" explorer to simulate destinations risk-free' },
+      { label: 'Semantic classification via Ollama local LLMs with taxonomy overrides' },
+      { label: 'Audit-grade SQLite3 WAL transaction ledger with atomic 1-click rollback' },
+      { label: 'Streaming SHA-256 chunk hashing & non-blocking intake directory daemon' },
+    ],
+    technologies: [
+      'Python 3.11+',
+      'Ollama (Llama 3.2)',
+      'FastAPI',
+      'SQLite3 (WAL)',
+      'Watchdog Daemon',
+      'HTML5 Canvas',
+      'Pytest',
+    ],
+  },
+  {
     id: 'declaraform',
     title: 'Declaraform',
     subtitle: 'Automated UMS Declaration Form PDF Generator',
@@ -184,50 +228,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       'Tailwind CSS',
       'Vite',
       'Vercel',
-    ],
-  },
-  {
-    id: 'neurosort',
-    title: 'NeuroSort',
-    subtitle: 'Autonomous Local-First File Organization Daemon Powered by Ollama',
-    description:
-      'A local-first, safe, and intelligent automatic file management daemon and CLI powered by Ollama (Llama 3.2 / Phi 3.5). Features a built-in local web dashboard with a read-only "Future Sight" explorer that extracts metadata from documents, images (EXIF), and code to simulate destinations before moving, accompanied by an audit-grade SQLite WAL ledger guaranteeing instant transaction rollback and zero data loss.',
-    accentHoverBorder: 'hover:border-indigo-500/40',
-    accentHoverShadow: 'hover:shadow-indigo-500/10',
-    titleHoverColor: 'group-hover:text-indigo-300',
-    subtitleColor: 'text-indigo-300',
-    badges: [
-      {
-        label: 'Open Source Daemon & CLI',
-        className: 'border-indigo-500/40 text-indigo-400 bg-indigo-500/10',
-      },
-      {
-        label: 'Local LLMs & SQLite WAL',
-        className: 'border-purple-500/40 text-purple-300 bg-purple-500/10',
-      },
-    ],
-    domainBadge: {
-      label: 'Localhost: 127.0.0.1:8765',
-      status: 'Local Daemon',
-      isOnline: true,
-    },
-    image: neurosortImg,
-    imageAlt: 'NeuroSort Future Sight Dashboard Preview',
-    githubUrl: EXTERNAL_LINKS.neurosortRepo,
-    features: [
-      { label: 'Read-only "Future Sight" explorer to simulate destinations risk-free' },
-      { label: 'Semantic classification via Ollama local LLMs with taxonomy overrides' },
-      { label: 'Audit-grade SQLite3 WAL transaction ledger with atomic 1-click rollback' },
-      { label: 'Streaming SHA-256 chunk hashing & non-blocking intake directory daemon' },
-    ],
-    technologies: [
-      'Python 3.11+',
-      'Ollama (Llama 3.2)',
-      'FastAPI',
-      'SQLite3 (WAL)',
-      'Watchdog Daemon',
-      'HTML5 Canvas',
-      'Pytest',
     ],
   },
 ] as const;
