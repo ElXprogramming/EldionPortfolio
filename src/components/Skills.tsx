@@ -60,7 +60,6 @@ const SKILL_CATEGORIES: readonly SkillCategory[] = [
       description: 'Integrating open-source LLMs and RAG pipelines for production-grade reliability.',
       skills: [
         { name: 'Retrieval-Augmented Generation (RAG)', highlight: true },
-        { name: 'Prompt Engineering', highlight: true },
         { name: 'Local LLM Deployment (Ollama)', highlight: true },
         { name: 'OpenAI SDK' },
         { name: 'Open-Source Models (Qwen, GLM)' },
