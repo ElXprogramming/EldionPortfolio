@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Mail,
-  Phone,
   Send,
   Copy,
   Check,
@@ -26,7 +25,6 @@ const INITIAL_FORM_DATA = {
 
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
@@ -39,14 +37,6 @@ export default function Contact() {
     if (success) {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2500);
-    }
-  };
-
-  const handleCopyPhone = async () => {
-    const success = await copyToClipboard(PROFILE.phone);
-    if (success) {
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2500);
     }
   };
 
@@ -117,36 +107,6 @@ export default function Contact() {
                 title="Copy email to clipboard"
               >
                 {copiedEmail ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-
-            {/* Phone Card */}
-            <div className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Phone / WhatsApp</div>
-                  <a
-                    href={EXTERNAL_LINKS.tel}
-                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
-                  >
-                    {PROFILE.phoneDisplay}
-                  </a>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopyPhone}
-                className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors ml-2 shrink-0 cursor-pointer"
-                title="Copy phone number"
-              >
-                {copiedPhone ? (
                   <Check className="w-4 h-4 text-emerald-400" />
                 ) : (
                   <Copy className="w-4 h-4" />

@@ -2,7 +2,6 @@ import {
   sanitizeExternalUrl,
   sanitizeInternalRoute,
   sanitizeMailtoUrl,
-  sanitizeTelUrl,
 } from './security';
 
 export const PROFILE = {
@@ -15,8 +14,6 @@ export const PROFILE = {
   location: 'Sabah, Malaysia',
   fullLocation: 'Universiti Malaysia Sabah, Kota Kinabalu, Sabah',
   email: 'nayrnoidle@gmail.com',
-  phone: '0178201365',
-  phoneDisplay: '017-820 1365',
   githubUsername: 'ElXprogramming',
 } as const;
 
@@ -28,7 +25,6 @@ export const ROUTES = {
   education: sanitizeInternalRoute('#education'),
   contact: sanitizeInternalRoute('#contact'),
   inbox: sanitizeInternalRoute('#inbox'),
-  resume: sanitizeInternalRoute('/Eldion_Ryan_Godius_Resume.pdf'),
 } as const;
 
 export const EXTERNAL_LINKS = {
@@ -64,5 +60,4 @@ export const EXTERNAL_LINKS = {
       ['github.com']
     ) ?? '#',
   mailto: sanitizeMailtoUrl(PROFILE.email),
-  tel: sanitizeTelUrl(PROFILE.phone),
 } as const;

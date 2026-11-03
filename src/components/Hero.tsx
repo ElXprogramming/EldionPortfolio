@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import { 
   Mail, 
-  Phone, 
-  Download, 
   ArrowRight, 
   Check, 
-  Sparkles,
-  MapPin,
-  GraduationCap,
-  RotateCcw,
-  Layers,
-  BrainCircuit
+  Sparkles, 
+  MapPin, 
+  GraduationCap, 
+  RotateCcw, 
+  Layers, 
+  BrainCircuit 
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 import eldionPortrait from '../assets/eldion-portrait.jpg';
@@ -113,12 +111,11 @@ export default function Hero() {
               </a>
 
               <a
-                href={ROUTES.resume}
-                download="Eldion_Ryan_Godius_Resume.pdf"
+                href={ROUTES.contact}
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-slate-200 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 transition-all duration-200 shadow-sm text-sm sm:text-base w-full sm:w-auto cursor-pointer"
               >
-                <Download className="w-4 h-4 text-purple-400" />
-                Download CV
+                <Mail className="w-4 h-4 text-purple-400" />
+                Contact Me
               </a>
             </div>
 
@@ -166,14 +163,6 @@ export default function Hero() {
                   </>
                 )}
               </button>
-
-              <a
-                href={EXTERNAL_LINKS.tel}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-medium text-slate-300 hover:text-white transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{PROFILE.phoneDisplay}</span>
-              </a>
             </div>
 
           </div>

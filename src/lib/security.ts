@@ -40,7 +40,6 @@ const ALLOWED_INTERNAL_PATHS: ReadonlySet<string> = new Set([
   '/',
   '/inbox',
   '/admin',
-  '/Eldion_Ryan_Godius_Resume.pdf',
 ]);
 
 export class SafeUserError extends Error {

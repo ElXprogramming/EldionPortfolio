@@ -86,8 +86,8 @@ describe('security utilities', () => {
 
   describe('sanitizeTelUrl', () => {
     it('constructs a safe tel link for valid phone numbers', () => {
-      expect(sanitizeTelUrl('017-820 1365')).toBe('tel:0178201365');
-      expect(sanitizeTelUrl('+60 17-820 1365')).toBe('tel:+60178201365');
+      expect(sanitizeTelUrl('123-456-7890')).toBe('tel:1234567890');
+      expect(sanitizeTelUrl('+1 555-019-2834')).toBe('tel:+15550192834');
     });
 
     it('returns fallback # for invalid phone inputs', () => {
@@ -101,9 +101,7 @@ describe('security utilities', () => {
       expect(sanitizeInternalRoute('#about')).toBe('#about');
       expect(sanitizeInternalRoute('#projects')).toBe('#projects');
       expect(sanitizeInternalRoute('#inbox')).toBe('#inbox');
-      expect(sanitizeInternalRoute('/Eldion_Ryan_Godius_Resume.pdf')).toBe(
-        '/Eldion_Ryan_Godius_Resume.pdf'
-      );
+      expect(sanitizeInternalRoute('/inbox')).toBe('/inbox');
     });
 
     it('blocks open redirects and dangerous schemes', () => {
