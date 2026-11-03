@@ -39,6 +39,13 @@ export const EXTERNAL_LINKS = {
       'https://www.linkedin.com/in/eldion-ryan-godius-897064235',
       ['www.linkedin.com']
     ) ?? '#',
+  chessGameReviewLive:
+    sanitizeExternalUrl('https://chessgamereview-two.vercel.app/', ['chessgamereview-two.vercel.app']) ?? '#',
+  chessGameReviewRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/chess-game-review',
+      ['github.com']
+    ) ?? '#',
   declaraformLive:
     sanitizeExternalUrl('https://declaraform.netlify.app/', ['declaraform.netlify.app']) ?? '#',
   declaraformRepo:

@@ -61,6 +61,8 @@ describe('security utilities', () => {
     });
 
     it('correctly validates production project links in EXTERNAL_LINKS', () => {
+      expect(EXTERNAL_LINKS.chessGameReviewLive).toContain('https://chessgamereview-two.vercel.app');
+      expect(EXTERNAL_LINKS.chessGameReviewRepo).toContain('https://github.com/ElXprogramming/chess-game-review');
       expect(EXTERNAL_LINKS.declaraformLive).toContain('https://declaraform.netlify.app');
       expect(EXTERNAL_LINKS.declaraformRepo).toContain('https://github.com/ElXprogramming/declaration-form-filler');
       expect(EXTERNAL_LINKS.neurosortRepo).toContain('https://github.com/ElXprogramming/neurosort');

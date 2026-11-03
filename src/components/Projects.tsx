@@ -9,6 +9,7 @@ import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
 import neurosortImg from '../assets/projects/neurosort-preview.png';
 import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.png';
+import chessGameReviewImg from '../assets/projects/chess-game-review-preview.png';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 interface ProjectFeature {
@@ -48,6 +49,55 @@ interface ProjectItem {
 }
 
 const PROJECTS_DATA: readonly ProjectItem[] = [
+  {
+    id: 'chess-game-review',
+    title: 'Grandmaster Review',
+    subtitle: 'Client-Side Browser Chess Engine & Game Review Web Application',
+    description:
+      'A high-performance, browser-native chess engine and full game review web application powered by Stockfish 16 compiled to WebAssembly. Evaluates PGN games directly inside browser Web Workers with zero server dependencies, calculating CAPS2 accuracy percentages, classifying every move with badges (Brilliant, Great, Best, Inaccuracy, Blunder), rendering dynamic engine recommendation arrows, and delivering natural language virtual coach commentary.',
+    accentHoverBorder: 'hover:border-emerald-500/40',
+    accentHoverShadow: 'hover:shadow-emerald-500/10',
+    titleHoverColor: 'group-hover:text-emerald-300',
+    subtitleColor: 'text-emerald-300',
+    primaryButtonClass: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25',
+    floatingBadgeClass: 'bg-emerald-600/90 hover:bg-emerald-500',
+    badges: [
+      {
+        label: 'Live Web App & Stockfish WASM',
+        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
+      },
+      {
+        label: 'CAPS2 Accuracy & Virtual Coach',
+        className: 'border-teal-500/40 text-teal-300 bg-teal-500/10',
+      },
+    ],
+    domainBadge: {
+      label: 'Domain: chessgamereview-two.vercel.app',
+      status: 'Online',
+      isOnline: true,
+    },
+    image: chessGameReviewImg,
+    imageAlt: 'Grandmaster Review Chess Engine & Move Analysis Preview',
+    liveUrl: EXTERNAL_LINKS.chessGameReviewLive,
+    githubUrl: EXTERNAL_LINKS.chessGameReviewRepo,
+    features: [
+      { label: 'In-browser Stockfish 16 MultiPV evaluation with', codeSnippet: 'WebAssembly' },
+      { label: 'CAPS2 accuracy model & win probability decay algorithms' },
+      { label: 'Interactive move badges, eval chart & engine recommendation arrows' },
+      { label: 'Procedural audio synthesis with zero audio assets via', codeSnippet: 'Web Audio API' },
+    ],
+    technologies: [
+      'React 18',
+      'TypeScript',
+      'Stockfish 16 (WASM)',
+      'chess.js',
+      'Tailwind CSS',
+      'Web Workers',
+      'Web Audio API',
+      'Vite',
+      'Vercel',
+    ],
+  },
   {
     id: 'neurosort',
     title: 'NeuroSort',
@@ -231,7 +281,7 @@ export default function Projects() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-purple-600/90 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:bg-purple-500 transition-colors cursor-pointer"
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg ${project.floatingBadgeClass ?? 'bg-purple-600/90 hover:bg-purple-500'} text-white text-xs font-semibold shadow-lg backdrop-blur-md transition-colors cursor-pointer`}
                         >
                           <span>Visit Live Site</span>
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -337,7 +387,7 @@ export default function Projects() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-purple-600 hover:bg-purple-500 shadow-md shadow-purple-600/25 transition-all duration-200 cursor-pointer"
+                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white ${project.primaryButtonClass ?? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/25'} shadow-md transition-all duration-200 cursor-pointer`}
                         >
                           <ExternalLink className="w-4 h-4" />
                           Launch Application
