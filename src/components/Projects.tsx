@@ -7,8 +7,6 @@ import {
 import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
-import doomscrollImg from '../assets/projects/doomscroll-preview.jpg';
-import gymposeImg from '../assets/projects/gympose-preview.jpg';
 import neurosortImg from '../assets/projects/neurosort-preview.png';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
@@ -134,100 +132,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       'pdf-lib',
       'Vite',
       'Netlify',
-    ],
-  },
-  {
-    id: 'doomscroll-siren',
-    title: 'Doomscroll Siren',
-    subtitle: 'Autonomous Webcam Doomscroll Sentry & Web Audio Siren',
-    description:
-      'An autonomous, privacy-first computer vision sentry that monitors your workspace via webcam to detect smartphone doomscrolling. Leverages YOLO11n running on ONNX Runtime Web with WebGPU acceleration. If exposure exceeds the duration threshold (default: 10s), a piercing dual-oscillator tactical Web Audio siren and crimson alert trigger to break the scroll cycle—with zero video frames ever leaving the browser.',
-    accentHoverBorder: 'hover:border-rose-500/40',
-    accentHoverShadow: 'hover:shadow-rose-500/10',
-    titleHoverColor: 'group-hover:text-rose-300',
-    subtitleColor: 'text-rose-300',
-    badges: [
-      {
-        label: 'Live Production App',
-        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
-      },
-      {
-        label: 'Client-Side AI (WebGPU)',
-        className: 'border-rose-500/40 text-rose-400 bg-rose-500/10',
-      },
-    ],
-    domainBadge: {
-      label: 'Domain: doomscroll-siren.netlify.app',
-      status: 'Online',
-      isOnline: true,
-    },
-    image: doomscrollImg,
-    imageAlt: 'Doomscroll Siren Application Preview',
-    liveUrl: EXTERNAL_LINKS.doomscrollSirenLive,
-    githubUrl: EXTERNAL_LINKS.doomscrollSirenRepo,
-    features: [
-      { label: 'Client-side neural inference with', codeSnippet: 'ONNX Runtime Web' },
-      { label: 'Embedded YOLO11n model with direct NMS bounding box evaluation' },
-      { label: 'Anti-flicker grace buffer preventing false drops on occlusions' },
-      { label: 'Dual-oscillator Web Audio synthesizer with LFO siren modulation' },
-    ],
-    technologies: [
-      'React 19',
-      'TypeScript',
-      'ONNX Runtime Web',
-      'YOLO11n',
-      'WebGPU',
-      'Web Audio API',
-      'Tailwind CSS',
-      'Vite',
-      'Netlify',
-    ],
-  },
-  {
-    id: 'gymposecamera',
-    title: 'GymPoseCamera (AuraCam)',
-    subtitle: 'Real-Time AI Bodybuilding Pose Recognition & Shader Pipeline',
-    description:
-      'A mobile-first real-time camera web application engineered to detect iconic bodybuilding poses (Front Double Bicep, Zyzz/Archer pose, Lat Spread) using MediaPipe Pose WebAssembly. Upon pose detection, it dynamically shifts into an angelic divine aura powered by a custom multi-pass WebGL post-processing shader with bloom and halation, synchronized with a real-time Web Audio API harmonic swell.',
-    accentHoverBorder: 'hover:border-amber-500/40',
-    accentHoverShadow: 'hover:shadow-amber-500/10',
-    titleHoverColor: 'group-hover:text-amber-300',
-    subtitleColor: 'text-amber-300',
-    badges: [
-      {
-        label: 'Live Production App',
-        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
-      },
-      {
-        label: 'MediaPipe & WebGL Shaders',
-        className: 'border-amber-500/40 text-amber-400 bg-amber-500/10',
-      },
-    ],
-    domainBadge: {
-      label: 'Domain: gymposecamera.vercel.app',
-      status: 'Online',
-      isOnline: true,
-    },
-    image: gymposeImg,
-    imageAlt: 'GymPoseCamera AuraCam Web App Preview',
-    liveUrl: EXTERNAL_LINKS.gymposeCameraLive,
-    githubUrl: EXTERNAL_LINKS.gymposeCameraRepo,
-    features: [
-      { label: 'Real-time geometric joint angle calculation with', codeSnippet: 'MediaPipe WASM' },
-      { label: 'Custom WebGL post-processing shader with luminance diffusion bloom' },
-      { label: 'Dynamic Web Audio filter sweep and harmonic volume swell' },
-      { label: 'In-browser canvas & audio stream recording via MediaRecorder (9:16 export)' },
-    ],
-    technologies: [
-      'React 19',
-      'TypeScript',
-      'MediaPipe Pose',
-      'WebGL Shaders',
-      'Web Audio API',
-      'MediaRecorder',
-      'Tailwind CSS',
-      'Vite',
-      'Vercel',
     ],
   },
 ] as const;
