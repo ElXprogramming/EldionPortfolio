@@ -50,7 +50,7 @@ interface ProjectItem {
 const PROJECTS_DATA: readonly ProjectItem[] = [
   {
     id: 'chess-game-review',
-    title: 'Chess Game Reviewer',
+    title: 'ChessGameReview',
     subtitle: 'Client-Side Browser Chess Engine & Game Review Web Application',
     description:
       'A high-performance, browser-native chess engine and full game review web application powered by Stockfish 16 compiled to WebAssembly. Evaluates PGN games directly inside browser Web Workers with zero server dependencies, calculating CAPS2 accuracy percentages, classifying every move with badges (Brilliant, Great, Best, Inaccuracy, Blunder), rendering dynamic engine recommendation arrows, and delivering natural language virtual coach commentary.',
@@ -76,7 +76,7 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       isOnline: true,
     },
     image: chessGameReviewImg,
-    imageAlt: 'Chess Game Reviewer Chess Engine & Move Analysis Preview',
+    imageAlt: 'ChessGameReview In-Browser Chess Engine & Move Analysis Preview',
     liveUrl: EXTERNAL_LINKS.chessGameReviewLive,
     githubUrl: EXTERNAL_LINKS.chessGameReviewRepo,
     features: [
