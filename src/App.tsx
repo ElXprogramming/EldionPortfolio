@@ -7,9 +7,9 @@ import Projects from './components/Projects';
 import Education from './components/Education';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import PixelBlast from './components/PixelBlast';
 import { sanitizeInternalRoute } from './lib/security';
 
+const PixelBlast = lazy(() => import('./components/PixelBlast'));
 const SecretInbox = lazy(() => import('./components/SecretInbox'));
 
 function resolveCurrentView(): 'home' | 'inbox' {
@@ -60,28 +60,44 @@ export default function App() {
     if (currentView === 'inbox') return;
 
     const sections = document.querySelectorAll('section[id]');
-    
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
+    if (typeof IntersectionObserver === 'undefined') return;
 
-      sections.forEach((section) => {
-        const el = section as HTMLElement;
-        const sectionTop = el.offsetTop - 120;
-        const sectionHeight = el.offsetHeight;
-        const sectionId = el.getAttribute('id') || '';
-
-        if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-          setActiveSection(sectionId);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+            break;
+          }
         }
-      });
+      },
+      {
+        rootMargin: '-20% 0px -65% 0px',
+        threshold: 0,
+      }
+    );
 
-      if (scrollY < 100) {
-        setActiveSection('');
+    sections.forEach((section) => observer.observe(section));
+
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (window.scrollY < 80) {
+            setActiveSection('');
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [currentView]);
 
   if (currentView === 'inbox') {
@@ -112,25 +128,27 @@ export default function App() {
     <div className="min-h-screen bg-[#080511] text-slate-100 flex flex-col selection:bg-[#B497CF]/30 selection:text-purple-200 relative">
       {/* Whole-page Fixed Background Canvas & Soft Atmospheric Lighting */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <PixelBlast
-          variant="circle"
-          pixelSize={6}
-          color="#B497CF"
-          patternScale={3}
-          patternDensity={1.2}
-          pixelSizeJitter={0.5}
-          enableRipples
-          rippleSpeed={0.4}
-          rippleThickness={0.12}
-          rippleIntensityScale={1.5}
-          liquid
-          liquidStrength={0.12}
-          liquidRadius={1.2}
-          liquidWobbleSpeed={5}
-          speed={0.5}
-          edgeFade={0.25}
-          transparent
-        />
+        <Suspense fallback={null}>
+          <PixelBlast
+            variant="circle"
+            pixelSize={6}
+            color="#B497CF"
+            patternScale={3}
+            patternDensity={1.2}
+            pixelSizeJitter={0.5}
+            enableRipples
+            rippleSpeed={0.4}
+            rippleThickness={0.12}
+            rippleIntensityScale={1.5}
+            liquid
+            liquidStrength={0.12}
+            liquidRadius={1.2}
+            liquidWobbleSpeed={5}
+            speed={0.5}
+            edgeFade={0.25}
+            transparent
+          />
+        </Suspense>
 
         {/* Ambient atmospheric glow orbs positioned across the page height */}
         <div className="absolute top-[5%] left-[10%] w-[500px] h-[500px] bg-purple-700/10 rounded-full blur-[140px] pointer-events-none" />

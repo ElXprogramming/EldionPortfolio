@@ -101,6 +101,7 @@ export default function FlipCard({
   const grip = useRef<GripState | null>(null);
   const spin = useRef<{ stop: () => void } | null>(null);
   const target = useRef(shown ? 180 : 0);
+  const cardRectRef = useRef<DOMRect | null>(null);
 
   const turn = useMotionValue(shown ? 180 : 0);
   const tiltX = useSpring(0, TILT_SPRING);
@@ -220,7 +221,7 @@ export default function FlipCard({
       return;
     }
     if (!tilt || reduce || disabled || e.pointerType === 'touch') return;
-    const r = e.currentTarget.getBoundingClientRect();
+    const r = cardRectRef.current ?? e.currentTarget.getBoundingClientRect();
     const px = clamp((e.clientX - r.left) / r.width, 0, 1);
     const py = clamp((e.clientY - r.top) / r.height, 0, 1);
     tiltX.set((0.5 - py) * 2 * tiltMax);
@@ -290,9 +291,11 @@ export default function FlipCard({
       onPointerCancel={e => release(e, true)}
       onLostPointerCapture={e => release(e, true)}
       onPointerEnter={e => {
+        cardRectRef.current = e.currentTarget.getBoundingClientRect();
         if (!reduce && !disabled && e.pointerType !== 'touch') lift.set(hoverScale);
       }}
       onPointerLeave={() => {
+        cardRectRef.current = null;
         if (!grip.current) rest();
       }}
       onKeyDown={onKeyDown}

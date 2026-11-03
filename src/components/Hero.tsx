@@ -73,6 +73,7 @@ export default function Hero() {
                   introDuration={2}
                   clickKick
                   guides={false}
+                  sweep={false}
                 />
               </div>
             </div>

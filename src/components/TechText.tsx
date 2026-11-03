@@ -1158,12 +1158,27 @@ const TechText = ({
       document.fonts.ready.then(fontsLoaded, fontsLoaded);
     }
 
+    const handleVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else {
+        wake();
+      }
+    };
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
     resize();
 
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
       wakeRef.current = () => {};
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibility);
+      }
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       themeObserver.disconnect();

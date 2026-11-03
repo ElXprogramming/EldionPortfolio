@@ -40,6 +40,8 @@ const createTouchTexture = (): TouchTexture => {
   let radius = 0.1 * size;
   const speed = 1 / maxAge;
 
+  let isDirty = false;
+
   const clear = () => {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -81,9 +83,19 @@ const createTouchTexture = (): TouchTexture => {
     }
     last = { x: norm.x, y: norm.y };
     trail.push({ x: norm.x, y: norm.y, age: 0, force, vx, vy });
+    isDirty = true;
   };
 
   const update = () => {
+    if (trail.length === 0) {
+      if (isDirty) {
+        clear();
+        texture.needsUpdate = true;
+        isDirty = false;
+      }
+      return;
+    }
+    isDirty = true;
     clear();
     for (let i = trail.length - 1; i >= 0; i--) {
       const point = trail[i];
@@ -191,7 +203,7 @@ float Bayer2(vec2 a) {
 #define Bayer4(a) (Bayer2(.5*(a))*0.25 + Bayer2(a))
 #define Bayer8(a) (Bayer4(.5*(a))*0.25 + Bayer2(a))
 
-#define FBM_OCTAVES     5
+#define FBM_OCTAVES     3
 #define FBM_LACUNARITY  1.25
 #define FBM_GAIN        1.0
 
@@ -413,7 +425,7 @@ const PixelBlast = ({
     });
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(1.0);
     container.appendChild(renderer.domElement);
     if (transparent) renderer.setClearAlpha(0);
     else renderer.setClearColor(0x000000, 1);
@@ -427,7 +439,7 @@ const PixelBlast = ({
       },
       uClickTimes: { value: new Float32Array(MAX_CLICKS) },
       uShapeType: { value: SHAPE_MAP[variant] ?? 0 },
-      uPixelSize: { value: pixelSize * renderer.getPixelRatio() },
+      uPixelSize: { value: pixelSize },
       uScale: { value: patternScale },
       uDensity: { value: patternDensity },
       uPixelJitter: { value: pixelSizeJitter },
@@ -454,6 +466,11 @@ const PixelBlast = ({
     scene.add(quad);
     const clock = new THREE.Clock();
 
+    let cachedWidth = 1;
+    let cachedHeight = 1;
+    let cachedLeft = 0;
+    let cachedTop = 0;
+
     const setSize = () => {
       const w = container.clientWidth || 1;
       const h = container.clientHeight || 1;
@@ -461,7 +478,13 @@ const PixelBlast = ({
       (uniforms.uResolution.value as THREE.Vector2).set(renderer.domElement.width, renderer.domElement.height);
       if (threeRef.current?.composer)
         threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
-      uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
+      uniforms.uPixelSize.value = pixelSize;
+
+      const r = container.getBoundingClientRect();
+      cachedLeft = r.left;
+      cachedTop = r.top;
+      cachedWidth = r.width || 1;
+      cachedHeight = r.height || 1;
     };
     setSize();
     const ro = new ResizeObserver(setSize);
@@ -525,12 +548,13 @@ const PixelBlast = ({
     }
     if (composer) composer.setSize(renderer.domElement.width, renderer.domElement.height);
 
+    const liquidTimeUniform = liquidEffect?.uniforms.get('uTime');
+
     const mapToPixels = (e: { clientX: number; clientY: number }) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      const scaleX = renderer.domElement.width / rect.width;
-      const scaleY = renderer.domElement.height / rect.height;
-      const fx = (e.clientX - rect.left) * scaleX;
-      const fy = (rect.height - (e.clientY - rect.top)) * scaleY;
+      const scaleX = renderer.domElement.width / cachedWidth;
+      const scaleY = renderer.domElement.height / cachedHeight;
+      const fx = (e.clientX - cachedLeft) * scaleX;
+      const fy = (cachedHeight - (e.clientY - cachedTop)) * scaleY;
       return {
         fx,
         fy,
@@ -547,68 +571,57 @@ const PixelBlast = ({
       if (threeRef.current) threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
     };
 
-    const onPointerMove = (e: { clientX: number; clientY: number }) => {
-      if (!touch) return;
-      const { fx, fy, w, h } = mapToPixels(e);
-      touch.addTouch({ x: fx / w, y: fy / h });
-    };
-
-    renderer.domElement.addEventListener('pointerdown', onPointerDown, {
-      passive: true
-    });
-    renderer.domElement.addEventListener('pointermove', onPointerMove, {
-      passive: true
-    });
-
+    let pendingPointer: { clientX: number; clientY: number } | null = null;
     const onWindowPointerDown = (e: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      if (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      ) {
-        onPointerDown(e);
-      }
+      onPointerDown(e);
     };
 
     const onWindowPointerMove = (e: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      if (
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom
-      ) {
-        onPointerMove(e);
-      }
+      pendingPointer = { clientX: e.clientX, clientY: e.clientY };
     };
 
     window.addEventListener('pointerdown', onWindowPointerDown, { passive: true });
     window.addEventListener('pointermove', onWindowPointerMove, { passive: true });
 
+    const reducedMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+
     let raf: number;
+    let lastFrameTime = performance.now();
+    const minFrameDelta = 1000 / 60; // Smooth 60 FPS cap
+
     const animate = () => {
+      if (reducedMotion) {
+        renderer.render(scene, camera);
+        return;
+      }
+
       if (autoPauseOffscreen && !visibilityRef.current.visible) {
         raf = requestAnimationFrame(animate);
         return;
       }
-      uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
-      if (liquidEffect) {
-        const uTime = liquidEffect.uniforms.get('uTime');
-        if (uTime) uTime.value = uniforms.uTime.value;
+
+      const now = performance.now();
+      const elapsed = now - lastFrameTime;
+
+      if (elapsed < minFrameDelta) {
+        raf = requestAnimationFrame(animate);
+        return;
       }
+      lastFrameTime = now - (elapsed % minFrameDelta);
+
+      if (pendingPointer && touch) {
+        const { fx, fy, w, h } = mapToPixels(pendingPointer);
+        touch.addTouch({ x: fx / w, y: fy / h });
+        pendingPointer = null;
+      }
+
+      uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
+      if (liquidTimeUniform) {
+        liquidTimeUniform.value = uniforms.uTime.value;
+      }
+
       if (composer) {
         if (touch) touch.update();
-        composer.passes.forEach(p => {
-          const effs = (p as unknown as { effects?: Effect[] }).effects;
-          if (effs) {
-            effs.forEach(eff => {
-              const u = eff.uniforms?.get('uTime');
-              if (u) u.value = uniforms.uTime.value;
-            });
-          }
-        });
         composer.render();
       } else {
         renderer.render(scene, camera);
@@ -616,6 +629,16 @@ const PixelBlast = ({
       raf = requestAnimationFrame(animate);
     };
     raf = requestAnimationFrame(animate);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+      } else {
+        lastFrameTime = performance.now();
+        raf = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     threeRef.current = {
       renderer,
@@ -636,6 +659,7 @@ const PixelBlast = ({
     };
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.removeEventListener('pointerdown', onWindowPointerDown);
       window.removeEventListener('pointermove', onWindowPointerMove);
       ro.disconnect();
@@ -661,7 +685,7 @@ const PixelBlast = ({
     if (!t) return;
 
     t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
-    t.uniforms.uPixelSize.value = pixelSize * t.renderer.getPixelRatio();
+    t.uniforms.uPixelSize.value = pixelSize;
     (t.uniforms.uColor.value as THREE.Color).set(color);
     t.uniforms.uScale.value = patternScale;
     t.uniforms.uDensity.value = patternDensity;

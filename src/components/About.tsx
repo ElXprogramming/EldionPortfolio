@@ -25,7 +25,6 @@ const CORE_VALUES = [
 ] as const;
 
 export default function About() {
-
   return (
     <section id="about" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

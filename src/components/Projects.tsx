@@ -15,7 +15,6 @@ import { EXTERNAL_LINKS } from '../lib/constants';
 interface ProjectFeature {
   label: string;
   codeSnippet?: string;
-  suffix?: string;
 }
 
 interface ProjectBadge {
@@ -359,7 +358,6 @@ export default function Projects() {
                                   </code>
                                 </>
                               )}
-                              {feat.suffix && ` ${feat.suffix}`}
                             </span>
                           </div>
                         ))}

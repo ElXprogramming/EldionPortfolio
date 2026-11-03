@@ -123,6 +123,14 @@ export default function GithubContributions() {
     return getMonthLabels(weeks);
   }, [weeks]);
 
+  const monthMap = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const m of monthLabels) {
+      map.set(m.weekIndex, m.label);
+    }
+    return map;
+  }, [monthLabels]);
+
   const getCellColorClass = (level: number): string => {
     if (theme === 'purple') {
       switch (level) {
@@ -337,17 +345,14 @@ export default function GithubContributions() {
             <div className="min-w-[760px] p-4 rounded-xl bg-slate-950/70 border border-slate-800/90">
               {/* Month Labels Header */}
               <div className="flex items-center text-[11px] font-mono text-slate-400 mb-2 pl-7 select-none">
-                {weeks.map((_, wIndex) => {
-                  const mLabel = monthLabels.find((m) => m.weekIndex === wIndex);
-                  return (
-                    <div
-                      key={wIndex}
-                      className="w-3.5 text-center shrink-0 mr-1 text-[10px] text-slate-300"
-                    >
-                      {mLabel ? mLabel.label : ''}
-                    </div>
-                  );
-                })}
+                {weeks.map((_, wIndex) => (
+                  <div
+                    key={wIndex}
+                    className="w-3.5 text-center shrink-0 mr-1 text-[10px] text-slate-300"
+                  >
+                    {monthMap.get(wIndex) ?? ''}
+                  </div>
+                ))}
               </div>
 
               {/* Grid: 7 Rows (Sun..Sat) with Left Day Labels */}
