@@ -51,6 +51,11 @@ export const EXTERNAL_LINKS = {
       'https://github.com/ElXprogramming/neurosort',
       ['github.com']
     ) ?? '#',
+  restaurantscraperRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/RestaurantScraper',
+      ['github.com']
+    ) ?? '#',
   mailto: sanitizeMailtoUrl(PROFILE.email),
   tel: sanitizeTelUrl(PROFILE.phone),
 } as const;

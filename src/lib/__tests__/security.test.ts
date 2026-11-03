@@ -64,6 +64,7 @@ describe('security utilities', () => {
       expect(EXTERNAL_LINKS.declaraformLive).toContain('https://declaraform.netlify.app');
       expect(EXTERNAL_LINKS.declaraformRepo).toContain('https://github.com/ElXprogramming/declaration-form-filler');
       expect(EXTERNAL_LINKS.neurosortRepo).toContain('https://github.com/ElXprogramming/neurosort');
+      expect(EXTERNAL_LINKS.restaurantscraperRepo).toContain('https://github.com/ElXprogramming/RestaurantScraper');
     });
   });
 

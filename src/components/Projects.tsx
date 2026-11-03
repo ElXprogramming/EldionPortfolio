@@ -8,6 +8,7 @@ import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
 import neurosortImg from '../assets/projects/neurosort-preview.png';
+import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.png';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 interface ProjectFeature {
@@ -30,6 +31,8 @@ interface ProjectItem {
   accentHoverShadow: string;
   titleHoverColor: string;
   subtitleColor: string;
+  primaryButtonClass?: string;
+  floatingBadgeClass?: string;
   badges: readonly ProjectBadge[];
   domainBadge: {
     label: string;
@@ -86,6 +89,52 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       'SQLite3 (WAL)',
       'Watchdog Daemon',
       'HTML5 Canvas',
+      'Pytest',
+    ],
+  },
+  {
+    id: 'restaurantscraper',
+    title: 'RestaurantScraper',
+    subtitle: 'High-Performance Restaurant Menu Scraper & Local SQLite Database Explorer',
+    description:
+      'A local-first menu extraction system engineered to harvest, deduplicate, and catalog food menus from dynamic delivery platforms (GrabFood, foodpanda) and restaurant websites. Overcomes single-page application hydration barriers via Playwright Chromium passive network response sniffing, normalizes minor unit pricing to Ringgit (MYR), deduplicates venues with Haversine distance and SequenceMatcher algorithms, and provides both a Rich Typer CLI and zero-dependency local Web GUI with formula-injection-safe CSV and JSON export.',
+    accentHoverBorder: 'hover:border-teal-500/40',
+    accentHoverShadow: 'hover:shadow-teal-500/10',
+    titleHoverColor: 'group-hover:text-teal-300',
+    subtitleColor: 'text-teal-300',
+    primaryButtonClass: 'bg-teal-600 hover:bg-teal-500 shadow-teal-600/25',
+    floatingBadgeClass: 'bg-teal-600/90 hover:bg-teal-500',
+    badges: [
+      {
+        label: 'Passive Sniffer & Rich CLI',
+        className: 'border-teal-500/40 text-teal-400 bg-teal-500/10',
+      },
+      {
+        label: 'Playwright & SQLite WAL',
+        className: 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10',
+      },
+    ],
+    domainBadge: {
+      label: 'Localhost: 127.0.0.1:8765',
+      status: 'Local Web GUI',
+      isOnline: true,
+    },
+    image: restaurantscraperImg,
+    imageAlt: 'RestaurantScraper Database Explorer & Studio Preview',
+    githubUrl: EXTERNAL_LINKS.restaurantscraperRepo,
+    features: [
+      { label: 'Passive network sniffer for GrabFood & foodpanda with', codeSnippet: 'Playwright' },
+      { label: 'Embedded database with WAL mode using', codeSnippet: 'SQLite3' },
+      { label: 'Fuzzy venue deduplication via Haversine distance & SequenceMatcher' },
+      { label: 'Formula injection defense for sanitized Excel-ready CSV/JSON exports' },
+    ],
+    technologies: [
+      'Python 3.11+',
+      'Playwright (Chromium)',
+      'SQLite3 (WAL)',
+      'Typer & Rich',
+      'Vanilla JS & Tailwind',
+      'BeautifulSoup4',
       'Pytest',
     ],
   },
@@ -151,7 +200,7 @@ export default function Projects() {
             Projects &amp; Applications
           </h2>
           <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
-            Production-ready software built to solve real-world problems with modern web technologies, computer vision, and local AI.
+            Production-ready software built to solve real-world problems with modern web technologies, automated data pipelines, and local AI.
           </p>
         </div>
 
@@ -192,7 +241,7 @@ export default function Projects() {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600/90 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:bg-indigo-500 transition-colors cursor-pointer"
+                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg ${project.floatingBadgeClass ?? 'bg-indigo-600/90 hover:bg-indigo-500'} text-white text-xs font-semibold shadow-lg backdrop-blur-md transition-colors cursor-pointer`}
                         >
                           <GithubIcon className="w-3.5 h-3.5 text-white" />
                           <span>View on GitHub</span>
@@ -310,7 +359,7 @@ export default function Projects() {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all duration-200 cursor-pointer"
+                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white ${project.primaryButtonClass ?? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/25'} shadow-md transition-all duration-200 cursor-pointer`}
                         >
                           <GithubIcon className="w-4 h-4 text-white" />
                           Explore on GitHub
