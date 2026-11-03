@@ -49,55 +49,6 @@ interface ProjectItem {
 
 const PROJECTS_DATA: readonly ProjectItem[] = [
   {
-    id: 'chess-game-review',
-    title: 'ChessGameReview',
-    subtitle: 'Client-Side Browser Chess Engine & Game Review Web Application',
-    description:
-      'A high-performance, browser-native chess engine and full game review web application powered by Stockfish 16 compiled to WebAssembly. Evaluates PGN games directly inside browser Web Workers with zero server dependencies, calculating CAPS2 accuracy percentages, classifying every move with badges (Brilliant, Great, Best, Inaccuracy, Blunder), rendering dynamic engine recommendation arrows, and delivering natural language virtual coach commentary.',
-    accentHoverBorder: 'hover:border-emerald-500/40',
-    accentHoverShadow: 'hover:shadow-emerald-500/10',
-    titleHoverColor: 'group-hover:text-emerald-300',
-    subtitleColor: 'text-emerald-300',
-    primaryButtonClass: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25',
-    floatingBadgeClass: 'bg-emerald-600/90 hover:bg-emerald-500',
-    badges: [
-      {
-        label: 'Live Web App & Stockfish WASM',
-        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
-      },
-      {
-        label: 'CAPS2 Accuracy & Virtual Coach',
-        className: 'border-teal-500/40 text-teal-300 bg-teal-500/10',
-      },
-    ],
-    domainBadge: {
-      label: 'Domain: chessgamereview-two.vercel.app',
-      status: 'Online',
-      isOnline: true,
-    },
-    image: chessGameReviewImg,
-    imageAlt: 'ChessGameReview In-Browser Chess Engine & Move Analysis Preview',
-    liveUrl: EXTERNAL_LINKS.chessGameReviewLive,
-    githubUrl: EXTERNAL_LINKS.chessGameReviewRepo,
-    features: [
-      { label: 'In-browser Stockfish 16 MultiPV evaluation with', codeSnippet: 'WebAssembly' },
-      { label: 'CAPS2 accuracy model & win probability decay algorithms' },
-      { label: 'Interactive move badges, eval chart & engine recommendation arrows' },
-      { label: 'Procedural audio synthesis with zero audio assets via', codeSnippet: 'Web Audio API' },
-    ],
-    technologies: [
-      'React 18',
-      'TypeScript',
-      'Stockfish 16 (WASM)',
-      'chess.js',
-      'Tailwind CSS',
-      'Web Workers',
-      'Web Audio API',
-      'Vite',
-      'Vercel',
-    ],
-  },
-  {
     id: 'neurosort',
     title: 'NeuroSort',
     subtitle: 'Autonomous Local-First File Organization Daemon Powered by Ollama',
@@ -230,6 +181,55 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       'pdf-lib',
       'Vite',
       'Netlify',
+    ],
+  },
+  {
+    id: 'chess-game-review',
+    title: 'ChessGameReview',
+    subtitle: 'Client-Side Browser Chess Engine & Game Review Web Application',
+    description:
+      'A high-performance, browser-native chess engine and full game review web application powered by Stockfish 16 compiled to WebAssembly. Evaluates PGN games directly inside browser Web Workers with zero server dependencies, calculating CAPS2 accuracy percentages, classifying every move with badges (Brilliant, Great, Best, Inaccuracy, Blunder), rendering dynamic engine recommendation arrows, and delivering natural language virtual coach commentary.',
+    accentHoverBorder: 'hover:border-emerald-500/40',
+    accentHoverShadow: 'hover:shadow-emerald-500/10',
+    titleHoverColor: 'group-hover:text-emerald-300',
+    subtitleColor: 'text-emerald-300',
+    primaryButtonClass: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25',
+    floatingBadgeClass: 'bg-emerald-600/90 hover:bg-emerald-500',
+    badges: [
+      {
+        label: 'Live Web App & Stockfish WASM',
+        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
+      },
+      {
+        label: 'CAPS2 Accuracy & Virtual Coach',
+        className: 'border-teal-500/40 text-teal-300 bg-teal-500/10',
+      },
+    ],
+    domainBadge: {
+      label: 'Domain: chessgamereview-two.vercel.app',
+      status: 'Online',
+      isOnline: true,
+    },
+    image: chessGameReviewImg,
+    imageAlt: 'ChessGameReview In-Browser Chess Engine & Move Analysis Preview',
+    liveUrl: EXTERNAL_LINKS.chessGameReviewLive,
+    githubUrl: EXTERNAL_LINKS.chessGameReviewRepo,
+    features: [
+      { label: 'In-browser Stockfish 16 MultiPV evaluation with', codeSnippet: 'WebAssembly' },
+      { label: 'CAPS2 accuracy model & win probability decay algorithms' },
+      { label: 'Interactive move badges, eval chart & engine recommendation arrows' },
+      { label: 'Procedural audio synthesis with zero audio assets via', codeSnippet: 'Web Audio API' },
+    ],
+    technologies: [
+      'React 18',
+      'TypeScript',
+      'Stockfish 16 (WASM)',
+      'chess.js',
+      'Tailwind CSS',
+      'Web Workers',
+      'Web Audio API',
+      'Vite',
+      'Vercel',
     ],
   },
 ] as const;
