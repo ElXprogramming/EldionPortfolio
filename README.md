@@ -64,4 +64,3 @@ npm run preview
 
 - **Email**: [nayrnoidle@gmail.com](mailto:nayrnoidle@gmail.com)
 - **LinkedIn**: [Eldion Ryan Godius](https://www.linkedin.com/in/eldion-ryan-godius-897064235)
-- **GitHub**: [@ElXprogramming](https://github.com/ElXprogramming)
