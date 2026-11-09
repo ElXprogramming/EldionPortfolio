@@ -29,34 +29,7 @@
 
 ---
 
-## 🚀 Getting Started
 
-### Prerequisites
-
-Ensure you have [Node.js](https://nodejs.org/) installed (v18+ recommended).
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/ElXprogramming/EldionPortfolio.git
-
-# Navigate into the project folder
-cd EldionPortfolio
-
-# Install dependencies
-npm install
-
-# Start local development server
-npm run dev
-```
-
-### Production Build
-
-```bash
-npm run build
-npm run preview
-```
 
 ---
 
