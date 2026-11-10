@@ -34,13 +34,13 @@ interface TouchTexture {
   size: number;
 }
 
-const createTouchTexture = (): TouchTexture => {
+const createTouchTexture = (): TouchTexture | null => {
   const size = 64;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('2D context not available');
+  if (!ctx) return null;
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   const texture = new Texture(canvas);
@@ -437,13 +437,19 @@ const PixelBlast = ({
     const container = containerRef.current;
     if (!container) return;
 
-    const canvas = document.createElement('canvas');
-    const renderer = new WebGLRenderer({
-      canvas,
-      antialias,
-      alpha: true,
-      powerPreference: 'high-performance'
-    });
+    let renderer: WebGLRenderer;
+    try {
+      const canvas = document.createElement('canvas');
+      renderer = new WebGLRenderer({
+        canvas,
+        antialias,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+    } catch {
+      return;
+    }
+
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
     renderer.setPixelRatio(1.0);
@@ -455,8 +461,12 @@ const PixelBlast = ({
     let dummyTexture: Texture | undefined;
 
     if (liquid) {
-      touch = createTouchTexture();
-      touch.radiusScale = liquidRadius;
+      touch = createTouchTexture() ?? undefined;
+      if (touch) {
+        touch.radiusScale = liquidRadius;
+      } else {
+        dummyTexture = createDummyTexture();
+      }
     } else {
       dummyTexture = createDummyTexture();
     }

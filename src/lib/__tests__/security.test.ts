@@ -5,8 +5,6 @@ import {
   sanitizeExternalUrl,
   sanitizeInternalRoute,
   sanitizeMailtoUrl,
-  sanitizeRichHtml,
-  sanitizeTelUrl,
   sanitizeText,
 } from '../security';
 import { EXTERNAL_LINKS } from '../constants';
@@ -21,17 +19,6 @@ describe('security utilities', () => {
     it('preserves safe newlines and tabs while stripping tags', () => {
       const dirty = 'Line 1\n<b>Line 2</b>';
       expect(sanitizeText(dirty)).toBe('Line 1\nLine 2');
-    });
-  });
-
-  describe('sanitizeRichHtml', () => {
-    it('removes script tags and inline event handlers', () => {
-      const dirty = '<p onclick="evil()">Safe</p><script>alert(1)</script><img src=x onerror=alert(1)>';
-      const clean = sanitizeRichHtml(dirty);
-      expect(clean).not.toContain('<script');
-      expect(clean).not.toContain('onclick');
-      expect(clean).not.toContain('onerror');
-      expect(clean).toContain('Safe');
     });
   });
 
@@ -83,18 +70,6 @@ describe('security utilities', () => {
     it('returns fallback # for invalid or malicious email addresses', () => {
       expect(sanitizeMailtoUrl('javascript:alert(1)')).toBe('#');
       expect(sanitizeMailtoUrl('not-an-email')).toBe('#');
-    });
-  });
-
-  describe('sanitizeTelUrl', () => {
-    it('constructs a safe tel link for valid phone numbers', () => {
-      expect(sanitizeTelUrl('123-456-7890')).toBe('tel:1234567890');
-      expect(sanitizeTelUrl('+1 555-019-2834')).toBe('tel:+15550192834');
-    });
-
-    it('returns fallback # for invalid phone inputs', () => {
-      expect(sanitizeTelUrl('javascript:alert(1)')).toBe('#');
-      expect(sanitizeTelUrl('abc')).toBe('#');
     });
   });
 

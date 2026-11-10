@@ -3,9 +3,7 @@ import DOMPurify from 'dompurify';
 const CRLF_REGEX = /[\r\n]+/g;
 const SCRIPT_STYLE_BLOCK_REGEX = /<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1>/gi;
 const HTML_TAG_REGEX = /<[^>]*>/g;
-const EVENT_HANDLER_ATTR_REGEX = /\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi;
 const SAFE_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-const SAFE_PHONE_REGEX = /^\+?[0-9]{7,15}$/;
 
 function stripControlChars(input: string): string {
   let result = '';
@@ -60,21 +58,6 @@ export function sanitizeText(input: string): string {
   return domPurified.replace(HTML_TAG_REGEX, '').trim();
 }
 
-export function sanitizeRichHtml(dirtyHtml: string): string {
-  const withoutControls = stripControlChars(dirtyHtml);
-  if (typeof window !== 'undefined' && DOMPurify.isSupported) {
-    return DOMPurify.sanitize(withoutControls, {
-      USE_PROFILES: { html: true },
-      FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input'],
-      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'style'],
-    });
-  }
-
-  return withoutControls
-    .replace(SCRIPT_STYLE_BLOCK_REGEX, '')
-    .replace(EVENT_HANDLER_ATTR_REGEX, '');
-}
-
 export function sanitizeExternalUrl(
   rawUrl: string,
   allowedHosts?: readonly string[]
@@ -122,14 +105,6 @@ export function sanitizeMailtoUrl(email: string, subject?: string): string {
 
   const encodedSubject = encodeURIComponent(`Re: ${cleanedSubject}`);
   return `mailto:${cleanedEmail}?subject=${encodedSubject}`;
-}
-
-export function sanitizeTelUrl(phone: string): string {
-  const normalized = phone.replace(/[\s()-]/g, '').trim();
-  if (!SAFE_PHONE_REGEX.test(normalized)) {
-    return '#';
-  }
-  return `tel:${normalized}`;
 }
 
 export function sanitizeInternalRoute(hashOrPath: string): string {

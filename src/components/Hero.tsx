@@ -13,7 +13,6 @@ import {
 import { GithubIcon, LinkedinIcon } from './Icons';
 import eldionPortrait from '../assets/eldion-portrait.webp';
 import FlipCard from './FlipCard';
-import TechText from './TechText';
 import { copyToClipboard } from '../lib/security';
 import { PROFILE, ROUTES, EXTERNAL_LINKS } from '../lib/constants';
 
@@ -55,25 +54,11 @@ export default function Hero() {
 
             {/* Main Headline */}
             <div className="w-full relative mb-4 sm:mb-6">
-              <h1 className="sr-only">Eldion Ryan Godius</h1>
-              <div className="w-full h-20 sm:h-24 md:h-28 lg:h-32 relative" aria-hidden="true">
-                <TechText
-                  text="Eldion Ryan Godius"
-                  fontWeight={800}
-                  fontSize={85}
-                  color="#ffffff"
-                  accentColor="#c084fc"
-                  reveal="letter"
-                  dashLength={4}
-                  dashGap={2}
-                  specks={15}
-                  intro="none"
-                  introDuration={2}
-                  clickKick
-                  guides={false}
-                  sweep={false}
-                />
-              </div>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight">
+                <span className="text-gradient hover:brightness-110 transition-all duration-300">
+                  Eldion Ryan Godius
+                </span>
+              </h1>
             </div>
 
             {/* Core Summary */}

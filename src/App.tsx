@@ -6,6 +6,7 @@ import Skills from './components/Skills';
 import Education from './components/Education';
 import Footer from './components/Footer';
 import { sanitizeInternalRoute } from './lib/security';
+import { shouldEnableHeavyVisuals } from './lib/device';
 
 const Projects = lazy(() => import('./components/Projects'));
 const Contact = lazy(() => import('./components/Contact'));
@@ -30,8 +31,12 @@ export default function App() {
   const [shouldRenderBg, setShouldRenderBg] = useState(false);
 
   useEffect(() => {
-    // Defer heavy background WebGL initialization until after initial paint and layout
+    // Only load heavy background WebGL if device is capable (skip on low-end, slow networks, data saver, or reduced motion)
     if (typeof window !== 'undefined') {
+      if (!shouldEnableHeavyVisuals()) {
+        return;
+      }
+
       if ('requestIdleCallback' in window) {
         const id = (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(
           () => {
