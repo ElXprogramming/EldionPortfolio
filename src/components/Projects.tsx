@@ -6,11 +6,11 @@ import {
 } from 'lucide-react';
 import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
-import declaraformImg from '../assets/projects/declaraform-preview.jpg';
-import gitcanvasImg from '../assets/projects/gitcanvas-preview.jpg';
-import neurosortImg from '../assets/projects/neurosort-preview.png';
-import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.png';
-import chessGameReviewImg from '../assets/projects/chess-game-review-preview.png';
+import declaraformImg from '../assets/projects/declaraform-preview.webp';
+import gitcanvasImg from '../assets/projects/gitcanvas-preview.webp';
+import neurosortImg from '../assets/projects/neurosort-preview.webp';
+import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.webp';
+import chessGameReviewImg from '../assets/projects/chess-game-review-preview.webp';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 interface ProjectFeature {
@@ -319,6 +319,7 @@ export default function Projects() {
                       alt={project.imageAlt}
                       className="w-full h-full object-cover object-center"
                       loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-slate-950/40" />
                     

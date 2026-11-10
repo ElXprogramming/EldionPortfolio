@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Flame,
   Trophy,
@@ -41,6 +41,8 @@ const DAY_NAMES = ['', 'Mon', '', 'Wed', '', 'Fri', ''] as const;
 type ThemeMode = 'purple' | 'emerald';
 
 export default function GithubContributions() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(() => typeof IntersectionObserver === 'undefined');
   const [selectedYear, setSelectedYear] = useState<string>('last');
   const [theme, setTheme] = useState<ThemeMode>('purple');
   const [contributionsData, setContributionsData] = useState<GithubContributionsResponse | null>(
@@ -55,6 +57,24 @@ export default function GithubContributions() {
   const [reloadKey, setReloadKey] = useState<number>(0);
 
   useEffect(() => {
+    if (isVisible) return;
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!isVisible) return;
     let isMounted = true;
     fetchGithubContributions(selectedYear)
       .then((data) => {
@@ -84,7 +104,7 @@ export default function GithubContributions() {
     return () => {
       isMounted = false;
     };
-  }, [selectedYear, reloadKey]);
+  }, [selectedYear, reloadKey, isVisible]);
 
   const handleSelectYear = (year: string) => {
     if (year === selectedYear) return;
@@ -98,6 +118,7 @@ export default function GithubContributions() {
   };
 
   useEffect(() => {
+    if (!isVisible) return;
     let isMounted = true;
     fetchGithubUserProfile()
       .then((profile) => {
@@ -109,7 +130,7 @@ export default function GithubContributions() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isVisible]);
 
   const stats = useMemo(() => {
     return calculateContributionStats(contributionsData?.contributions ?? []);
@@ -163,7 +184,7 @@ export default function GithubContributions() {
   };
 
   return (
-    <div id="contributions" className="mt-16 sm:mt-20 scroll-mt-24">
+    <div ref={containerRef} id="contributions" className="mt-16 sm:mt-20 scroll-mt-24">
       <div className="glass-card rounded-2xl border border-slate-800/80 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden">
         {/* Ambient Top Glow */}
         <div className="absolute top-0 right-1/4 w-96 h-32 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />

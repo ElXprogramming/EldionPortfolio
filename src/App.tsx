@@ -3,12 +3,12 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
-import Projects from './components/Projects';
 import Education from './components/Education';
-import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { sanitizeInternalRoute } from './lib/security';
 
+const Projects = lazy(() => import('./components/Projects'));
+const Contact = lazy(() => import('./components/Contact'));
 const PixelBlast = lazy(() => import('./components/PixelBlast'));
 const SecretInbox = lazy(() => import('./components/SecretInbox'));
 
@@ -27,6 +27,31 @@ function resolveCurrentView(): 'home' | 'inbox' {
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
   const [currentView, setCurrentView] = useState<'home' | 'inbox'>(resolveCurrentView);
+  const [shouldRenderBg, setShouldRenderBg] = useState(false);
+
+  useEffect(() => {
+    // Defer heavy background WebGL initialization until after initial paint and layout
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        const id = (window as unknown as { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback(
+          () => {
+            setShouldRenderBg(true);
+          },
+          { timeout: 800 }
+        );
+        return () => {
+          if ('cancelIdleCallback' in window) {
+            (window as unknown as { cancelIdleCallback: (n: number) => void }).cancelIdleCallback(id);
+          }
+        };
+      } else {
+        const timer = setTimeout(() => {
+          setShouldRenderBg(true);
+        }, 120);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const handleNavigation = () => {
@@ -59,25 +84,33 @@ export default function App() {
   useEffect(() => {
     if (currentView === 'inbox') return;
 
-    const sections = document.querySelectorAll('section[id]');
-    if (typeof IntersectionObserver === 'undefined') return;
+    let observer: IntersectionObserver | null = null;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-            break;
+    const setupObserver = () => {
+      if (typeof IntersectionObserver === 'undefined') return;
+      observer?.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id);
+              break;
+            }
           }
+        },
+        {
+          rootMargin: '-20% 0px -65% 0px',
+          threshold: 0,
         }
-      },
-      {
-        rootMargin: '-20% 0px -65% 0px',
-        threshold: 0,
-      }
-    );
+      );
 
-    sections.forEach((section) => observer.observe(section));
+      document.querySelectorAll('section[id]').forEach((section) => observer?.observe(section));
+    };
+
+    setupObserver();
+
+    // Re-check observed sections after lazy components hydrate
+    const observerTimer = setTimeout(setupObserver, 800);
 
     let ticking = false;
     const handleScroll = () => {
@@ -95,7 +128,8 @@ export default function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      observer.disconnect();
+      clearTimeout(observerTimer);
+      observer?.disconnect();
       window.removeEventListener('scroll', handleScroll);
     };
   }, [currentView]);
@@ -127,28 +161,30 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#080511] text-slate-100 flex flex-col selection:bg-[#B497CF]/30 selection:text-purple-200 relative">
       {/* Whole-page Fixed Background Canvas & Soft Atmospheric Lighting */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <Suspense fallback={null}>
-          <PixelBlast
-            variant="circle"
-            pixelSize={6}
-            color="#B497CF"
-            patternScale={3}
-            patternDensity={1.2}
-            pixelSizeJitter={0.5}
-            enableRipples
-            rippleSpeed={0.4}
-            rippleThickness={0.12}
-            rippleIntensityScale={1.5}
-            liquid
-            liquidStrength={0.12}
-            liquidRadius={1.2}
-            liquidWobbleSpeed={5}
-            speed={0.5}
-            edgeFade={0.25}
-            transparent
-          />
-        </Suspense>
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" style={{ transform: 'translateZ(0)' }}>
+        {shouldRenderBg && (
+          <Suspense fallback={null}>
+            <PixelBlast
+              variant="circle"
+              pixelSize={6}
+              color="#B497CF"
+              patternScale={3}
+              patternDensity={1.2}
+              pixelSizeJitter={0.5}
+              enableRipples
+              rippleSpeed={0.4}
+              rippleThickness={0.12}
+              rippleIntensityScale={1.5}
+              liquid
+              liquidStrength={0.12}
+              liquidRadius={1.2}
+              liquidWobbleSpeed={5}
+              speed={0.5}
+              edgeFade={0.25}
+              transparent
+            />
+          </Suspense>
+        )}
 
         {/* Ambient atmospheric glow orbs positioned across the page height */}
         <div className="absolute top-[5%] left-[10%] w-[500px] h-[500px] bg-purple-700/10 rounded-full blur-[140px] pointer-events-none" />
@@ -162,9 +198,25 @@ export default function App() {
         <Hero />
         <About />
         <Skills />
-        <Projects />
+        <Suspense
+          fallback={
+            <div id="projects" className="min-h-[500px] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
+            </div>
+          }
+        >
+          <Projects />
+        </Suspense>
         <Education />
-        <Contact />
+        <Suspense
+          fallback={
+            <div id="contact" className="min-h-[400px] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
+            </div>
+          }
+        >
+          <Contact />
+        </Suspense>
       </main>
 
       <div className="relative z-10">

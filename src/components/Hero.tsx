@@ -11,7 +11,7 @@ import {
   BrainCircuit 
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
-import eldionPortrait from '../assets/eldion-portrait.jpg';
+import eldionPortrait from '../assets/eldion-portrait.webp';
 import FlipCard from './FlipCard';
 import TechText from './TechText';
 import { copyToClipboard } from '../lib/security';
@@ -202,6 +202,11 @@ export default function Hero() {
                       alt="Eldion Ryan Godius"
                       className="absolute inset-0 w-full h-full object-cover object-top filter brightness-[1.02] contrast-[1.03]"
                       draggable={false}
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                      width={340}
+                      height={460}
                     />
                     
                     {/* Cinematic vignettes for maximum contrast and aesthetics */}
