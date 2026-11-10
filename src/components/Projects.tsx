@@ -52,9 +52,9 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
   {
     id: 'gitcanvas',
     title: 'GitCanvas',
-    subtitle: 'Visual Bento-Grid Profile Studio & Developer Archetype Engine',
+    subtitle: 'Visual Bento-Grid Profile Studio & One Piece Themed README Engine',
     description:
-      'An Apple-inspired Bento-Grid profile studio and real-time GitHub desktop simulator. Ingests public repositories, star velocity, fork metrics, and byte-level language distributions via Octokit REST to detect engineering archetypes, synthesizes tailored bio copy using Gemini AI, and renders pixel-accurate Bento, Terminal CLI, and Editorial Minimalist Markdown READMEs with 1-click deployment to <username>/<username>.',
+      'A full-featured visual GitHub profile README studio and desktop simulator featuring animated One Piece pixel-art themes (Luffy Gatling punch, Straw Hat crew, Gear 5 Nika, and Wano Zoro). Ingests public repositories, star velocity, and byte-level language stats via Octokit REST to classify developer archetypes, synthesizes personalized bio copy using Gemini AI, and renders pixel-accurate Bento, Terminal CLI, and Anime-themed Markdown cards with instant 1-click deployment to <username>/<username>.',
     accentHoverBorder: 'hover:border-cyan-500/40',
     accentHoverShadow: 'hover:shadow-cyan-500/10',
     titleHoverColor: 'group-hover:text-cyan-300',
@@ -67,6 +67,10 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
         className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
       },
       {
+        label: 'One Piece Animated Themes',
+        className: 'border-amber-500/40 text-amber-300 bg-amber-500/10',
+      },
+      {
         label: 'Next.js 14 & Gemini AI',
         className: 'border-cyan-500/40 text-cyan-300 bg-cyan-500/10',
       },
@@ -77,14 +81,14 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       isOnline: true,
     },
     image: gitcanvasImg,
-    imageAlt: 'GitCanvas Bento Grid README Studio & Live Simulator Preview',
+    imageAlt: 'GitCanvas Live Studio — One Piece Themed GitHub Profile README with Luffy Gatling Mascot Preview',
     liveUrl: EXTERNAL_LINKS.gitCanvasLive,
     githubUrl: EXTERNAL_LINKS.gitCanvasRepo,
     features: [
+      { label: 'Animated One Piece themes & pixel-art mascots (Luffy Gatling, Straw Hat, Zoro, Chopper)' },
       { label: 'Portfolio ingestion & archetype classifier powered by', codeSnippet: 'Octokit REST' },
       { label: 'AI bio synthesizer with 4 distinct persona tones using', codeSnippet: 'Gemini AI' },
-      { label: 'Split-screen GitHub simulator with drag-and-drop via', codeSnippet: '@dnd-kit' },
-      { label: 'Direct 1-click commit to <username>/<username> with diff verification' },
+      { label: 'Split-screen GitHub simulator with 1-click commit & diff verification' },
     ],
     technologies: [
       'Next.js 14',
@@ -93,7 +97,7 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
       'Tailwind CSS',
       'Gemini AI',
       'Octokit REST',
-      '@dnd-kit',
+      'Pixel Art & GIFs',
       'Vercel',
     ],
   },

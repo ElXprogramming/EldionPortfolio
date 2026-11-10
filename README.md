@@ -12,7 +12,7 @@
 
 - **Modern Glassmorphic UI**: High-resolution dark aesthetic powered by Tailwind CSS v4, smooth gradients, and backdrop blur.
 - **Project Showcases**:
-  - **[GitCanvas](https://githubstatreadme.vercel.app/)**: Visual Bento-Grid GitHub profile README studio and developer archetype engine with AI bio synthesis and direct profile deployment.
+  - **[GitCanvas](https://githubstatreadme.vercel.app/)**: Visual Bento-Grid and One Piece themed GitHub profile README studio with animated pixel-art mascots, AI bio synthesis, and direct repository deployment.
   - **[Declaraform](https://declaraform.netlify.app/)**: UMS Declaration Form PDF generator with 3D WebGL background and interactive digital signature pad.
 - **Curated Technical Stack Bento**: Categorized into Frontend, Backend & APIs, AI & LLMs, and Databases & System Tools.
 - **Education & Credentials**: Universiti Malaysia Sabah (B.CompSc Software Engineering) & Kolej Matrikulasi Labuan (Physical Science).
