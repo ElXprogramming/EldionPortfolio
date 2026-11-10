@@ -35,6 +35,13 @@ export const EXTERNAL_LINKS = {
       'https://www.linkedin.com/in/eldion-ryan-godius-897064235',
       ['www.linkedin.com']
     ) ?? '#',
+  gitCanvasLive:
+    sanitizeExternalUrl('https://githubstatreadme.vercel.app/', ['githubstatreadme.vercel.app']) ?? '#',
+  gitCanvasRepo:
+    sanitizeExternalUrl(
+      'https://github.com/ElXprogramming/GitCanvas',
+      ['github.com']
+    ) ?? '#',
   chessGameReviewLive:
     sanitizeExternalUrl('https://chessgamereview-two.vercel.app/', ['chessgamereview-two.vercel.app']) ?? '#',
   chessGameReviewRepo:

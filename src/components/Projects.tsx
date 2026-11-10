@@ -7,6 +7,7 @@ import {
 import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
 import declaraformImg from '../assets/projects/declaraform-preview.jpg';
+import gitcanvasImg from '../assets/projects/gitcanvas-preview.jpg';
 import neurosortImg from '../assets/projects/neurosort-preview.png';
 import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.png';
 import chessGameReviewImg from '../assets/projects/chess-game-review-preview.png';
@@ -48,6 +49,54 @@ interface ProjectItem {
 }
 
 const PROJECTS_DATA: readonly ProjectItem[] = [
+  {
+    id: 'gitcanvas',
+    title: 'GitCanvas',
+    subtitle: 'Visual Bento-Grid Profile Studio & Developer Archetype Engine',
+    description:
+      'An Apple-inspired Bento-Grid profile studio and real-time GitHub desktop simulator. Ingests public repositories, star velocity, fork metrics, and byte-level language distributions via Octokit REST to detect engineering archetypes, synthesizes tailored bio copy using Gemini AI, and renders pixel-accurate Bento, Terminal CLI, and Editorial Minimalist Markdown READMEs with 1-click deployment to <username>/<username>.',
+    accentHoverBorder: 'hover:border-cyan-500/40',
+    accentHoverShadow: 'hover:shadow-cyan-500/10',
+    titleHoverColor: 'group-hover:text-cyan-300',
+    subtitleColor: 'text-cyan-300',
+    primaryButtonClass: 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-600/25',
+    floatingBadgeClass: 'bg-cyan-600/90 hover:bg-cyan-500',
+    badges: [
+      {
+        label: 'Live Production App',
+        className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
+      },
+      {
+        label: 'Next.js 14 & Gemini AI',
+        className: 'border-cyan-500/40 text-cyan-300 bg-cyan-500/10',
+      },
+    ],
+    domainBadge: {
+      label: 'Domain: githubstatreadme.vercel.app',
+      status: 'Online',
+      isOnline: true,
+    },
+    image: gitcanvasImg,
+    imageAlt: 'GitCanvas Bento Grid README Studio & Live Simulator Preview',
+    liveUrl: EXTERNAL_LINKS.gitCanvasLive,
+    githubUrl: EXTERNAL_LINKS.gitCanvasRepo,
+    features: [
+      { label: 'Portfolio ingestion & archetype classifier powered by', codeSnippet: 'Octokit REST' },
+      { label: 'AI bio synthesizer with 4 distinct persona tones using', codeSnippet: 'Gemini AI' },
+      { label: 'Split-screen GitHub simulator with drag-and-drop via', codeSnippet: '@dnd-kit' },
+      { label: 'Direct 1-click commit to <username>/<username> with diff verification' },
+    ],
+    technologies: [
+      'Next.js 14',
+      'React 18',
+      'TypeScript',
+      'Tailwind CSS',
+      'Gemini AI',
+      'Octokit REST',
+      '@dnd-kit',
+      'Vercel',
+    ],
+  },
   {
     id: 'neurosort',
     title: 'NeuroSort',
