@@ -5,8 +5,6 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
-import Lanyard from './components/Lanyard';
-import eldionPortrait from './assets/eldion-portrait.webp';
 import { sanitizeInternalRoute } from './lib/security';
 
 const Projects = lazy(() => import('./components/Projects'));
@@ -136,26 +134,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col selection:bg-purple-600/30 selection:text-purple-200 relative">
-      {/* Interactive 3D Lanyard Card - full window visibility across the entire site behind texts */}
-      <div
-        className="fixed inset-0 w-full h-full pointer-events-none z-0"
-        aria-label="Interactive 3D Profile Card hanging on lanyard"
-      >
-        <Lanyard
-          frontImage={eldionPortrait}
-          backImage={eldionPortrait}
-          cardColor="#141419"
-          strapColor="#27272a"
-          finish="glossy"
-          metal="silver"
-          size={0.28}
-          anchor="right"
-          strapLength={0.45}
-          interactive={true}
-          breeze={0.25}
-        />
-      </div>
-
       {/* Left-side docked navigation using BranchedMenu */}
       <Navbar activeSection={activeSection} />
       
