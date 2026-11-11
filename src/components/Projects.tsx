@@ -8,7 +8,6 @@ import {
   X
 } from 'lucide-react';
 import { GithubIcon } from './Icons';
-import GithubContributions from './GithubContributions';
 import Folder, { type FolderItem } from './Folder';
 import declaraformImg from '../assets/projects/declaraform-preview.webp';
 import gitcanvasImg from '../assets/projects/gitcanvas-preview.webp';
@@ -502,9 +501,6 @@ export default function Projects() {
           )}
 
         </div>
-
-        {/* GitHub Contributions & Open Source Activity */}
-        <GithubContributions />
 
         {/* Future / In Development Callout */}
         <div className="mt-8 p-6 rounded-2xl bg-[#111116] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
