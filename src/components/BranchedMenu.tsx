@@ -37,7 +37,7 @@ export interface BranchedMenuProps {
 const PAD = 6;
 const MARK = 16;
 
-import { renderIcon } from '../lib/branchedMenuUtils';
+import { renderIcon } from '../lib/branchedMenuUtils.tsx';
 
 const toSet = (open: number | number[]) => new Set(Array.isArray(open) ? open : open >= 0 ? [open] : []);
 

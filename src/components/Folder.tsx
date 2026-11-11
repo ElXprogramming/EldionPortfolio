@@ -24,6 +24,7 @@ export interface FolderProps {
   openOn?: 'click' | 'hover';
   open?: boolean;
   defaultOpen?: boolean;
+  selectedIndex?: number | null;
   onOpenChange?: (open: boolean) => void;
   onItemClick?: (item: FolderItem, index: number) => void;
   onItemDrop?: (item: FolderItem, index: number, inside: boolean) => void;
@@ -798,6 +799,11 @@ const renderItem = (item: FolderItem) => {
       return (
         <div className="folder-photo">
           <img src={item.image} alt={item.alt ?? item.title ?? ''} draggable={false} />
+          {item.title && (
+            <div className="folder-photo-caption">
+              <span>{item.title}</span>
+            </div>
+          )}
         </div>
       );
     }
@@ -899,6 +905,7 @@ export default function Folder({
   openOn = 'click',
   open,
   defaultOpen = false,
+  selectedIndex,
   onOpenChange,
   onItemClick,
   onItemDrop,
@@ -931,6 +938,7 @@ export default function Folder({
     consumeClick: () => boolean;
     interactive: (index: number) => boolean;
     select: (index: number) => void;
+    setFocus: (index: number) => void;
     blur: () => boolean;
   } | null>(null);
   const rendererRef = useRef<ReturnType<typeof createGlass> | null>(null);
@@ -997,6 +1005,7 @@ export default function Folder({
     intro,
     draggable,
     zoomOnClick,
+    selectedIndex,
     closeOnOutsideClick,
     onItemClick,
     onItemDrop,
@@ -1901,6 +1910,10 @@ export default function Folder({
       }
     }
 
+    if (settingsRef.current.selectedIndex !== undefined && settingsRef.current.selectedIndex !== null) {
+      state.focus = settingsRef.current.selectedIndex;
+    }
+
     engineRef.current = {
       wake,
       invalidate,
@@ -1912,9 +1925,19 @@ export default function Folder({
       interactive: index => settingsRef.current.open || state.items[index]?.place === 'out' || state.focus === index,
       select: index => {
         const s = settingsRef.current;
-        if (s.zoomOnClick) state.focus = state.focus === index ? -1 : index;
-        s.onItemClick?.(s.entries[index], index);
+        if (s.selectedIndex !== undefined) {
+          s.onItemClick?.(s.entries[index], index);
+        } else {
+          if (s.zoomOnClick) state.focus = state.focus === index ? -1 : index;
+          s.onItemClick?.(s.entries[index], index);
+        }
         wake();
+      },
+      setFocus: (idx: number) => {
+        if (state.focus !== idx) {
+          state.focus = idx;
+          wake();
+        }
       },
       blur: () => {
         if (state.focus < 0) return false;
@@ -1972,6 +1995,7 @@ export default function Folder({
       intro,
       draggable,
       zoomOnClick,
+      selectedIndex,
       closeOnOutsideClick,
       onItemClick,
       onItemDrop,
@@ -1997,6 +2021,13 @@ export default function Folder({
     };
     engineRef.current?.wake();
   });
+
+  useEffect(() => {
+    if (selectedIndex !== undefined) {
+      const nextFocus = selectedIndex === null ? -1 : selectedIndex;
+      engineRef.current?.setFocus(nextFocus);
+    }
+  }, [selectedIndex]);
 
   const toggle = () => {
     if (engineRef.current?.blur()) return;
@@ -2099,6 +2130,7 @@ export default function Folder({
               }}
               className="folder-layer folder-item"
               data-folder-item={index}
+              data-selected={selectedIndex === index ? '' : undefined}
               role={interactive ? 'button' : undefined}
               tabIndex={interactive ? 0 : -1}
               onClick={event => onItemActivate(event, index)}

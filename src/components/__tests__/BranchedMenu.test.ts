@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import React from 'react';
 import { Home } from 'lucide-react';
 import { type BranchedMenuItem } from '../BranchedMenu';
-import { renderIcon } from '../../lib/branchedMenuUtils';
+import { renderIcon } from '../../lib/branchedMenuUtils.tsx';
 
 describe('BranchedMenu item structures and navigation', () => {
   const testMenu: BranchedMenuItem[] = [

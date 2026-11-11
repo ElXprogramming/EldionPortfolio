@@ -350,3 +350,40 @@
   pointer-events: none;
   -webkit-user-drag: none;
 }
+
+.folder-photo-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: calc(6px * var(--folder-scale)) calc(6px * var(--folder-scale));
+  background: linear-gradient(to top, rgba(9, 9, 11, 0.96) 0%, rgba(9, 9, 11, 0.82) 65%, transparent 100%);
+  color: #ffffff;
+  font-size: calc(9.5px * var(--folder-scale));
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  border-bottom-left-radius: calc(3px * var(--folder-scale));
+  border-bottom-right-radius: calc(3px * var(--folder-scale));
+  transition: background 250ms ease, color 250ms ease;
+}
+
+.folder-item[data-selected] {
+  outline: 2px solid #a855f7;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1px rgba(168, 85, 247, 0.5),
+    0 8px 24px rgba(168, 85, 247, 0.35);
+}
+
+.folder-item[data-selected] .folder-photo-caption {
+  background: linear-gradient(to top, rgba(88, 28, 135, 0.98) 0%, rgba(107, 33, 168, 0.88) 70%, transparent 100%);
+  color: #faf5ff;
+}
