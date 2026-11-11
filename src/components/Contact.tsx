@@ -65,7 +65,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="py-24 relative">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-left max-w-2xl mb-8 sm:mb-10">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -77,9 +77,9 @@ export default function Contact() {
         </div>
 
         {/* Symmetrical 2-Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch max-w-5xl mx-auto">
-          {/* Direct Contact Cards (Left Column: Chunky Standalone Boxes) */}
-          <div className="flex flex-col justify-between gap-4 w-full max-w-[400px] mx-auto lg:mx-0 lg:ml-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
+          {/* Direct Contact Cards (Left Column: Chunky Standalone Boxes aligned with title) */}
+          <div className="flex flex-col justify-between gap-4 w-full max-w-[420px]">
             {/* Email Box */}
             <div className="rounded-2xl p-5 sm:p-6 border border-white/10 bg-[#111116] hover:border-purple-500/30 transition-all shadow-lg flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px]">
               <div className="flex items-center justify-between mb-3">
@@ -165,7 +165,7 @@ export default function Contact() {
           </div>
 
           {/* Quick Interactive Message Form (Right Column) */}
-          <div className="rounded-2xl p-6 sm:p-8 border border-white/10 bg-[#111116] shadow-xl w-full max-w-[480px] mx-auto lg:mx-0 lg:mr-auto flex flex-col justify-between">
+          <div className="rounded-2xl p-6 sm:p-8 border border-white/10 bg-[#111116] shadow-xl w-full max-w-[480px] lg:ml-auto flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-purple-400" />
