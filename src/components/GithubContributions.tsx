@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { GithubIcon } from './Icons';
 import {
   fetchGithubContributions,
@@ -6,7 +6,7 @@ import {
   groupContributionsIntoWeeks,
 } from '../lib/github';
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from '../lib/githubFallback';
-import type { GithubContributionsResponse } from '../lib/schemas';
+import type { GithubContributionsResponse, GithubContributionDay } from '../lib/schemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 const getLevelColor = (level: number) => {
@@ -24,8 +24,25 @@ const getLevelColor = (level: number) => {
   }
 };
 
+const formatHoverDate = (dateStr: string) => {
+  try {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    return dateObj.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
+
 export default function GithubContributions() {
   const [data, setData] = useState<GithubContributionsResponse>(GITHUB_CONTRIBUTIONS_FALLBACK);
+  const [hoveredDay, setHoveredDay] = useState<GithubContributionDay | null>(null);
+  const [columnsCount, setColumnsCount] = useState<number>(27);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -42,18 +59,40 @@ export default function GithubContributions() {
     };
   }, []);
 
+  // Compute how many columns comfortably fit without horizontal scrolling
+  useEffect(() => {
+    const updateColumns = () => {
+      if (!containerRef.current) return;
+      const width = containerRef.current.clientWidth;
+      // Each column is approx 14px cell + 4px gap = 18px
+      const count = Math.max(12, Math.floor((width + 4) / 18));
+      setColumnsCount(count);
+    };
+
+    updateColumns();
+
+    if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+      const ro = new ResizeObserver(updateColumns);
+      ro.observe(containerRef.current);
+      return () => ro.disconnect();
+    }
+
+    window.addEventListener('resize', updateColumns);
+    return () => window.removeEventListener('resize', updateColumns);
+  }, []);
+
   const stats = useMemo(() => calculateContributionStats(data.contributions), [data]);
   const weeks = useMemo(() => groupContributionsIntoWeeks(data.contributions), [data]);
 
-  // Display the last 27 weeks to match the card layout exactly
+  // Display only what fits in the card without horizontal scrolling
   const displayWeeks = useMemo(() => {
-    const last27 = weeks.slice(-27);
-    if (last27.length < 27) {
-      const padding = Array.from({ length: 27 - last27.length }, () => Array(7).fill(null));
-      return [...padding, ...last27];
+    const sliced = weeks.slice(-columnsCount);
+    if (sliced.length < columnsCount) {
+      const padding = Array.from({ length: columnsCount - sliced.length }, () => Array(7).fill(null));
+      return [...padding, ...sliced];
     }
-    return last27;
-  }, [weeks]);
+    return sliced;
+  }, [weeks, columnsCount]);
 
   // Total count formatted
   const totalContributions = useMemo(() => {
@@ -97,7 +136,7 @@ export default function GithubContributions() {
 
   return (
     <div className="rounded-2xl p-5 sm:p-6 bg-[#08080a] border border-white/10 shadow-xl">
-      {/* Top Header: Badge on left, contributions count on right */}
+      {/* Top Header: Badge on left, dynamic status text on right */}
       <div className="flex items-center justify-between gap-4 mb-5">
         <a
           href={EXTERNAL_LINKS.github}
@@ -109,22 +148,36 @@ export default function GithubContributions() {
           <span>Github activity</span>
         </a>
 
-        <div className="text-xs sm:text-sm text-zinc-400 font-normal text-right truncate">
-          <span className="font-semibold text-zinc-200">{totalContributions}</span> contributions in the last year
+        <div className="text-xs sm:text-sm text-zinc-400 font-normal text-right truncate transition-all">
+          {hoveredDay ? (
+            <span>
+              <span className="font-semibold text-zinc-200">{hoveredDay.count}</span>{' '}
+              {hoveredDay.count === 1 ? 'contribution' : 'contributions'} on{' '}
+              <span className="text-zinc-300 font-medium">{formatHoverDate(hoveredDay.date)}</span>
+            </span>
+          ) : (
+            <span>
+              <span className="font-semibold text-zinc-200">{totalContributions}</span> contributions in the last year
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Contribution Grid (27 columns x 7 rows) */}
-      <div className="overflow-x-auto scrollbar-none py-1 mb-5">
-        <div className="flex gap-1 sm:gap-1.5 justify-between min-w-max">
+      {/* Contribution Grid: fits 100% of the card with no scroll */}
+      <div
+        ref={containerRef}
+        onMouseLeave={() => setHoveredDay(null)}
+        className="w-full overflow-hidden py-1 mb-5"
+      >
+        <div className="flex justify-between w-full">
           {displayWeeks.map((week, wIdx) => (
             <div key={wIdx} className="flex flex-col gap-1 sm:gap-1.5">
               {week.map((day, dIdx) => (
                 day ? (
                   <div
                     key={day.date}
-                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] ${getLevelColor(day.level)} transition-transform hover:scale-125 cursor-pointer`}
-                    title={`${day.count} contribution${day.count === 1 ? '' : 's'} on ${day.date}`}
+                    onMouseEnter={() => setHoveredDay(day)}
+                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] ${getLevelColor(day.level)} cursor-pointer`}
                   />
                 ) : (
                   <div
