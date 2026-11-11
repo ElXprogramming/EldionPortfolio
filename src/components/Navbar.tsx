@@ -4,7 +4,6 @@ import {
   User,
   Layers,
   FolderGit2,
-  GraduationCap,
   Menu,
   X
 } from 'lucide-react';
@@ -53,8 +52,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
         { value: 'hero', label: 'Home', icon: Home },
         { value: 'about', label: 'About', icon: User },
         { value: 'skills', label: 'Skills', icon: Layers },
-        { value: 'projects', label: 'Projects', icon: FolderGit2 },
-        { value: 'education', label: 'Education', icon: GraduationCap }
+        { value: 'projects', label: 'Projects', icon: FolderGit2 }
       ]
     }
   ];

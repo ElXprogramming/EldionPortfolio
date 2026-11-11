@@ -12,8 +12,7 @@ describe('BranchedMenu item structures and navigation', () => {
         { value: 'hero', label: 'Home' },
         { value: 'about', label: 'About' },
         { value: 'skills', label: 'Skills' },
-        { value: 'projects', label: 'Projects' },
-        { value: 'education', label: 'Education' }
+        { value: 'projects', label: 'Projects' }
       ]
     }
   ];
@@ -25,8 +24,7 @@ describe('BranchedMenu item structures and navigation', () => {
       'hero',
       'about',
       'skills',
-      'projects',
-      'education'
+      'projects'
     ]);
   });
 
@@ -36,7 +34,7 @@ describe('BranchedMenu item structures and navigation', () => {
 
     expect(findSection('hero')).toBe(0);
     expect(findSection('projects')).toBe(0);
-    expect(findSection('education')).toBe(0);
+    expect(findSection('skills')).toBe(0);
     expect(findSection('non-existent')).toBe(-1);
   });
 

@@ -3,7 +3,6 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
-import Education from './components/Education';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import Lanyard from './components/Lanyard';
@@ -178,7 +177,6 @@ export default function App() {
             <Projects />
           </Suspense>
         </ErrorBoundary>
-        <Education />
         <ErrorBoundary fallbackTitle="Contact display issue">
           <Suspense
             fallback={
