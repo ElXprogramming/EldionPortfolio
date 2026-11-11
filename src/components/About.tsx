@@ -103,16 +103,7 @@ export default function About() {
                     </p>
                   </div>
 
-                  <span
-                    className={`absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium shrink-0 whitespace-nowrap ${
-                      item.status === 'Current Student'
-                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 flex items-center gap-1.5'
-                        : 'border border-white/10 bg-white/5 text-zinc-300'
-                    }`}
-                  >
-                    {item.status === 'Current Student' && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    )}
+                  <span className="absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium shrink-0 whitespace-nowrap border border-white/10 bg-white/5 text-zinc-300">
                     {item.status}
                   </span>
 
