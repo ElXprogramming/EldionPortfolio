@@ -324,23 +324,7 @@ export default function Projects() {
               </span>
             </div>
 
-            {/* Project Selector Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-4 w-full">
-              {PROJECTS_DATA.map((project, idx) => (
-                <button
-                  key={project.id}
-                  type="button"
-                  onClick={() => setActiveProjectIndex((prev) => (prev === idx ? null : idx))}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
-                    activeProjectIndex === idx
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-500/50'
-                      : 'bg-[#141419] text-zinc-400 hover:text-white border border-white/5 hover:border-white/15'
-                  }`}
-                >
-                  {project.title}
-                </button>
-              ))}
-            </div>
+
           </div>
 
           {/* Right Column: Opened Project Details Card */}
