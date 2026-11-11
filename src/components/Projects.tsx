@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { 
   ExternalLink, 
-  Sparkles, 
   FileText, 
   X 
 } from 'lucide-react';
@@ -104,16 +103,12 @@ export default function Projects() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            Interactive Portfolio Folder
-          </div>
+        <div className="text-left max-w-2xl mb-8 sm:mb-10">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Projects &amp; Applications
+            Projects
           </h2>
-          <p className="mt-3 text-zinc-300 text-sm sm:text-base">
-            Click any project document in the folder to inspect details.
+          <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+            Interactive folder archive of selected applications and tools.
           </p>
         </div>
 

@@ -67,16 +67,12 @@ export default function Contact() {
     <section id="contact" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Mail className="w-3.5 h-3.5" />
-            Get in Touch
-          </div>
+        <div className="text-left max-w-2xl mb-8 sm:mb-10">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Let's Build Something Great
+            Get in Touch
           </h2>
-          <p className="mt-3 text-zinc-300 text-sm sm:text-base">
-            Open to internship opportunities, software engineering roles, and innovative projects. Feel free to reach out directly!
+          <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+            Open to internships, software engineering roles, and project discussions.
           </p>
         </div>
 

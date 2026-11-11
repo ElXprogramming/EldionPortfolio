@@ -3,8 +3,7 @@ import {
   Server, 
   BrainCircuit, 
   Database, 
-  CheckCircle2, 
-  Layers
+  CheckCircle2 
 } from 'lucide-react';
 
 interface SkillCategory {
@@ -91,17 +90,13 @@ export default function Skills() {
     <section id="skills" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Title */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Layers className="w-3.5 h-3.5" />
+        {/* Section Header */}
+        <div className="text-left max-w-2xl mb-8 sm:mb-10">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Technical Stack
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
-            Skills &amp; Capabilities
           </h2>
-          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
-            Equipped with modern full-stack development tools, database engineering, and practical AI integrations.
+          <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+            Core technologies, frameworks, and engineering tools.
           </p>
         </div>
 
