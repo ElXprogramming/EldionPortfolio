@@ -114,9 +114,6 @@ export default function Skills() {
                 key={idx}
                 className="glass-card rounded-2xl p-6 sm:p-7 border border-slate-800/80 bg-slate-900/60 relative overflow-hidden group"
               >
-                {/* Glow backdrop */}
-                <div className={`absolute top-0 right-0 w-44 h-44 rounded-full blur-3xl pointer-events-none opacity-20 bg-gradient-to-br ${cat.color}`} />
-
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`p-2.5 rounded-xl border bg-slate-950/80 ${cat.color}`}>

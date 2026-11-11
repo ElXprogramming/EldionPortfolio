@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import { 
   ExternalLink, 
   Sparkles, 
   CheckCircle2, 
-  Clock
+  Clock,
+  FileText
 } from 'lucide-react';
 import { GithubIcon } from './Icons';
 import GithubContributions from './GithubContributions';
+import Folder, { type FolderItem } from './Folder';
 import declaraformImg from '../assets/projects/declaraform-preview.webp';
 import gitcanvasImg from '../assets/projects/gitcanvas-preview.webp';
 import neurosortImg from '../assets/projects/neurosort-preview.webp';
@@ -28,12 +31,6 @@ interface ProjectItem {
   title: string;
   subtitle: string;
   description: string;
-  accentHoverBorder: string;
-  accentHoverShadow: string;
-  titleHoverColor: string;
-  subtitleColor: string;
-  primaryButtonClass?: string;
-  floatingBadgeClass?: string;
   badges: readonly ProjectBadge[];
   domainBadge: {
     label: string;
@@ -55,12 +52,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
     subtitle: 'Visual Bento-Grid Profile Studio & One Piece Themed README Engine',
     description:
       'A full-featured visual GitHub profile README studio and desktop simulator featuring animated One Piece pixel-art themes (Luffy Gatling punch, Straw Hat crew, Gear 5 Nika, and Wano Zoro). Ingests public repositories, star velocity, and byte-level language stats via Octokit REST to classify developer archetypes, synthesizes personalized bio copy using Gemini AI, and renders pixel-accurate Bento, Terminal CLI, and Anime-themed Markdown cards with instant 1-click deployment to <username>/<username>.',
-    accentHoverBorder: 'hover:border-cyan-500/40',
-    accentHoverShadow: 'hover:shadow-cyan-500/10',
-    titleHoverColor: 'group-hover:text-cyan-300',
-    subtitleColor: 'text-cyan-300',
-    primaryButtonClass: 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-600/25',
-    floatingBadgeClass: 'bg-cyan-600/90 hover:bg-cyan-500',
     badges: [
       {
         label: 'Live Production App',
@@ -107,10 +98,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
     subtitle: 'Autonomous Local-First File Organization Daemon Powered by Ollama',
     description:
       'A local-first, safe, and intelligent automatic file management daemon and CLI powered by Ollama (Llama 3.2 / Phi 3.5). Features a built-in local web dashboard with a read-only "Future Sight" explorer that extracts metadata from documents, images (EXIF), and code to simulate destinations before moving, accompanied by an audit-grade SQLite WAL ledger guaranteeing instant transaction rollback and zero data loss.',
-    accentHoverBorder: 'hover:border-indigo-500/40',
-    accentHoverShadow: 'hover:shadow-indigo-500/10',
-    titleHoverColor: 'group-hover:text-indigo-300',
-    subtitleColor: 'text-indigo-300',
     badges: [
       {
         label: 'Open Source Daemon & CLI',
@@ -151,12 +138,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
     subtitle: 'High-Performance Restaurant Menu Scraper & Local SQLite Database Explorer',
     description:
       'A local-first menu extraction system engineered to harvest, deduplicate, and catalog food menus from dynamic delivery platforms (GrabFood, foodpanda) and restaurant websites. Overcomes single-page application hydration barriers via Playwright Chromium passive network response sniffing, normalizes minor unit pricing to Ringgit (MYR), deduplicates venues with Haversine distance and SequenceMatcher algorithms, and provides both a Rich Typer CLI and zero-dependency local Web GUI with formula-injection-safe CSV and JSON export.',
-    accentHoverBorder: 'hover:border-teal-500/40',
-    accentHoverShadow: 'hover:shadow-teal-500/10',
-    titleHoverColor: 'group-hover:text-teal-300',
-    subtitleColor: 'text-teal-300',
-    primaryButtonClass: 'bg-teal-600 hover:bg-teal-500 shadow-teal-600/25',
-    floatingBadgeClass: 'bg-teal-600/90 hover:bg-teal-500',
     badges: [
       {
         label: 'Passive Sniffer & Rich CLI',
@@ -197,18 +178,14 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
     subtitle: 'Automated UMS Declaration Form PDF Generator',
     description:
       'A specialized system engineered for Universiti Malaysia Sabah Computer Science students in FKI KK (Faculty of Computing and Informatics, Kota Kinabalu). Accepts structured student inputs and automatically parses them into official, print-ready declaration PDFs. Eliminates the extra manual labor of transforming static PDF templates into editable files, paired with a playful interactive 3D WebGL background.',
-    accentHoverBorder: 'hover:border-purple-500/40',
-    accentHoverShadow: 'hover:shadow-purple-500/10',
-    titleHoverColor: 'group-hover:text-purple-300',
-    subtitleColor: 'text-purple-300',
     badges: [
       {
         label: 'Live Production App',
         className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
       },
       {
-        label: 'Interactive WebGL',
-        className: 'border-sky-500/40 text-sky-400 bg-sky-500/10',
+        label: 'Client-Side PDF Generator',
+        className: 'border-purple-500/40 text-purple-300 bg-purple-500/10',
       },
     ],
     domainBadge: {
@@ -242,12 +219,6 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
     subtitle: 'Client-Side Browser Chess Engine & Game Review Web Application',
     description:
       'A high-performance, browser-native chess engine and full game review web application powered by Stockfish 16 compiled to WebAssembly. Evaluates PGN games directly inside browser Web Workers with zero server dependencies, calculating CAPS2 accuracy percentages, classifying every move with badges (Brilliant, Great, Best, Inaccuracy, Blunder), rendering dynamic engine recommendation arrows, and delivering natural language virtual coach commentary.',
-    accentHoverBorder: 'hover:border-emerald-500/40',
-    accentHoverShadow: 'hover:shadow-emerald-500/10',
-    titleHoverColor: 'group-hover:text-emerald-300',
-    subtitleColor: 'text-emerald-300',
-    primaryButtonClass: 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/25',
-    floatingBadgeClass: 'bg-emerald-600/90 hover:bg-emerald-500',
     badges: [
       {
         label: 'Live Web App & Stockfish WASM',
@@ -288,219 +259,242 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
 ] as const;
 
 export default function Projects() {
+  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+
+  const folderItems: FolderItem[] = PROJECTS_DATA.map((p) => ({
+    title: p.title,
+    description: p.subtitle,
+    image: p.image,
+    alt: p.imageAlt,
+  }));
+
+  const activeProject = PROJECTS_DATA[activeProjectIndex] ?? PROJECTS_DATA[0];
+
   return (
     <section id="projects" className="py-24 relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" />
-            Featured Work
+            Interactive Portfolio Folder
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Projects &amp; Applications
           </h2>
-          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
-            Production-ready software built to solve real-world problems with modern web technologies, automated data pipelines, and local AI.
+          <p className="mt-3 text-zinc-300 text-sm sm:text-base">
+            Click to open the interactive project folder, drag documents out, or select any project to explore its architecture and live demo.
           </p>
         </div>
 
-        {/* Project Cards List */}
-        <div className="space-y-10 sm:space-y-12 mb-16">
-          {PROJECTS_DATA.map((project) => (
-            <div
+        {/* Interactive Folder Stage */}
+        <div className="flex flex-col items-center justify-center my-10 py-6">
+          <div className="relative flex items-center justify-center min-h-[300px] sm:min-h-[340px]">
+            <Folder
+              label="Projects Archive"
+              items={folderItems}
+              mode="flap"
+              variant="solid"
+              color="#3b1d60"
+              paperColor="#ffffff"
+              tabPosition="left"
+              defaultOpen={true}
+              draggable={true}
+              zoomOnClick={true}
+              size={1.15}
+              onItemClick={(_item, idx) => {
+                if (idx >= 0 && idx < PROJECTS_DATA.length) {
+                  setActiveProjectIndex(idx);
+                }
+              }}
+            />
+          </div>
+          <div className="text-xs text-zinc-400 mt-4 flex items-center gap-2 font-mono">
+            <FileText className="w-3.5 h-3.5 text-purple-400" />
+            <span>Interactive: Click or drag documents from the folder to inspect</span>
+          </div>
+        </div>
+
+        {/* Project Selector Pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          {PROJECTS_DATA.map((project, idx) => (
+            <button
               key={project.id}
-              className={`glass-card rounded-2xl overflow-hidden border border-slate-800/80 bg-slate-900/60 transition-all duration-300 ${project.accentHoverBorder} hover:shadow-2xl ${project.accentHoverShadow} group`}
+              type="button"
+              onClick={() => setActiveProjectIndex(idx)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                activeProjectIndex === idx
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-500/50'
+                  : 'bg-[#141419] text-zinc-400 hover:text-white border border-white/5 hover:border-white/15'
+              }`}
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                
-                {/* Visual Preview Column */}
-                <div className="lg:col-span-6 relative bg-slate-950 flex flex-col justify-center items-center overflow-hidden border-b lg:border-b-0 lg:border-r border-slate-800/80 min-h-[300px] lg:min-h-full">
-                  <div className="relative w-full h-full min-h-[300px] group-hover:scale-105 transition-transform duration-500 ease-out">
-                    <img
-                      src={project.image}
-                      alt={project.imageAlt}
-                      className="w-full h-full object-cover object-center"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-slate-950/40" />
-                    
-                    {/* Floating badge inside visual */}
-                    <div className="absolute top-4 right-4">
-                      {project.liveUrl ? (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg ${project.floatingBadgeClass ?? 'bg-purple-600/90 hover:bg-purple-500'} text-white text-xs font-semibold shadow-lg backdrop-blur-md transition-colors cursor-pointer`}
-                        >
-                          <span>Visit Live Site</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      ) : (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg ${project.floatingBadgeClass ?? 'bg-indigo-600/90 hover:bg-indigo-500'} text-white text-xs font-semibold shadow-lg backdrop-blur-md transition-colors cursor-pointer`}
-                        >
-                          <GithubIcon className="w-3.5 h-3.5 text-white" />
-                          <span>View on GitHub</span>
-                        </a>
-                      )}
-                    </div>
+              {project.title}
+            </button>
+          ))}
+        </div>
 
-                    <div className="absolute bottom-4 left-4 right-4 p-3.5 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800/80 hidden sm:block">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-300 font-medium font-mono">
-                          {project.domainBadge.label}
-                        </span>
-                        <span className={`${project.domainBadge.isOnline ? 'text-emerald-400' : 'text-purple-300'} font-semibold flex items-center gap-1.5 font-mono`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${project.domainBadge.isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-purple-400'}`} />
-                          {project.domainBadge.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+        {/* Active Project Details Card */}
+        <div className="rounded-2xl border border-white/10 bg-[#111116] overflow-hidden shadow-2xl transition-all duration-300 mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
+            
+            {/* Visual Preview Column */}
+            <div className="lg:col-span-6 relative bg-zinc-950 flex flex-col justify-center items-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10 min-h-[300px] lg:min-h-full">
+              <img
+                src={activeProject.image}
+                alt={activeProject.imageAlt}
+                className="w-full h-full object-cover object-center max-h-[460px]"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent pointer-events-none" />
+
+              <div className="absolute bottom-4 left-4 right-4 p-3 rounded-xl bg-black/80 backdrop-blur-md border border-white/10 hidden sm:block">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-zinc-300 font-mono">
+                    {activeProject.domainBadge.label}
+                  </span>
+                  <span className="text-emerald-400 font-semibold flex items-center gap-1.5 font-mono">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    {activeProject.domainBadge.status}
+                  </span>
                 </div>
-
-                {/* Details Column */}
-                <div className="lg:col-span-6 p-6 sm:p-9 flex flex-col justify-between">
-                  <div>
-                    {/* Top Badges */}
-                    <div className="flex flex-wrap items-center gap-2.5 mb-3">
-                      {project.badges.map((badge, bIdx) => (
-                        <span
-                          key={bIdx}
-                          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badge.className}`}
-                        >
-                          {badge.label}
-                        </span>
-                      ))}
-                    </div>
-
-                    <h3 className={`text-2xl sm:text-3xl font-bold text-white tracking-tight ${project.titleHoverColor} transition-colors text-readable-subheading`}>
-                      {project.title}
-                    </h3>
-                    
-                    <p className={`text-sm font-semibold ${project.subtitleColor} mb-4 text-readable-body`}>
-                      {project.subtitle}
-                    </p>
-
-                    <p className="text-slate-200 text-sm sm:text-base leading-relaxed mb-6 text-readable-body">
-                      {project.description}
-                    </p>
-
-                    {/* Key Highlights */}
-                    <div className="mb-6 space-y-2.5 text-readable-body">
-                      <div className="text-xs font-bold uppercase tracking-wider text-slate-200 mb-2">
-                        Key Engineering Features:
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200">
-                        {project.features.map((feat, fIdx) => (
-                          <div key={fIdx} className="flex items-start gap-2">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
-                            <span>
-                              {feat.label}
-                              {feat.codeSnippet && (
-                                <>
-                                  {' '}
-                                  <code className="text-purple-300 bg-purple-950/40 px-1 py-0.5 rounded border border-purple-800/50 font-mono text-[11px]">
-                                    {feat.codeSnippet}
-                                  </code>
-                                </>
-                              )}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Technologies */}
-                    <div className="flex flex-wrap gap-1.5 mb-8">
-                      {project.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2.5 py-1 rounded-md bg-slate-800/90 text-slate-300 border border-slate-700/60 text-xs font-mono"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-slate-800/80">
-                    {project.liveUrl ? (
-                      <>
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white ${project.primaryButtonClass ?? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/25'} shadow-md transition-all duration-200 cursor-pointer`}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          Launch Application
-                        </a>
-
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
-                        >
-                          <GithubIcon className="w-4 h-4 text-slate-300" />
-                          View Source Code
-                        </a>
-                      </>
-                    ) : (
-                      <>
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white ${project.primaryButtonClass ?? 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/25'} shadow-md transition-all duration-200 cursor-pointer`}
-                        >
-                          <GithubIcon className="w-4 h-4 text-white" />
-                          Explore on GitHub
-                        </a>
-
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-slate-200 bg-slate-800/90 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
-                        >
-                          <ExternalLink className="w-4 h-4 text-slate-300" />
-                          Documentation &amp; Architecture
-                        </a>
-                      </>
-                    )}
-                  </div>
-
-                </div>
-
               </div>
             </div>
-          ))}
+
+            {/* Details Column */}
+            <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between">
+              <div>
+                {/* Badges */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {activeProject.badges.map((badge, bIdx) => (
+                    <span
+                      key={bIdx}
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badge.className}`}
+                    >
+                      {badge.label}
+                    </span>
+                  ))}
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                  {activeProject.title}
+                </h3>
+                
+                <p className="text-sm font-semibold text-purple-300 mt-1 mb-4">
+                  {activeProject.subtitle}
+                </p>
+
+                <p className="text-zinc-300 text-sm sm:text-base leading-relaxed mb-6">
+                  {activeProject.description}
+                </p>
+
+                {/* Key Highlights */}
+                <div className="mb-6 space-y-2">
+                  <div className="text-xs font-bold uppercase tracking-wider text-zinc-300 mb-2">
+                    Key Engineering Features:
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 text-xs text-zinc-300">
+                    {activeProject.features.map((feat, fIdx) => (
+                      <div key={fIdx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+                        <span>
+                          {feat.label}
+                          {feat.codeSnippet && (
+                            <>
+                              {' '}
+                              <code className="text-purple-300 bg-purple-950/40 px-1 py-0.5 rounded border border-purple-800/50 font-mono text-[11px]">
+                                {feat.codeSnippet}
+                              </code>
+                            </>
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Technologies */}
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {activeProject.technologies.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-2.5 py-1 rounded-md bg-zinc-900 text-zinc-300 border border-zinc-800 text-xs font-mono"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-white/10">
+                {activeProject.liveUrl ? (
+                  <>
+                    <a
+                      href={activeProject.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-purple-600 hover:bg-purple-500 shadow-lg shadow-purple-600/30 transition-all cursor-pointer"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Launch Application
+                    </a>
+
+                    <a
+                      href={activeProject.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                    >
+                      <GithubIcon className="w-4 h-4 text-zinc-300" />
+                      View Source Code
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href={activeProject.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+                    >
+                      <GithubIcon className="w-4 h-4 text-white" />
+                      Explore on GitHub
+                    </a>
+
+                    <a
+                      href={activeProject.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-xs sm:text-sm text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"
+                    >
+                      <ExternalLink className="w-4 h-4 text-zinc-300" />
+                      Documentation &amp; Architecture
+                    </a>
+                  </>
+                )}
+              </div>
+
+            </div>
+
+          </div>
         </div>
 
         {/* GitHub Contributions & Open Source Activity */}
         <GithubContributions />
 
-        {/* Future / In Development Callout Card */}
-        <div className="mt-8 p-6 sm:p-7 rounded-2xl bg-slate-900/65 border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+        {/* Future / In Development Callout */}
+        <div className="mt-8 p-6 rounded-2xl bg-[#111116] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex items-center gap-3.5">
             <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-sm sm:text-base font-bold text-white text-readable-subheading">
+              <h4 className="text-sm sm:text-base font-bold text-white">
                 More Projects Under Active Development
               </h4>
-              <p className="text-xs sm:text-sm text-slate-200 text-readable-body">
+              <p className="text-xs sm:text-sm text-zinc-300">
                 Currently exploring new applications in full-stack web engineering, local AI pipelines, and student productivity tools.
               </p>
             </div>
@@ -510,7 +504,7 @@ export default function Projects() {
             href={EXTERNAL_LINKS.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-colors shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors shrink-0 cursor-pointer"
           >
             <GithubIcon className="w-4 h-4 text-purple-400" />
             <span>Follow on GitHub</span>

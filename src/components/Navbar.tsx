@@ -1,136 +1,192 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import { PROFILE, ROUTES } from '../lib/constants';
+import {
+  Home,
+  User,
+  Layers,
+  FolderGit2,
+  GraduationCap,
+  Mail,
+  Send,
+  Menu,
+  X
+} from 'lucide-react';
+import { GithubIcon, LinkedinIcon } from './Icons';
+import BranchedMenu, { type BranchedMenuItem } from './BranchedMenu';
+import { PROFILE, EXTERNAL_LINKS } from '../lib/constants';
+import { copyToClipboard } from '../lib/security';
 
 interface NavbarProps {
   activeSection: string;
 }
 
-const NAV_LINKS = [
-  { label: 'About', href: ROUTES.about },
-  { label: 'Skills', href: ROUTES.skills },
-  { label: 'Projects', href: ROUTES.projects },
-  { label: 'Education', href: ROUTES.education },
-  { label: 'Contact', href: ROUTES.contact },
-] as const;
-
 export default function Navbar({ activeSection }: NavbarProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [copiedNotice, setCopiedNotice] = useState(false);
 
+  // Close mobile drawer on resize to desktop
   useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 20);
-          ticking = false;
-        });
-        ticking = true;
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setMobileOpen(false);
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleSelect = (value: string) => {
+    if (value === 'github') {
+      window.open(EXTERNAL_LINKS.github, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (value === 'linkedin') {
+      window.open(EXTERNAL_LINKS.linkedin, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (value === 'email') {
+      copyToClipboard(PROFILE.email);
+      setCopiedNotice(true);
+      setTimeout(() => setCopiedNotice(false), 2000);
+      return;
+    }
+    if (value === 'inbox') {
+      window.location.hash = '#inbox';
+      return;
+    }
+
+    // Scroll to section
+    const target = document.getElementById(value);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+      if (window.history.pushState) {
+        window.history.pushState(null, '', `#${value}`);
+      }
+    }
+    setMobileOpen(false);
+  };
+
+  const menuItems: BranchedMenuItem[] = [
+    {
+      label: 'Navigation',
+      children: [
+        { value: 'hero', label: 'Home', icon: Home },
+        { value: 'about', label: 'About', icon: User },
+        { value: 'skills', label: 'Skills', icon: Layers },
+        { value: 'projects', label: 'Projects', icon: FolderGit2 },
+        { value: 'education', label: 'Education', icon: GraduationCap },
+        { value: 'contact', label: 'Contact', icon: Mail }
+      ]
+    },
+    {
+      label: 'Connect',
+      children: [
+        { value: 'github', label: 'GitHub', icon: GithubIcon },
+        { value: 'linkedin', label: 'LinkedIn', icon: LinkedinIcon },
+        { value: 'email', label: copiedNotice ? 'Copied!' : 'Copy Email', icon: Send }
+      ]
+    }
+  ];
+
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 shadow-lg shadow-black/20 py-3.5'
-          : 'bg-transparent py-5'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand / Logo */}
-        <a
-          href={ROUTES.home}
-          className="group flex items-center gap-3 text-slate-100 hover:text-white transition-colors"
-        >
-          <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-[#B497CF] to-indigo-400 p-[1px] shadow-md shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
-            <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-[#B497CF] to-purple-300">
-              {PROFILE.initials}
-            </div>
+    <>
+      {/* Desktop Right-Side Branched Navbar */}
+      <aside
+        aria-label="Right side navigation"
+        className="hidden lg:block fixed right-6 top-1/2 -translate-y-1/2 z-50 pointer-events-auto"
+      >
+        <div className="bg-[#0c0c11]/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl shadow-black/60 transition-all hover:border-white/20">
+          {/* Subtle branding title */}
+          <div className="flex items-center justify-between pb-3 mb-2 border-b border-white/10 text-xs">
+            <span className="font-bold text-white tracking-wide">{PROFILE.initials}</span>
+            <span className="text-[10px] text-zinc-400 font-mono">PORTFOLIO</span>
           </div>
-          <div>
-            <div className="font-bold tracking-tight text-sm sm:text-base leading-none text-readable-subheading">
-              {PROFILE.name}
-            </div>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] text-slate-300 font-medium leading-none text-readable-body">
-                {PROFILE.role}
-              </span>
-            </div>
-          </div>
-        </a>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-900/60 border border-slate-800/80 rounded-full px-4 py-1.5 backdrop-blur-sm">
-          {NAV_LINKS.map((link) => {
-            const isActive = activeSection === link.href.slice(1);
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                className={`px-3.5 py-1.5 text-xs lg:text-sm font-medium rounded-full transition-all duration-200 ${
-                  isActive
-                    ? 'text-white bg-purple-600/30 text-purple-300 border border-purple-500/30 shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
-                }`}
-              >
-                {link.label}
-              </a>
-            );
-          })}
-        </nav>
+          <BranchedMenu
+            items={menuItems}
+            defaultOpen={[0, 1]}
+            defaultActive={activeSection || 'hero'}
+            onSelect={handleSelect}
+            color="#e4e4e7"
+            accentColor="#c084fc"
+            lineColor="#27272a"
+            width={210}
+            rowHeight={32}
+            indent={36}
+            trunk={12}
+            radius={8}
+            fontSize={13}
+            drawDuration={300}
+            foldDuration={250}
+          />
 
-        {/* Actions */}
-        <div className="hidden md:flex items-center gap-3">
-          <a
-            href={ROUTES.contact}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 transition-all duration-200 shadow-md shadow-purple-600/25 hover:shadow-purple-600/40 cursor-pointer"
-          >
-            Get in Touch
-          </a>
+          {copiedNotice && (
+            <div className="mt-2 text-center text-[11px] text-emerald-400 font-medium animate-pulse">
+              Email copied to clipboard!
+            </div>
+          )}
         </div>
+      </aside>
 
-        {/* Mobile menu button */}
+      {/* Mobile Top Bar with Right-Side Menu Toggle */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between">
+        <a href="#" className="font-bold text-sm tracking-wide text-white">
+          {PROFILE.name}
+        </a>
         <button
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+          type="button"
+          onClick={() => setMobileOpen(prev => !prev)}
+          className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
           aria-label="Toggle navigation menu"
         >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden px-4 pt-3 pb-6 bg-slate-950/95 border-b border-slate-800/90 backdrop-blur-xl animate-in slide-in-from-top-4 duration-200">
-          <nav className="flex flex-col gap-1.5">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
-            <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
-              <a
-                href={ROUTES.contact}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 cursor-pointer"
-              >
-                Get in Touch
-              </a>
+      {/* Mobile Right-Side Drawer */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+          <div className="fixed top-0 right-0 bottom-0 w-72 bg-[#0c0c11] border-l border-white/10 p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
+            <div>
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+                <span className="font-bold text-white text-base">{PROFILE.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <BranchedMenu
+                items={menuItems}
+                defaultOpen={[0, 1]}
+                defaultActive={activeSection || 'hero'}
+                onSelect={handleSelect}
+                color="#e4e4e7"
+                accentColor="#c084fc"
+                lineColor="#27272a"
+                width={240}
+                rowHeight={36}
+                indent={40}
+                trunk={14}
+                radius={10}
+                fontSize={14}
+              />
             </div>
-          </nav>
+
+            <div className="pt-6 border-t border-white/10 text-xs text-zinc-400 text-center">
+              <span>{PROFILE.role}</span>
+            </div>
+          </div>
         </div>
       )}
-    </header>
+    </>
   );
 }
