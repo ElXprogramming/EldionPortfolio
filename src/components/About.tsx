@@ -82,43 +82,45 @@ export default function About() {
 
           {/* Right Column: Education Background & Languages */}
           <div className="lg:col-span-6 flex flex-col gap-5">
-            {/* Education Section */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 font-mono px-1">
+            {/* Education Card */}
+            <div className="rounded-2xl p-5 sm:p-6 bg-[#111116] border border-white/10 shadow-xl">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-4 font-mono">
                 <GraduationCap className="w-4 h-4" />
                 <span>Education</span>
               </div>
 
-              {EDUCATION_ITEMS.map((item) => (
-                <div
-                  key={item.institution}
-                  className="relative rounded-2xl p-4 sm:p-5 bg-[#111116] border border-white/10 shadow-lg hover:border-white/20 transition-all"
-                >
-                  <div className="mb-2 pr-28 sm:pr-32">
-                    <h4 className="text-base sm:text-lg font-bold text-white">
-                      {item.institution}
-                    </h4>
-                    <p className="text-xs sm:text-sm font-medium text-purple-300 mt-0.5">
-                      {item.degree}
-                    </p>
-                  </div>
-
-                  <span className="absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium shrink-0 whitespace-nowrap border border-white/10 bg-white/5 text-zinc-300">
-                    {item.status}
-                  </span>
-
-                  <div className="flex items-center gap-4 text-xs text-zinc-400 font-mono">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                      <span>{item.period}</span>
+              <div className="flex flex-col gap-3">
+                {EDUCATION_ITEMS.map((item) => (
+                  <div
+                    key={item.institution}
+                    className="relative rounded-xl p-3.5 sm:p-4 bg-[#141419] border border-white/5 hover:border-white/15 transition-all"
+                  >
+                    <div className="mb-2 pr-28 sm:pr-32">
+                      <h4 className="text-sm sm:text-base font-bold text-white">
+                        {item.institution}
+                      </h4>
+                      <p className="text-xs sm:text-sm font-medium text-purple-300 mt-0.5">
+                        {item.degree}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-                      <span>{item.location}</span>
+
+                    <span className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium shrink-0 whitespace-nowrap border border-white/10 bg-white/5 text-zinc-300">
+                      {item.status}
+                    </span>
+
+                    <div className="flex items-center gap-4 text-xs text-zinc-400 font-mono">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                        <span>{item.period}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                        <span>{item.location}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Languages Card (Below Education) */}
