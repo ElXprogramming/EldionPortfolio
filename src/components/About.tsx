@@ -28,13 +28,15 @@ const EDUCATION_ITEMS = [
 const LANGUAGES = [
   {
     name: 'English',
-    level: 'Fluent / Professional',
-    desc: 'Technical documentation, code, and collaborative communication.',
+    level: 'Fluent',
   },
   {
     name: 'Malay',
-    level: 'Native Speaker',
-    desc: 'Mother tongue, fluent written and verbal communication.',
+    level: 'Native',
+  },
+  {
+    name: 'Dusun',
+    level: 'Native',
   },
 ] as const;
 
@@ -60,9 +62,11 @@ export default function About() {
         {/* Content Grid: Narrative & Languages (Left) | Education (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
-          {/* Left Column: Narrative Box & Languages */}
-          <div className="lg:col-span-6 rounded-2xl p-6 sm:p-8 bg-[#111116] border border-white/10 shadow-xl flex flex-col justify-between">
-            <div>
+          {/* Left Column: Narrative Box & Languages Card */}
+          <div className="lg:col-span-6 flex flex-col gap-6">
+            
+            {/* Narrative Card */}
+            <div className="rounded-2xl p-6 sm:p-8 bg-[#111116] border border-white/10 shadow-xl flex-1 flex flex-col justify-center">
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
                 Turning Ideas into High-Quality Software
               </h3>
@@ -83,46 +87,42 @@ export default function About() {
               </div>
             </div>
 
-            {/* Languages Spoken */}
-            <div className="mt-8 pt-6 border-t border-white/10">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-3 font-mono">
+            {/* Languages Card (Separate Card) */}
+            <div className="rounded-2xl p-6 bg-[#111116] border border-white/10 shadow-xl">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-4 font-mono">
                 <Languages className="w-4 h-4" />
-                <span>Languages Spoken</span>
+                <span>Languages</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {LANGUAGES.map((lang) => (
                   <div
                     key={lang.name}
-                    className="p-3.5 rounded-xl bg-[#141419] border border-white/5"
+                    className="p-3.5 rounded-xl bg-[#141419] border border-white/5 flex flex-col items-center justify-center text-center hover:border-purple-500/20 transition-colors"
                   >
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="font-bold text-white text-sm">{lang.name}</span>
-                      <span className="text-[11px] font-mono text-purple-300 font-medium">
-                        {lang.level}
-                      </span>
-                    </div>
-                    <p className="text-xs text-zinc-400 leading-normal">
-                      {lang.desc}
-                    </p>
+                    <span className="font-bold text-white text-sm sm:text-base">{lang.name}</span>
+                    <span className="text-[11px] sm:text-xs font-mono text-purple-300 mt-0.5 font-medium">
+                      {lang.level}
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
+
           </div>
 
           {/* Right Column: Education Background */}
-          <div className="lg:col-span-6 flex flex-col justify-between gap-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 font-mono px-1">
-                <GraduationCap className="w-4 h-4" />
-                <span>Education</span>
-              </div>
+          <div className="lg:col-span-6 flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 font-mono px-1">
+              <GraduationCap className="w-4 h-4" />
+              <span>Education</span>
+            </div>
 
-              {EDUCATION_ITEMS.map((item) => (
-                <div
-                  key={item.institution}
-                  className="rounded-2xl p-6 bg-[#111116] border border-white/10 shadow-lg hover:border-white/20 transition-all"
-                >
+            {EDUCATION_ITEMS.map((item) => (
+              <div
+                key={item.institution}
+                className="rounded-2xl p-6 bg-[#111116] border border-white/10 shadow-lg hover:border-white/20 transition-all flex-1 flex flex-col justify-between"
+              >
+                <div>
                   <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                     <div>
                       <h4 className="text-base sm:text-lg font-bold text-white">
@@ -147,13 +147,13 @@ export default function About() {
                       <span>{item.location}</span>
                     </div>
                   </div>
-
-                  <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
-                    {item.desc}
-                  </p>
                 </div>
-              ))}
-            </div>
+
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
 
         </div>
