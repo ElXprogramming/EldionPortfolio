@@ -138,8 +138,8 @@ export default function App() {
       {/* Left-side docked navigation using BranchedMenu */}
       <Navbar activeSection={activeSection} />
       
-      {/* Main content area with left-side padding on large screens for comfortable clearance */}
-      <main className="flex-grow relative z-10 lg:pl-56 xl:pl-64">
+      {/* Main content area: centered horizontally with symmetrical clearance so it never touches the left navbar */}
+      <main className="flex-grow relative z-10 w-full px-4 sm:px-6 lg:px-56 2xl:px-8">
         <ErrorBoundary fallbackTitle="Hero display issue">
           <Hero />
         </ErrorBoundary>
@@ -170,7 +170,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <div className="relative z-10 lg:pl-56 xl:pl-64">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-56 2xl:px-8">
         <Footer />
       </div>
     </div>

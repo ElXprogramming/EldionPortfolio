@@ -9,7 +9,7 @@ export default function Hero() {
       className="relative pt-16 pb-12 md:pt-20 md:pb-16 min-h-[820px] lg:min-h-[880px] flex items-center overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-end gap-8 sm:gap-12 lg:gap-16 w-full">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-16 w-full">
           {/* Name and Bio - placed at the right side */}
           <div className="flex flex-col items-center lg:items-end text-center lg:text-right shrink-0">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white mb-3">

@@ -64,9 +64,9 @@ export default function Navbar({ activeSection }: NavbarProps) {
       {/* Desktop Left-Side Branched Navbar */}
       <aside
         aria-label="Left side navigation"
-        className="hidden lg:block fixed left-6 top-1/2 -translate-y-1/2 z-50 pointer-events-auto"
+        className="hidden lg:block fixed left-5 top-1/2 -translate-y-1/2 z-50 pointer-events-auto"
       >
-        <div className="bg-[#0c0c11]/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl shadow-black/60 transition-all hover:border-white/20">
+        <div className="bg-[#0c0c11]/85 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 shadow-2xl shadow-black/60 transition-all hover:border-white/20">
           <BranchedMenu
             items={menuItems}
             defaultOpen={[0]}
@@ -75,9 +75,9 @@ export default function Navbar({ activeSection }: NavbarProps) {
             color="#e4e4e7"
             accentColor="#c084fc"
             lineColor="#27272a"
-            width={210}
+            width={175}
             rowHeight={32}
-            indent={36}
+            indent={32}
             trunk={12}
             radius={8}
             fontSize={13}
