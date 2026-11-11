@@ -53,7 +53,8 @@ export default function Navbar({ activeSection }: NavbarProps) {
         { value: 'hero', label: 'Home', icon: Home },
         { value: 'about', label: 'About', icon: User },
         { value: 'skills', label: 'Skills', icon: Layers },
-        { value: 'projects', label: 'Projects', icon: FolderGit2 }
+        { value: 'projects', label: 'Projects', icon: FolderGit2 },
+        { value: 'contact', label: 'Contact', icon: Mail }
       ]
     }
   ];
@@ -83,22 +84,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
             drawDuration={300}
             foldDuration={250}
           />
-
-          {/* Contact Button */}
-          <div className="pt-3 mt-2 border-t border-white/10">
-            <button
-              type="button"
-              onClick={() => handleSelect('contact')}
-              className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold font-mono transition-all cursor-pointer ${
-                activeSection === 'contact'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                  : 'bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-white/10'
-              }`}
-            >
-              <Mail className="w-3.5 h-3.5 text-purple-400" />
-              <span>Contact</span>
-            </button>
-          </div>
         </div>
       </aside>
 
@@ -107,27 +92,14 @@ export default function Navbar({ activeSection }: NavbarProps) {
         <a href="#" className="font-bold text-sm tracking-wide text-white">
           {PROFILE.name}
         </a>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => handleSelect('contact')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all cursor-pointer ${
-              activeSection === 'contact'
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white'
-            }`}
-          >
-            Contact
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileOpen(prev => !prev)}
-            className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setMobileOpen(prev => !prev)}
+          className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer"
+          aria-label="Toggle navigation menu"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
 
       {/* Mobile Left-Side Drawer */}
@@ -167,22 +139,6 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 radius={10}
                 fontSize={14}
               />
-
-              {/* Mobile Drawer Contact Button */}
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => handleSelect('contact')}
-                  className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-mono transition-all cursor-pointer ${
-                    activeSection === 'contact'
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                      : 'bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-white/10'
-                  }`}
-                >
-                  <Mail className="w-4 h-4 text-purple-400" />
-                  <span>Contact</span>
-                </button>
-              </div>
             </div>
 
             <div className="pt-6 border-t border-white/10 text-xs text-zinc-400 text-center">
