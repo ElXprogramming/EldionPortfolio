@@ -121,7 +121,7 @@ export default function Projects() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10 my-8">
           
           {/* Left Column: Interactive Folder */}
-          <div className="w-full max-w-[380px] sm:max-w-[400px] flex flex-col items-center justify-center">
+          <div className={`w-full ${activeProject ? 'max-w-[420px]' : 'max-w-2xl'} flex flex-col items-center justify-center transition-all duration-300`}>
             <div className="relative flex items-center justify-center min-h-[290px] sm:min-h-[310px] w-full py-2">
               <Folder
                 label="Projects Archive"
@@ -144,9 +144,9 @@ export default function Projects() {
               />
             </div>
 
-            <div className="text-[11px] text-zinc-400 mt-2 flex items-center gap-1.5 font-mono text-center">
+            <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 flex items-center justify-center gap-1.5 font-mono text-center whitespace-nowrap">
               <FileText className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-              <span>
+              <span className="whitespace-nowrap">
                 {activeProject
                   ? 'Click another project to switch, or click selected to close'
                   : 'Click any project document in the folder to inspect details →'}
