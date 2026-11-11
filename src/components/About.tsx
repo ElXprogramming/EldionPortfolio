@@ -120,22 +120,30 @@ export default function About() {
             {EDUCATION_ITEMS.map((item) => (
               <div
                 key={item.institution}
-                className="rounded-2xl p-6 bg-[#111116] border border-white/10 shadow-lg hover:border-white/20 transition-all flex-1 flex flex-col justify-between"
+                className="relative rounded-2xl p-5 sm:p-6 bg-[#111116] border border-white/10 shadow-lg hover:border-white/20 transition-all flex-1 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                    <div>
-                      <h4 className="text-base sm:text-lg font-bold text-white">
-                        {item.institution}
-                      </h4>
-                      <p className="text-xs sm:text-sm font-medium text-purple-300 mt-0.5">
-                        {item.degree}
-                      </p>
-                    </div>
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium border border-white/10 bg-white/5 text-zinc-300 shrink-0">
-                      {item.status}
-                    </span>
+                  <div className="mb-2 pr-28 sm:pr-32">
+                    <h4 className="text-base sm:text-lg font-bold text-white">
+                      {item.institution}
+                    </h4>
+                    <p className="text-xs sm:text-sm font-medium text-purple-300 mt-0.5">
+                      {item.degree}
+                    </p>
                   </div>
+
+                  <span
+                    className={`absolute top-5 right-5 sm:top-6 sm:right-6 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium shrink-0 whitespace-nowrap ${
+                      item.status === 'Current Student'
+                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 flex items-center gap-1.5'
+                        : 'border border-white/10 bg-white/5 text-zinc-300'
+                    }`}
+                  >
+                    {item.status === 'Current Student' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    )}
+                    {item.status}
+                  </span>
 
                   <div className="flex items-center gap-4 text-xs text-zinc-400 font-mono mb-3">
                     <div className="flex items-center gap-1.5">
