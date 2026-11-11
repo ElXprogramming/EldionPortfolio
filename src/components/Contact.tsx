@@ -4,7 +4,6 @@ import {
   Send,
   Copy,
   Check,
-  MapPin,
   Sparkles,
   ArrowUpRight,
   Loader2,
@@ -76,106 +75,129 @@ export default function Contact() {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight text-readable-heading">
             Let's Build Something Great
           </h2>
-          <p className="mt-3 text-slate-200 text-sm sm:text-base text-readable-body">
+          <p className="mt-3 text-zinc-300 text-sm sm:text-base text-readable-body">
             I am currently open to internship opportunities, junior software engineering roles, and innovative projects. Feel free to reach out directly!
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Direct Contact Cards (5 cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            {/* Email Card */}
-            <div className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">Email</div>
-                  <a
-                    href={EXTERNAL_LINKS.mailto}
-                    className="text-sm font-semibold text-white hover:text-purple-400 transition-colors truncate block text-readable-subheading"
-                  >
-                    {PROFILE.email}
-                  </a>
-                </div>
+        {/* Symmetrical 2-Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          
+          {/* Direct Contact Cards (Left Column) */}
+          <div className="rounded-2xl p-7 sm:p-9 bg-[#111116] border border-white/10 shadow-xl flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Mail className="w-4 h-4 text-purple-400" />
+                <h3 className="text-xl font-bold text-white text-readable-subheading">
+                  Direct Channels
+                </h3>
               </div>
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors ml-2 shrink-0 cursor-pointer"
-                title="Copy email to clipboard"
-              >
-                {copiedEmail ? (
-                  <Check className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+              <p className="text-xs sm:text-sm text-zinc-300 mb-6 text-readable-body">
+                Prefer direct inquiries? Feel free to reach out via email or connect with me across professional networks.
+              </p>
             </div>
 
-            {/* LinkedIn Card */}
-            <a
-              href={EXTERNAL_LINKS.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-3 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
-                  <LinkedinIcon className="w-5 h-5" />
-                </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">LinkedIn</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-sky-400 transition-colors truncate text-readable-subheading">
-                    {PROFILE.name}
+            {/* Chunkier Contact Boxes */}
+            <div className="space-y-4 my-auto py-2">
+              {/* Email Card */}
+              <div className="p-5 rounded-2xl bg-[#141419] border border-white/5 hover:border-purple-500/30 transition-all flex items-center justify-between group">
+                <a
+                  href={EXTERNAL_LINKS.mailto}
+                  className="flex items-center gap-4 min-w-0 flex-1 mr-2 cursor-pointer"
+                >
+                  <div className="p-3.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div className="truncate">
+                    <div className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono">Email</div>
+                    <div className="text-sm sm:text-base font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
+                      {PROFILE.email}
+                    </div>
+                  </div>
+                </a>
+                <button
+                  type="button"
+                  onClick={handleCopyEmail}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition-colors shrink-0 cursor-pointer"
+                  title="Copy email to clipboard"
+                  aria-label="Copy email address"
+                >
+                  {copiedEmail ? (
+                    <Check className="w-4 h-4 text-emerald-400" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* LinkedIn Card */}
+              <a
+                href={EXTERNAL_LINKS.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-5 rounded-2xl bg-[#141419] border border-white/5 hover:border-sky-500/30 transition-all flex items-center justify-between group cursor-pointer block"
+              >
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="p-3.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                    <LinkedinIcon className="w-5 h-5" />
+                  </div>
+                  <div className="truncate">
+                    <div className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono">LinkedIn</div>
+                    <div className="text-sm sm:text-base font-semibold text-white group-hover:text-sky-300 transition-colors truncate">
+                      {PROFILE.name}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-            </a>
+                <ArrowUpRight className="w-5 h-5 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </a>
 
-            {/* GitHub Card */}
-            <a
-              href={EXTERNAL_LINKS.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="glass-card rounded-2xl p-5 border border-slate-800/80 bg-slate-900/60 flex items-center justify-between group block cursor-pointer"
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="p-3 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0">
-                  <GithubIcon className="w-5 h-5" />
-                </div>
-                <div className="truncate">
-                  <div className="text-xs font-bold text-slate-300 uppercase tracking-wider text-readable-body">GitHub</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-purple-300 transition-colors truncate text-readable-subheading">
-                    @{PROFILE.githubUsername}
+              {/* GitHub Card */}
+              <a
+                href={EXTERNAL_LINKS.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-5 rounded-2xl bg-[#141419] border border-white/5 hover:border-purple-500/30 transition-all flex items-center justify-between group cursor-pointer block"
+              >
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="p-3.5 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                    <GithubIcon className="w-5 h-5" />
+                  </div>
+                  <div className="truncate">
+                    <div className="text-xs font-bold text-zinc-400 uppercase tracking-wider font-mono">GitHub</div>
+                    <div className="text-sm sm:text-base font-semibold text-white group-hover:text-purple-300 transition-colors truncate">
+                      @{PROFILE.githubUsername}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-slate-300 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-            </a>
+                <ArrowUpRight className="w-5 h-5 text-zinc-400 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </a>
+            </div>
 
-            {/* Location Pill */}
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/60 flex items-center gap-3 text-xs text-slate-200 text-readable-body">
-              <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>Based in {PROFILE.fullLocation}</span>
+            {/* Availability Indicator */}
+            <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs font-mono text-zinc-400">
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Open to Opportunities</span>
+              </span>
+              <span className="text-zinc-500">Fast Response</span>
             </div>
           </div>
 
-          {/* Quick Interactive Message Form (7 cols) */}
-          <div className="lg:col-span-7 glass-panel rounded-2xl p-7 sm:p-9 border border-slate-800/80 shadow-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              <h3 className="text-xl font-bold text-white text-readable-subheading">
-                Send a Message
-              </h3>
+          {/* Quick Interactive Message Form (Right Column) */}
+          <div className="rounded-2xl p-7 sm:p-9 bg-[#111116] border border-white/10 shadow-xl flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <h3 className="text-xl font-bold text-white text-readable-subheading">
+                  Send a Message
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-zinc-300 mb-6 text-readable-body">
+                Have an idea, project, or role to discuss? Send a direct note to my inbox.
+              </p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-200 mb-6 text-readable-body">
-              Have an idea, project, or role to discuss? Send a direct note to my inbox.
-            </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 my-auto">
               {submitStatus === 'success' && (
                 <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
@@ -200,7 +222,7 @@ export default function Contact() {
                 <div>
                   <label
                     htmlFor="contact-name"
-                    className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                    className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5 font-mono"
                   >
                     Your Name
                   </label>
@@ -215,13 +237,13 @@ export default function Contact() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, name: e.target.value }))
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
                 <div>
                   <label
                     htmlFor="contact-email"
-                    className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                    className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5 font-mono"
                   >
                     Your Email
                   </label>
@@ -236,7 +258,7 @@ export default function Contact() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, email: e.target.value }))
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -244,7 +266,7 @@ export default function Contact() {
               <div>
                 <label
                   htmlFor="contact-subject"
-                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5 font-mono"
                 >
                   Subject
                 </label>
@@ -259,14 +281,14 @@ export default function Contact() {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, subject: e.target.value }))
                   }
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="contact-message"
-                  className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5"
+                  className="block text-xs font-bold uppercase tracking-wider text-zinc-400 mb-1.5 font-mono"
                 >
                   Message
                 </label>
@@ -281,7 +303,7 @@ export default function Contact() {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, message: e.target.value }))
                   }
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-400 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors resize-none disabled:opacity-50"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors resize-none disabled:opacity-50"
                 />
               </div>
 
@@ -303,7 +325,14 @@ export default function Contact() {
                 )}
               </button>
             </form>
+
+            <div className="pt-4 text-center">
+              <span className="text-[11px] font-mono text-zinc-500">
+                End-to-end sanitized &amp; secured transmission
+              </span>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
