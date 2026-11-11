@@ -18,7 +18,7 @@ const getLevelColor = (level: number) => {
     case 3:
       return 'bg-[#1f8f75] border border-[#25ab8c]/40';
     case 4:
-      return 'bg-[#1ee9a7] border border-[#3af2b5]/60 shadow-[0_0_8px_rgba(30,233,167,0.35)]';
+      return 'bg-[#1ee9a7] border border-[#3af2b5]/60 shadow-[0_0_6px_rgba(30,233,167,0.35)]';
     default:
       return 'bg-[#010000] border border-white/[0.03]';
   }
@@ -64,8 +64,8 @@ export default function GithubContributions() {
     const updateColumns = () => {
       if (!containerRef.current) return;
       const width = containerRef.current.clientWidth;
-      // Each column is approx 14px cell + 4px gap = 18px
-      const count = Math.max(12, Math.floor((width + 4) / 18));
+      // Each column is approx 11px cell + 3px gap = 14px
+      const count = Math.max(14, Math.floor((width + 3) / 14));
       setColumnsCount(count);
     };
 
@@ -135,20 +135,20 @@ export default function GithubContributions() {
   }, [data.contributions]);
 
   return (
-    <div className="rounded-2xl p-5 sm:p-6 bg-[#08080a] border border-white/10 shadow-xl">
+    <div className="rounded-xl sm:rounded-2xl p-3.5 sm:p-4 bg-[#08080a] border border-white/10 shadow-lg">
       {/* Top Header: Badge on left, dynamic status text on right */}
-      <div className="flex items-center justify-between gap-4 mb-5">
+      <div className="flex items-center justify-between gap-3 mb-3">
         <a
           href={EXTERNAL_LINKS.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 text-xs sm:text-sm font-medium text-zinc-200 transition-colors cursor-pointer group shrink-0"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 text-[11px] sm:text-xs font-medium text-zinc-200 transition-colors cursor-pointer group shrink-0"
         >
-          <GithubIcon className="w-4 h-4 text-zinc-300 group-hover:text-white transition-colors" />
+          <GithubIcon className="w-3.5 h-3.5 text-zinc-300 group-hover:text-white transition-colors" />
           <span>Github activity</span>
         </a>
 
-        <div className="text-xs sm:text-sm text-zinc-400 font-normal text-right truncate transition-all">
+        <div className="text-[11px] sm:text-xs text-zinc-400 font-normal text-right truncate transition-all">
           {hoveredDay ? (
             <span>
               <span className="font-semibold text-zinc-200">{hoveredDay.count}</span>{' '}
@@ -167,22 +167,22 @@ export default function GithubContributions() {
       <div
         ref={containerRef}
         onMouseLeave={() => setHoveredDay(null)}
-        className="w-full overflow-hidden py-1 mb-5"
+        className="w-full overflow-hidden py-0.5 mb-3"
       >
         <div className="flex justify-between w-full">
           {displayWeeks.map((week, wIdx) => (
-            <div key={wIdx} className="flex flex-col gap-1 sm:gap-1.5">
+            <div key={wIdx} className="flex flex-col gap-0.5 sm:gap-1">
               {week.map((day, dIdx) => (
                 day ? (
                   <div
                     key={day.date}
                     onMouseEnter={() => setHoveredDay(day)}
-                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] ${getLevelColor(day.level)} cursor-pointer`}
+                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] ${getLevelColor(day.level)} cursor-pointer`}
                   />
                 ) : (
                   <div
                     key={`empty-${dIdx}`}
-                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] opacity-0 pointer-events-none"
+                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] opacity-0 pointer-events-none"
                   />
                 )
               ))}
@@ -192,9 +192,9 @@ export default function GithubContributions() {
       </div>
 
       {/* Bottom Bar: Progress on Left, Last Pushed on Right */}
-      <div className="flex items-center justify-between gap-4 pt-1">
+      <div className="flex items-center justify-between gap-3 pt-0.5">
         {/* Progress Capsule */}
-        <div className="h-1.5 w-36 sm:w-48 bg-[#18181f] rounded-full overflow-hidden shrink-0">
+        <div className="h-1 w-24 sm:w-36 bg-[#18181f] rounded-full overflow-hidden shrink-0">
           <div
             className="h-full bg-white rounded-full transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}
@@ -202,7 +202,7 @@ export default function GithubContributions() {
         </div>
 
         {/* Last pushed label */}
-        <div className="text-[11px] sm:text-xs text-zinc-500 font-normal truncate">
+        <div className="text-[10px] sm:text-[11px] text-zinc-500 font-normal truncate">
           Last pushed on {lastPushedText}
         </div>
       </div>
