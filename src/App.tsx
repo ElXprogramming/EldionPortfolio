@@ -135,11 +135,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col selection:bg-purple-600/30 selection:text-purple-200 relative">
-      {/* Right-side docked navigation using BranchedMenu */}
+      {/* Left-side docked navigation using BranchedMenu */}
       <Navbar activeSection={activeSection} />
       
-      {/* Main content area with right-side padding on large screens for comfortable clearance */}
-      <main className="flex-grow relative z-10 lg:pr-56 xl:pr-64">
+      {/* Main content area with left-side padding on large screens for comfortable clearance */}
+      <main className="flex-grow relative z-10 lg:pl-56 xl:pl-64">
         <ErrorBoundary fallbackTitle="Hero display issue">
           <Hero />
         </ErrorBoundary>
@@ -170,7 +170,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <div className="relative z-10 lg:pr-56 xl:pr-64">
+      <div className="relative z-10 lg:pl-56 xl:pl-64">
         <Footer />
       </div>
     </div>
