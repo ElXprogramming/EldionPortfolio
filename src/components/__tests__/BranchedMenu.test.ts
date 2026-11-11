@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { BranchedMenuItem } from '../BranchedMenu';
+import React from 'react';
+import { Home } from 'lucide-react';
+import { type BranchedMenuItem } from '../BranchedMenu';
+import { renderIcon } from '../../lib/branchedMenuUtils';
 
 describe('BranchedMenu item structures and navigation', () => {
   const testMenu: BranchedMenuItem[] = [
@@ -51,5 +54,34 @@ describe('BranchedMenu item structures and navigation', () => {
     expect(findSection('projects')).toBe(0);
     expect(findSection('github')).toBe(1);
     expect(findSection('non-existent')).toBe(-1);
+  });
+
+  describe('renderIcon safety', () => {
+    it('returns null for falsy icon', () => {
+      expect(renderIcon(null)).toBeNull();
+      expect(renderIcon(undefined)).toBeNull();
+    });
+
+    it('handles Lucide forwardRef icon objects without throwing', () => {
+      const node = renderIcon(Home);
+      expect(React.isValidElement(node)).toBe(true);
+    });
+
+    it('handles function components without throwing', () => {
+      const CustomIcon = () => React.createElement('span', null, 'icon');
+      const node = renderIcon(CustomIcon);
+      expect(React.isValidElement(node)).toBe(true);
+    });
+
+    it('handles pre-instantiated React elements', () => {
+      const element = React.createElement('svg');
+      expect(renderIcon(element)).toBe(element);
+    });
+
+    it('safely handles non-array arbitrary objects by returning null instead of throwing', () => {
+      expect(renderIcon({ invalid: 'shape' })).toBeNull();
+      expect(renderIcon('plain string')).toBeNull();
+      expect(renderIcon(123)).toBeNull();
+    });
   });
 });

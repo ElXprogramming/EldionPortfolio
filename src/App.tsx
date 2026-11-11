@@ -5,6 +5,7 @@ import About from './components/About';
 import Skills from './components/Skills';
 import Education from './components/Education';
 import Footer from './components/Footer';
+import ErrorBoundary from './components/ErrorBoundary';
 import { sanitizeInternalRoute } from './lib/security';
 
 const Projects = lazy(() => import('./components/Projects'));
@@ -139,28 +140,34 @@ export default function App() {
       
       {/* Main content area with right-side padding on large screens for comfortable clearance */}
       <main className="flex-grow relative z-10 lg:pr-56 xl:pr-64">
-        <Hero />
+        <ErrorBoundary fallbackTitle="Hero display issue">
+          <Hero />
+        </ErrorBoundary>
         <About />
         <Skills />
-        <Suspense
-          fallback={
-            <div id="projects" className="min-h-[500px] flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
-            </div>
-          }
-        >
-          <Projects />
-        </Suspense>
+        <ErrorBoundary fallbackTitle="Projects display issue">
+          <Suspense
+            fallback={
+              <div id="projects" className="min-h-[500px] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
+              </div>
+            }
+          >
+            <Projects />
+          </Suspense>
+        </ErrorBoundary>
         <Education />
-        <Suspense
-          fallback={
-            <div id="contact" className="min-h-[400px] flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
-            </div>
-          }
-        >
-          <Contact />
-        </Suspense>
+        <ErrorBoundary fallbackTitle="Contact display issue">
+          <Suspense
+            fallback={
+              <div id="contact" className="min-h-[400px] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-purple-500/30 border-t-purple-400 animate-spin" />
+              </div>
+            }
+          >
+            <Contact />
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
       <div className="relative z-10 lg:pr-56 xl:pr-64">

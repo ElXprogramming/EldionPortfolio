@@ -1,5 +1,4 @@
-import React, { isValidElement, useLayoutEffect, useRef, useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import './BranchedMenu.css';
 
 export interface BranchedMenuLeaf {
@@ -38,21 +37,7 @@ export interface BranchedMenuProps {
 const PAD = 6;
 const MARK = 16;
 
-const renderIcon = (icon: unknown): React.ReactNode => {
-  if (!icon) return null;
-  if (isValidElement(icon)) return icon;
-  // If it's a React component function (e.g. Lucide icon)
-  if (typeof icon === 'function') {
-    const Component = icon as React.ComponentType<{ className?: string; size?: number }>;
-    return <Component size={16} className="w-4 h-4" />;
-  }
-  // Otherwise Hugeicons icon object
-  try {
-    return <HugeiconsIcon icon={icon as Parameters<typeof HugeiconsIcon>[0]['icon']} size={16} strokeWidth={1.8} />;
-  } catch {
-    return null;
-  }
-};
+import { renderIcon } from '../lib/branchedMenuUtils';
 
 const toSet = (open: number | number[]) => new Set(Array.isArray(open) ? open : open >= 0 ? [open] : []);
 
