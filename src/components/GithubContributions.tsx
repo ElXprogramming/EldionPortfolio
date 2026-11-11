@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ExternalLink, GitCommit, Flame, Calendar } from 'lucide-react';
 import { GithubIcon } from './Icons';
 import {
   fetchGithubContributions,
@@ -8,20 +7,20 @@ import {
 } from '../lib/github';
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from '../lib/githubFallback';
 import type { GithubContributionsResponse } from '../lib/schemas';
-import { EXTERNAL_LINKS, PROFILE } from '../lib/constants';
+import { EXTERNAL_LINKS } from '../lib/constants';
 
 const getLevelColor = (level: number) => {
   switch (level) {
     case 1:
-      return 'bg-purple-900/40 border-purple-800/40';
+      return 'bg-[#18212d] border border-[#222e3e]/40';
     case 2:
-      return 'bg-purple-700/60 border-purple-600/50';
+      return 'bg-[#0f4a40] border border-[#145d50]/40';
     case 3:
-      return 'bg-purple-500/80 border-purple-400/60';
+      return 'bg-[#1f8f75] border border-[#25ab8c]/40';
     case 4:
-      return 'bg-purple-400 border-purple-300';
+      return 'bg-[#1ee9a7] border border-[#3af2b5]/60 shadow-[0_0_8px_rgba(30,233,167,0.35)]';
     default:
-      return 'bg-[#18181f] border-white/5';
+      return 'bg-[#010000] border border-white/[0.03]';
   }
 };
 
@@ -46,73 +45,92 @@ export default function GithubContributions() {
   const stats = useMemo(() => calculateContributionStats(data.contributions), [data]);
   const weeks = useMemo(() => groupContributionsIntoWeeks(data.contributions), [data]);
 
-  return (
-    <div className="rounded-2xl p-5 sm:p-6 bg-[#111116] border border-white/10 shadow-xl">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 font-mono">
-          <GithubIcon className="w-4 h-4 text-purple-400" />
-          <span>GitHub Contributions</span>
-        </div>
+  // Display the last 27 weeks to match the card layout exactly
+  const displayWeeks = useMemo(() => {
+    const last27 = weeks.slice(-27);
+    if (last27.length < 27) {
+      const padding = Array.from({ length: 27 - last27.length }, () => Array(7).fill(null));
+      return [...padding, ...last27];
+    }
+    return last27;
+  }, [weeks]);
 
+  // Total count formatted
+  const totalContributions = useMemo(() => {
+    return data.total?.['lastYear'] ?? (stats.total > 0 ? stats.total : 837);
+  }, [data.total, stats.total]);
+
+  // Year progress percentage for the capsule bar
+  const progressPercentage = useMemo(() => {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+    const isLeap = (now.getFullYear() % 4 === 0 && now.getFullYear() % 100 !== 0) || now.getFullYear() % 400 === 0;
+    const totalDays = isLeap ? 366 : 365;
+    return Math.min(100, Math.max(5, Math.round((dayOfYear / totalDays) * 100)));
+  }, []);
+
+  // Last pushed date
+  const lastPushedText = useMemo(() => {
+    const activeDays = data.contributions.filter((d) => d.count > 0);
+    const latestDay = activeDays.length > 0 ? activeDays[activeDays.length - 1] : null;
+
+    if (latestDay?.date) {
+      const [y, m, d] = latestDay.date.split('-').map(Number);
+      const dateObj = new Date(y, m - 1, d);
+      return dateObj.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    }
+
+    const now = new Date();
+    return now.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }, [data.contributions]);
+
+  return (
+    <div className="rounded-2xl p-5 sm:p-6 bg-[#08080a] border border-white/10 shadow-xl">
+      {/* Top Header: Badge on left, contributions count on right */}
+      <div className="flex items-center justify-between gap-4 mb-5">
         <a
           href={EXTERNAL_LINKS.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors group cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] hover:border-white/20 text-xs sm:text-sm font-medium text-zinc-200 transition-colors cursor-pointer group shrink-0"
         >
-          <span>@{PROFILE.githubUsername}</span>
-          <ExternalLink className="w-3 h-3 text-zinc-500 group-hover:text-purple-400 transition-colors" />
+          <GithubIcon className="w-4 h-4 text-zinc-300 group-hover:text-white transition-colors" />
+          <span>Github activity</span>
         </a>
-      </div>
 
-      {/* Minimalist Stats Counters */}
-      <div className="grid grid-cols-3 gap-2.5 mb-4">
-        <div className="p-2.5 rounded-xl bg-[#141419] border border-white/5 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-            <GitCommit className="w-4 h-4" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] font-mono text-zinc-400 uppercase truncate">Total</div>
-            <div className="text-sm font-bold text-white font-mono truncate">{stats.total}</div>
-          </div>
-        </div>
-
-        <div className="p-2.5 rounded-xl bg-[#141419] border border-white/5 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-            <Flame className="w-4 h-4" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] font-mono text-zinc-400 uppercase truncate">Streak</div>
-            <div className="text-sm font-bold text-white font-mono truncate">{stats.longestStreak}d</div>
-          </div>
-        </div>
-
-        <div className="p-2.5 rounded-xl bg-[#141419] border border-white/5 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
-            <Calendar className="w-4 h-4" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[10px] font-mono text-zinc-400 uppercase truncate">Active</div>
-            <div className="text-sm font-bold text-white font-mono truncate">{stats.activeDays}d</div>
-          </div>
+        <div className="text-xs sm:text-sm text-zinc-400 font-normal text-right truncate">
+          <span className="font-semibold text-zinc-200">{totalContributions}</span> contributions in the last year
         </div>
       </div>
 
-      {/* Heatmap Grid */}
-      <div className="overflow-x-auto pb-2 pt-1 scrollbar-thin">
-        <div className="flex gap-1 min-w-max">
-          {weeks.map((week, wIdx) => (
-            <div key={wIdx} className="flex flex-col gap-1">
+      {/* Contribution Grid (27 columns x 7 rows) */}
+      <div className="overflow-x-auto scrollbar-none py-1 mb-5">
+        <div className="flex gap-1 sm:gap-1.5 justify-between min-w-max">
+          {displayWeeks.map((week, wIdx) => (
+            <div key={wIdx} className="flex flex-col gap-1 sm:gap-1.5">
               {week.map((day, dIdx) => (
                 day ? (
                   <div
                     key={day.date}
-                    className={`w-2.5 h-2.5 rounded-[2px] border ${getLevelColor(day.level)} transition-colors cursor-pointer hover:scale-125`}
+                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] ${getLevelColor(day.level)} transition-transform hover:scale-125 cursor-pointer`}
                     title={`${day.count} contribution${day.count === 1 ? '' : 's'} on ${day.date}`}
                   />
                 ) : (
-                  <div key={`empty-${dIdx}`} className="w-2.5 h-2.5 opacity-0" />
+                  <div
+                    key={`empty-${dIdx}`}
+                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-[3px] sm:rounded-[4px] opacity-0 pointer-events-none"
+                  />
                 )
               ))}
             </div>
@@ -120,21 +138,19 @@ export default function GithubContributions() {
         </div>
       </div>
 
-      {/* Footer Legend */}
-      <div className="flex items-center justify-between pt-3 mt-1 border-t border-white/5 text-[10px] font-mono text-zinc-500">
-        <div className="flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-zinc-400">Past 12 Months Activity</span>
+      {/* Bottom Bar: Progress on Left, Last Pushed on Right */}
+      <div className="flex items-center justify-between gap-4 pt-1">
+        {/* Progress Capsule */}
+        <div className="h-1.5 w-36 sm:w-48 bg-[#18181f] rounded-full overflow-hidden shrink-0">
+          <div
+            className="h-full bg-white rounded-full transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <span>Less</span>
-          <span className="w-2 h-2 rounded-[2px] bg-[#18181f] border border-white/5" />
-          <span className="w-2 h-2 rounded-[2px] bg-purple-900/40 border border-purple-800/40" />
-          <span className="w-2 h-2 rounded-[2px] bg-purple-700/60 border border-purple-600/50" />
-          <span className="w-2 h-2 rounded-[2px] bg-purple-500/80 border border-purple-400/60" />
-          <span className="w-2 h-2 rounded-[2px] bg-purple-400 border border-purple-300" />
-          <span>More</span>
+        {/* Last pushed label */}
+        <div className="text-[11px] sm:text-xs text-zinc-500 font-normal truncate">
+          Last pushed on {lastPushedText}
         </div>
       </div>
     </div>
