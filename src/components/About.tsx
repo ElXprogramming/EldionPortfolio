@@ -4,6 +4,7 @@ import {
   Calendar, 
   MapPin 
 } from 'lucide-react';
+import GithubContributions from './GithubContributions';
 
 const EDUCATION_ITEMS = [
   {
@@ -80,7 +81,7 @@ export default function About() {
           </div>
 
           {/* Right Column: Education Background & Languages */}
-          <div className="lg:col-span-6 flex flex-col gap-5 justify-between">
+          <div className="lg:col-span-6 flex flex-col gap-5">
             {/* Education Section */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 font-mono px-1">
@@ -150,6 +151,8 @@ export default function About() {
               </div>
             </div>
 
+            {/* GitHub Contributions Monitoring Card */}
+            <GithubContributions />
           </div>
 
         </div>
