@@ -113,10 +113,10 @@ export default function Projects() {
         </div>
 
         {/* Main Section Layout: Left = Folder, Right = Compact Project Details */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10 my-8">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 xl:gap-28 my-8">
           
           {/* Left Column: Interactive Folder */}
-          <div className={`w-full ${activeProject ? 'max-w-[420px]' : 'max-w-2xl'} flex flex-col items-center justify-center transition-all duration-300`}>
+          <div className={`w-full ${activeProject ? 'max-w-[420px]' : 'max-w-2xl'} flex flex-col items-center justify-center transition-all duration-300 relative z-10 overflow-visible`}>
             <div className="relative flex items-center justify-center min-h-[290px] sm:min-h-[310px] w-full py-2">
               <Folder
                 label="Projects Archive"
@@ -151,7 +151,7 @@ export default function Projects() {
 
           {/* Right Column: Opened Compact Project Details Card */}
           {activeProject && (
-            <div className="w-full max-w-[380px] sm:max-w-[400px] transition-all duration-300">
+            <div className="w-full max-w-[380px] sm:max-w-[400px] shrink-0 transition-all duration-300 relative z-0">
               <div className="rounded-2xl border border-white/10 bg-[#111116] overflow-hidden shadow-2xl relative flex flex-col justify-between h-[340px] sm:h-[350px]">
                 
                 {/* Visual Preview Header */}
