@@ -6,13 +6,7 @@ import {
 
 export const PROFILE = {
   name: 'Eldion Ryan Godius',
-  initials: 'EG',
   role: 'Software Engineering',
-  headline: 'Software Engineering Student & Full-Stack Developer',
-  institution: 'Universiti Malaysia Sabah',
-  degree: 'Bachelor of Computer Science with Honours (Software Engineering)',
-  location: 'Sabah, Malaysia',
-  fullLocation: 'Universiti Malaysia Sabah, Kota Kinabalu, Sabah',
   email: 'nayrnoidle@gmail.com',
   githubUsername: 'ElXprogramming',
 } as const;
@@ -22,7 +16,6 @@ export const ROUTES = {
   about: sanitizeInternalRoute('#about'),
   skills: sanitizeInternalRoute('#skills'),
   projects: sanitizeInternalRoute('#projects'),
-  education: sanitizeInternalRoute('#education'),
   contact: sanitizeInternalRoute('#contact'),
   inbox: sanitizeInternalRoute('#inbox'),
 } as const;

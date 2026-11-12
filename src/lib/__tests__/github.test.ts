@@ -2,12 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateContributionStats,
   groupContributionsIntoWeeks,
-  getMonthLabels,
-  formatDateLabel,
 } from '../github';
 import {
   githubContributionsResponseSchema,
-  githubUserProfileSchema,
   type GithubContributionDay,
 } from '../schemas';
 
@@ -51,20 +48,6 @@ describe('GitHub Contributions Analytics & Formatting', () => {
   function groupIntoWeeksTest(days: GithubContributionDay[]) {
     return groupContributionsIntoWeeks(days);
   }
-
-  it('generates month labels from weeks', () => {
-    const weeks = groupContributionsIntoWeeks(sampleDays);
-    const months = getMonthLabels(weeks);
-    expect(months.length).toBeGreaterThan(0);
-    expect(months[0].label).toBe('Mar');
-  });
-
-  it('formats dates consistently', () => {
-    const formatted = formatDateLabel('2026-10-21');
-    expect(formatted).toContain('2026');
-    expect(formatted).toContain('Oct');
-    expect(formatted).toContain('21');
-  });
 });
 
 describe('GitHub Schemas Validation', () => {
@@ -87,19 +70,6 @@ describe('GitHub Schemas Validation', () => {
       contributions: [{ date: 'invalid-date', count: 'two', level: 10 }],
     };
     expect(() => githubContributionsResponseSchema.parse(invalidPayload)).toThrow();
-  });
-
-  it('validates GitHub user profile schema', () => {
-    const profile = {
-      login: 'ElXprogramming',
-      name: 'Eldion Ryan Godius',
-      avatar_url: 'https://avatars.githubusercontent.com/u/105546962?v=4',
-      public_repos: 4,
-      followers: 6,
-    };
-    const parsed = githubUserProfileSchema.parse(profile);
-    expect(parsed.login).toBe('ElXprogramming');
-    expect(parsed.public_repos).toBe(4);
   });
 
   it('validates bundled GITHUB_CONTRIBUTIONS_FALLBACK against the schema', async () => {

@@ -1,6 +1,8 @@
-import Lanyard from './Lanyard';
+import { lazy, Suspense } from 'react';
 import eldionPortrait from '../assets/eldion-portrait.webp';
 import { PROFILE } from '../lib/constants';
+
+const Lanyard = lazy(() => import('./Lanyard'));
 
 export default function Hero() {
   return (
@@ -13,19 +15,21 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full z-0 pointer-events-auto"
         aria-label="Interactive 3D Profile Card hanging on lanyard"
       >
-        <Lanyard
-          frontImage={eldionPortrait}
-          backImage={eldionPortrait}
-          cardColor="#141419"
-          strapColor="#27272a"
-          finish="glossy"
-          metal="silver"
-          size={0.28}
-          anchor="right"
-          strapLength={0.45}
-          interactive={true}
-          breeze={0.25}
-        />
+        <Suspense fallback={null}>
+          <Lanyard
+            frontImage={eldionPortrait}
+            backImage={eldionPortrait}
+            cardColor="#141419"
+            strapColor="#27272a"
+            finish="glossy"
+            metal="silver"
+            size={0.28}
+            anchor="right"
+            strapLength={0.45}
+            interactive={true}
+            breeze={0.25}
+          />
+        </Suspense>
       </div>
 
       {/* Hero Content - in front of the 3D canvas (z-10) with text pass-through */}

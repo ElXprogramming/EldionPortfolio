@@ -35,34 +35,15 @@ code, pre, .font-mono {
   font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Minimalist dark panels & cards */
-.dark-panel,
+/* Minimalist glass panel */
 .glass-panel {
   background: #0f0f13;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.dark-card,
-.glass-card {
-  background: #111116;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.dark-card:hover,
-.glass-card:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-}
-
 /* Clean gradient text */
 .text-gradient {
   background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 60%, #c084fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #34d399 0%, #2dd4bf 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

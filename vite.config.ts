@@ -51,9 +51,6 @@ export default defineConfig({
           if (id.includes('node_modules/three')) {
             return 'three-vendor';
           }
-          if (id.includes('node_modules/motion')) {
-            return 'motion-vendor';
-          }
           if (id.includes('node_modules/@supabase')) {
             return 'supabase-vendor';
           }

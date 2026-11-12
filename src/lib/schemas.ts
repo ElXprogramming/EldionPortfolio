@@ -174,17 +174,3 @@ export const githubContributionsResponseSchema = z
 
 export type GithubContributionsResponse = z.infer<typeof githubContributionsResponseSchema>;
 
-export const githubUserProfileSchema = z
-  .object({
-    login: z.string(),
-    name: z.string().nullable().optional(),
-    avatar_url: z.string().url(),
-    html_url: z.string().url().optional(),
-    public_repos: z.number().int().nonnegative().optional(),
-    followers: z.number().int().nonnegative().optional(),
-    bio: z.string().nullable().optional(),
-  })
-  .strip();
-
-export type GithubUserProfile = z.infer<typeof githubUserProfileSchema>;
-

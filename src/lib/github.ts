@@ -1,16 +1,13 @@
 import {
   githubContributionsResponseSchema,
-  githubUserProfileSchema,
   type GithubContributionsResponse,
   type GithubContributionDay,
-  type GithubUserProfile,
 } from './schemas';
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from './githubFallback';
-import { sanitizeExternalUrl, SafeUserError } from './security';
+import { SafeUserError } from './security';
 
 export const GITHUB_USERNAME = 'ElXprogramming';
 export const GITHUB_API_BASE = 'https://github-contributions-api.jogruber.de/v4';
-export const GITHUB_USERS_API = 'https://api.github.com/users';
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
 const REQUEST_TIMEOUT_MS = 8000;
@@ -21,7 +18,6 @@ interface CacheEntry<T> {
 }
 
 const contributionsCache = new Map<string, CacheEntry<GithubContributionsResponse>>();
-let userProfileCache: CacheEntry<GithubUserProfile> | null = null;
 
 export async function fetchGithubContributions(
   year: string = 'last'
@@ -78,57 +74,6 @@ export async function fetchGithubContributions(
     }
 
     throw new SafeUserError('Unable to load GitHub contributions at this time. Please try again.');
-  }
-}
-
-export async function fetchGithubUserProfile(): Promise<GithubUserProfile | null> {
-  if (userProfileCache && Date.now() - userProfileCache.timestamp < CACHE_TTL_MS) {
-    return userProfileCache.data;
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
-  try {
-    const url = `${GITHUB_USERS_API}/${encodeURIComponent(GITHUB_USERNAME)}`;
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/vnd.github.v3+json',
-      },
-    });
-
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const raw = await response.json();
-    const parsed = githubUserProfileSchema.safeParse(raw);
-    if (!parsed.success) {
-      return null;
-    }
-
-    const sanitizedProfile: GithubUserProfile = {
-      ...parsed.data,
-      avatar_url:
-        sanitizeExternalUrl(parsed.data.avatar_url, ['avatars.githubusercontent.com']) ??
-        parsed.data.avatar_url,
-      html_url: parsed.data.html_url
-        ? sanitizeExternalUrl(parsed.data.html_url, ['github.com']) ?? undefined
-        : undefined,
-    };
-
-    userProfileCache = {
-      data: sanitizedProfile,
-      timestamp: Date.now(),
-    };
-
-    return sanitizedProfile;
-  } catch {
-    clearTimeout(timer);
-    return null;
   }
 }
 
@@ -236,62 +181,4 @@ export function groupContributionsIntoWeeks(
   }
 
   return weeks;
-}
-
-export interface MonthLabel {
-  weekIndex: number;
-  label: string;
-}
-
-const MONTH_NAMES = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-export function getMonthLabels(
-  weeks: ReadonlyArray<ReadonlyArray<GithubContributionDay | null>>
-): MonthLabel[] {
-  const months: MonthLabel[] = [];
-  let lastMonth = -1;
-
-  weeks.forEach((week, wIndex) => {
-    const firstValidDay = week.find((d): d is GithubContributionDay => d !== null);
-    if (firstValidDay) {
-      const m = new Date(`${firstValidDay.date}T00:00:00Z`).getUTCMonth();
-      if (m !== lastMonth) {
-        // Prevent squishing labels too close to each other (at least 2 weeks apart)
-        if (months.length === 0 || wIndex - months[months.length - 1].weekIndex >= 2) {
-          months.push({ weekIndex: wIndex, label: MONTH_NAMES[m] });
-          lastMonth = m;
-        }
-      }
-    }
-  });
-
-  return months;
-}
-
-export function formatDateLabel(dateString: string): string {
-  try {
-    const date = new Date(`${dateString}T00:00:00Z`);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'UTC',
-    });
-  } catch {
-    return dateString;
-  }
 }

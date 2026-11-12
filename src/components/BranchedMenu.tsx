@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { renderIcon } from '../lib/branchedMenuUtils.tsx';
 import './BranchedMenu.css';
 
 export interface BranchedMenuLeaf {
@@ -36,8 +37,6 @@ export interface BranchedMenuProps {
 
 const PAD = 6;
 const MARK = 16;
-
-import { renderIcon } from '../lib/branchedMenuUtils.tsx';
 
 const toSet = (open: number | number[]) => new Set(Array.isArray(open) ? open : open >= 0 ? [open] : []);
 
