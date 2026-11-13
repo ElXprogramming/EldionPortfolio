@@ -1,7 +1,24 @@
 {
   "name": "eldionportfolio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Interactive 3D developer portfolio built with React 19, TypeScript, Tailwind CSS v4, Three.js, and Supabase.",
+  "homepage": "https://eldionryanportfolio.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElXprogramming/EldionPortfolio.git"
+  },
+  "keywords": [
+    "portfolio",
+    "developer-portfolio",
+    "react",
+    "typescript",
+    "tailwindcss",
+    "threejs",
+    "vite",
+    "supabase",
+    "full-stack"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
