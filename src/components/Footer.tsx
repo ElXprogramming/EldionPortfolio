@@ -1,5 +1,5 @@
-import { ArrowUp, Lock } from 'lucide-react';
-import { PROFILE, ROUTES } from '../lib/constants';
+import { ArrowUp } from 'lucide-react';
+import { PROFILE } from '../lib/constants';
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -12,16 +12,8 @@ export default function Footer() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-zinc-200 tracking-wide">{PROFILE.name}</p>
-            <p className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5">
-              <span>&copy; 2026 &bull; Built with Antigravity</span>
-              <a
-                href={ROUTES.inbox}
-                className="opacity-20 hover:opacity-100 hover:text-purple-400 transition-opacity p-0.5 ml-1 inline-flex items-center"
-                title="Secret Messages Inbox"
-                aria-label="Secret Inbox"
-              >
-                <Lock className="w-3 h-3" />
-              </a>
+            <p className="text-xs text-zinc-400 mt-1">
+              &copy; 2026 &bull; Built with Antigravity
             </p>
           </div>
 
