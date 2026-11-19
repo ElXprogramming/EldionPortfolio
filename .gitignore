@@ -28,3 +28,6 @@ coverage
 .env
 .env.local
 .env.*.local
+
+# Private personal documents (excluded from git and site builds)
+private/
