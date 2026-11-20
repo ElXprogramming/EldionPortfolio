@@ -7,7 +7,6 @@ import {
 import GithubContributions from './GithubContributions';
 import BorderGlow from './BorderGlow';
 
-const ABOUT_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
 const EDUCATION_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
 
 const EDUCATION_ITEMS = [
@@ -72,7 +71,6 @@ export default function About() {
               edgeSensitivity={28}
               coneSpread={25}
               glowColor="275 85 75"
-              colors={ABOUT_GLOW_COLORS}
               fillOpacity={0.35}
             >
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
@@ -160,7 +158,6 @@ export default function About() {
               edgeSensitivity={28}
               coneSpread={25}
               glowColor="275 85 75"
-              colors={ABOUT_GLOW_COLORS}
               fillOpacity={0.35}
             >
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-3.5 font-mono">

@@ -1,35 +1,28 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
 import Skills from './components/Skills';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
-import { sanitizeInternalRoute } from './lib/security';
+import { resolveAppView } from './lib/security';
 
 const Projects = lazy(() => import('./components/Projects'));
 const Contact = lazy(() => import('./components/Contact'));
 const SecretInbox = lazy(() => import('./components/SecretInbox'));
 
-function resolveCurrentView(): 'home' | 'inbox' {
-  const safeHash = sanitizeInternalRoute(window.location.hash.toLowerCase());
-  const safePath = sanitizeInternalRoute(window.location.pathname.toLowerCase());
-  return safeHash === '#inbox' ||
-    safeHash === '#admin' ||
-    safeHash === '#secret-inbox' ||
-    safePath === '/inbox' ||
-    safePath === '/admin'
-    ? 'inbox'
-    : 'home';
+function getCurrentView(): 'home' | 'inbox' {
+  return resolveAppView(window.location.hash, window.location.pathname);
 }
 
 export default function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [currentView, setCurrentView] = useState<'home' | 'inbox'>(resolveCurrentView);
+  const [currentView, setCurrentView] = useState<'home' | 'inbox'>(getCurrentView);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleNavigation = () => {
-      setCurrentView(resolveCurrentView());
+      setCurrentView(getCurrentView());
     };
 
     window.addEventListener('hashchange', handleNavigation);
@@ -58,12 +51,22 @@ export default function App() {
   useEffect(() => {
     if (currentView === 'inbox') return;
 
-    let observer: IntersectionObserver | null = null;
+    const observed = new WeakSet<Element>();
+    let intersectionObserver: IntersectionObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
 
-    const setupObserver = () => {
-      if (typeof IntersectionObserver === 'undefined') return;
-      observer?.disconnect();
-      observer = new IntersectionObserver(
+    const observeSections = () => {
+      if (!intersectionObserver) return;
+      document.querySelectorAll('section[id]').forEach((section) => {
+        if (!observed.has(section)) {
+          observed.add(section);
+          intersectionObserver?.observe(section);
+        }
+      });
+    };
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      intersectionObserver = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) {
@@ -78,57 +81,56 @@ export default function App() {
         }
       );
 
-      document.querySelectorAll('section[id]').forEach((section) => observer?.observe(section));
-    };
+      observeSections();
 
-    setupObserver();
-
-    // Re-check observed sections after lazy components hydrate
-    const observerTimer = setTimeout(setupObserver, 800);
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (window.scrollY < 80) {
-            setActiveSection('hero');
-          }
-          ticking = false;
-        });
-        ticking = true;
+      // Deterministically observe lazy-loaded sections as soon as they mount
+      if (typeof MutationObserver !== 'undefined' && mainRef.current) {
+        mutationObserver = new MutationObserver(observeSections);
+        mutationObserver.observe(mainRef.current, { childList: true, subtree: true });
       }
+    }
+
+    let rafId = 0;
+    const handleScroll = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        if (window.scrollY < 80) {
+          setActiveSection('hero');
+        }
+        rafId = 0;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      clearTimeout(observerTimer);
-      observer?.disconnect();
+      if (rafId) window.cancelAnimationFrame(rafId);
+      mutationObserver?.disconnect();
+      intersectionObserver?.disconnect();
       window.removeEventListener('scroll', handleScroll);
     };
   }, [currentView]);
 
   if (currentView === 'inbox') {
     return (
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-[#09090b] text-purple-300 flex items-center justify-center">
-            <div className="flex items-center gap-2 text-sm font-medium animate-pulse">
-              <span>Loading Secret Inbox...</span>
+      <ErrorBoundary fallbackTitle="Inbox display issue">
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-[#09090b] text-purple-300 flex items-center justify-center">
+              <div className="flex items-center gap-2 text-sm font-medium animate-pulse">
+                <span>Loading Secret Inbox...</span>
+              </div>
             </div>
-          </div>
-        }
-      >
-        <SecretInbox
-          onBackToHome={() => {
-            if (window.location.pathname !== '/') {
+          }
+        >
+          <SecretInbox
+            onBackToHome={() => {
               window.history.replaceState(null, '', '/');
-            }
-            window.location.hash = '';
-            setCurrentView('home');
-          }}
-        />
-      </Suspense>
+              setCurrentView('home');
+            }}
+          />
+        </Suspense>
+      </ErrorBoundary>
     );
   }
 
@@ -136,9 +138,9 @@ export default function App() {
     <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col selection:bg-purple-600/30 selection:text-purple-200 relative">
       {/* Left-side docked navigation using BranchedMenu */}
       <Navbar activeSection={activeSection} />
-      
-      {/* Main content area: centered horizontally with symmetrical clearance so it never touches the left navbar */}
-      <main className="flex-grow relative z-10 w-full px-4 sm:px-6 lg:px-56 2xl:px-8">
+
+      {/* Main content area: clears the fixed left navbar across all desktop breakpoints */}
+      <main ref={mainRef} className="flex-grow relative z-10 w-full px-4 sm:px-6 lg:pl-56 lg:pr-8 2xl:px-56">
         <ErrorBoundary fallbackTitle="Hero display issue">
           <Hero />
         </ErrorBoundary>
@@ -168,7 +170,7 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-56 2xl:px-8">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:pl-56 lg:pr-8 2xl:px-56">
         <Footer />
       </div>
     </div>

@@ -13,7 +13,7 @@ export default function Footer() {
           <div>
             <p className="text-sm font-medium text-zinc-200 tracking-wide">{PROFILE.name}</p>
             <p className="text-xs text-zinc-400 mt-1">
-              &copy; 2026 &bull; Built with Antigravity
+              &copy; {new Date().getFullYear()} &bull; Built with Antigravity
             </p>
           </div>
 

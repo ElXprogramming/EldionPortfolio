@@ -50,12 +50,15 @@ function animateValue({
   onUpdate,
   onEnd,
 }: AnimateValueOptions): () => void {
+  const safeDuration = Math.max(1, duration);
   const t0 = performance.now() + delay;
   let frame = 0;
+  let cancelled = false;
 
   function tick() {
+    if (cancelled) return;
     const elapsed = performance.now() - t0;
-    const t = Math.min(Math.max(elapsed / duration, 0), 1);
+    const t = Math.min(Math.max(elapsed / safeDuration, 0), 1);
     onUpdate(start + (end - start) * ease(t));
     if (t < 1) {
       frame = requestAnimationFrame(tick);
@@ -65,10 +68,13 @@ function animateValue({
   }
 
   const timer = setTimeout(() => {
-    frame = requestAnimationFrame(tick);
+    if (!cancelled) {
+      frame = requestAnimationFrame(tick);
+    }
   }, delay);
 
   return () => {
+    cancelled = true;
     clearTimeout(timer);
     cancelAnimationFrame(frame);
   };

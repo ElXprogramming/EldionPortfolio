@@ -1,12 +1,9 @@
 import { z } from 'zod';
 import { sanitizeText } from './security';
 
-const MIN_NAME_LENGTH = 1;
 const MAX_NAME_LENGTH = 100;
 const MAX_EMAIL_LENGTH = 254;
-const MIN_SUBJECT_LENGTH = 1;
 const MAX_SUBJECT_LENGTH = 150;
-const MIN_MESSAGE_LENGTH = 1;
 const MAX_MESSAGE_LENGTH = 2000;
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
@@ -21,44 +18,40 @@ const FORBIDDEN_VITE_SECRET_KEYS: readonly string[] = [
   'VITE_JWT_SECRET',
 ];
 
+const sanitizedText = () => z.string().transform(sanitizeText);
+
+const sanitizedBoundedText = (max: number, emptyMessage: string, maxMessage: string) =>
+  sanitizedText().pipe(z.string().min(1, emptyMessage).max(max, maxMessage));
+
+const sanitizedEmail = (invalidMessage: string) =>
+  z
+    .string()
+    .transform((val) => sanitizeText(val).toLowerCase())
+    .pipe(
+      z
+        .string()
+        .email(invalidMessage)
+        .max(MAX_EMAIL_LENGTH, `Email must be ${MAX_EMAIL_LENGTH} characters or fewer.`)
+    );
+
 export const contactMessageInputSchema = z
   .object({
-    name: z
-      .string()
-      .transform((val) => sanitizeText(val))
-      .pipe(
-        z
-          .string()
-          .min(MIN_NAME_LENGTH, 'Name is required.')
-          .max(MAX_NAME_LENGTH, `Name must be ${MAX_NAME_LENGTH} characters or fewer.`)
-      ),
-    email: z
-      .string()
-      .transform((val) => sanitizeText(val).toLowerCase())
-      .pipe(
-        z
-          .string()
-          .email('Please provide a valid email address.')
-          .max(MAX_EMAIL_LENGTH, `Email must be ${MAX_EMAIL_LENGTH} characters or fewer.`)
-      ),
-    subject: z
-      .string()
-      .transform((val) => sanitizeText(val))
-      .pipe(
-        z
-          .string()
-          .min(MIN_SUBJECT_LENGTH, 'Subject is required.')
-          .max(MAX_SUBJECT_LENGTH, `Subject must be ${MAX_SUBJECT_LENGTH} characters or fewer.`)
-      ),
-    message: z
-      .string()
-      .transform((val) => sanitizeText(val))
-      .pipe(
-        z
-          .string()
-          .min(MIN_MESSAGE_LENGTH, 'Message cannot be empty.')
-          .max(MAX_MESSAGE_LENGTH, `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`)
-      ),
+    name: sanitizedBoundedText(
+      MAX_NAME_LENGTH,
+      'Name is required.',
+      `Name must be ${MAX_NAME_LENGTH} characters or fewer.`
+    ),
+    email: sanitizedEmail('Please provide a valid email address.'),
+    subject: sanitizedBoundedText(
+      MAX_SUBJECT_LENGTH,
+      'Subject is required.',
+      `Subject must be ${MAX_SUBJECT_LENGTH} characters or fewer.`
+    ),
+    message: sanitizedBoundedText(
+      MAX_MESSAGE_LENGTH,
+      'Message cannot be empty.',
+      `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`
+    ),
   })
   .strip();
 
@@ -66,10 +59,7 @@ export type ContactMessageInput = z.infer<typeof contactMessageInputSchema>;
 
 export const adminLoginInputSchema = z
   .object({
-    email: z
-      .string()
-      .transform((val) => sanitizeText(val).toLowerCase())
-      .pipe(z.string().email('Please enter a valid admin email address.').max(MAX_EMAIL_LENGTH)),
+    email: sanitizedEmail('Please enter a valid admin email address.'),
     password: z
       .string()
       .min(MIN_PASSWORD_LENGTH, `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`)
@@ -88,21 +78,19 @@ export const toggleReadInputSchema = z
   })
   .strip();
 
-export const inboxPasscodeSchema = z
-  .string()
-  .transform((val) => sanitizeText(val).trim())
-  .pipe(z.string().min(1, 'Passcode is required.').max(100, 'Passcode is too long.'));
+export const inboxPasscodeSchema = sanitizedBoundedText(
+  100,
+  'Passcode is required.',
+  'Passcode is too long.'
+);
 
 export const contactMessageResponseSchema = z
   .object({
     id: z.string().uuid(),
-    name: z.string().transform((val) => sanitizeText(val)),
-    email: z
-      .string()
-      .transform((val) => sanitizeText(val).toLowerCase().trim())
-      .pipe(z.string().email()),
-    subject: z.string().transform((val) => sanitizeText(val)),
-    message: z.string().transform((val) => sanitizeText(val)),
+    name: sanitizedText(),
+    email: sanitizedEmail('Invalid email address.'),
+    subject: sanitizedText(),
+    message: sanitizedText(),
     created_at: z.string(),
     is_read: z
       .boolean()
@@ -155,7 +143,7 @@ export function validateClientEnv(rawEnv: Record<string, unknown>): ClientEnvCon
   };
 }
 
-export const githubContributionDaySchema = z
+const githubContributionDaySchema = z
   .object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
     count: z.number().int().nonnegative(),
@@ -173,4 +161,3 @@ export const githubContributionsResponseSchema = z
   .strip();
 
 export type GithubContributionsResponse = z.infer<typeof githubContributionsResponseSchema>;
-

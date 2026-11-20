@@ -6,33 +6,33 @@
 }
 
 :root {
-  font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   color-scheme: dark;
 }
 
-html,
-body,
 button,
 input,
 select,
 textarea {
-  font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #09090b; /* Clean solid dark */
+  background-color: #09090b;
   color: #f4f4f5;
   overflow-x: hidden;
-}
-
-code, pre, .font-mono {
-  font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* Minimalist glass panel */

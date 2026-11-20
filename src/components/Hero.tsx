@@ -8,7 +8,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative pt-20 pb-16 md:pt-28 md:pb-24 min-h-[720px] lg:min-h-[820px] flex items-center justify-center overflow-hidden"
+      className="relative pt-24 pb-12 sm:pt-20 sm:pb-16 md:pt-28 md:pb-24 min-h-[700px] lg:min-h-[820px] flex items-end sm:items-center justify-center overflow-hidden"
     >
       {/* Interactive 3D Lanyard Card spanning the full Hero area, behind texts */}
       <div
@@ -21,8 +21,6 @@ export default function Hero() {
             backImage={eldionPortrait}
             cardColor="#141419"
             strapColor="#27272a"
-            finish="glossy"
-            metal="silver"
             size={0.28}
             anchor="right"
             strapLength={0.45}
@@ -34,10 +32,10 @@ export default function Hero() {
 
       {/* Hero Content - in front of the 3D canvas (z-10) with text pass-through */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10 pointer-events-none">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-16 w-full">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-12 xl:gap-16 w-full">
           {/* Name and Bio */}
-          <div className="flex flex-col items-center lg:items-end text-center lg:text-right shrink-0 select-none">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white mb-3">
+          <div className="flex flex-col items-center lg:items-end text-center lg:text-right min-w-0 select-none">
+            <h1 className="text-3xl sm:text-5xl xl:text-6xl font-bold tracking-tight text-white mb-3">
               <span className="text-gradient">{PROFILE.name}</span>
             </h1>
             <p className="text-base sm:text-lg text-zinc-400">
@@ -46,7 +44,7 @@ export default function Hero() {
           </div>
 
           {/* Reserved space matching where the 3D lanyard hangs on the right */}
-          <div className="w-[220px] sm:w-[260px] lg:w-[300px] h-[320px] sm:h-[380px] lg:h-[440px] pointer-events-none shrink-0 hidden sm:block" />
+          <div className="hidden sm:block sm:w-[240px] lg:w-[260px] xl:w-[300px] sm:h-[360px] lg:h-[420px] pointer-events-none shrink-0" />
         </div>
       </div>
     </section>

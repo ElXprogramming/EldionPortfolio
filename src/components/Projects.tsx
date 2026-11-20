@@ -14,8 +14,6 @@ import chessGameReviewImg from '../assets/projects/chess-game-review-preview.web
 import { EXTERNAL_LINKS } from '../lib/constants';
 import BorderGlow from './BorderGlow';
 
-const PROJECT_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
-
 interface ProjectItem {
   id: string;
   title: string;
@@ -89,16 +87,14 @@ const PROJECTS_DATA: readonly ProjectItem[] = [
   },
 ] as const;
 
+const FOLDER_ITEMS: readonly FolderItem[] = PROJECTS_DATA.map((p) => ({
+  title: p.title,
+  image: p.image,
+  alt: p.imageAlt,
+}));
+
 export default function Projects() {
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(0);
-
-  const folderItems: FolderItem[] = PROJECTS_DATA.map((p) => ({
-    title: p.title,
-    description: p.subtitle,
-    image: p.image,
-    alt: p.imageAlt,
-  }));
-
   const activeProject = activeProjectIndex !== null ? PROJECTS_DATA[activeProjectIndex] : null;
 
   return (
@@ -116,16 +112,14 @@ export default function Projects() {
         </div>
 
         {/* Main Section Layout: Left = Folder, Right = Compact Project Details */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 xl:gap-28 my-8">
+        <div className="flex flex-col xl:flex-row items-center justify-center gap-10 xl:gap-20 2xl:gap-28 my-8">
           
           {/* Left Column: Interactive Folder */}
           <div className={`w-full ${activeProject ? 'max-w-[420px]' : 'max-w-2xl'} flex flex-col items-center justify-center transition-all duration-300 relative z-10 overflow-visible`}>
             <div className="relative flex items-center justify-center min-h-[290px] sm:min-h-[310px] w-full py-2">
               <Folder
                 label="Projects Archive"
-                items={folderItems}
-                mode="flap"
-                variant="solid"
+                items={FOLDER_ITEMS}
                 color="#3b1d60"
                 paperColor="#ffffff"
                 tabPosition="left"
@@ -142,9 +136,9 @@ export default function Projects() {
               />
             </div>
 
-            <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 flex items-center justify-center gap-1.5 font-mono text-center whitespace-nowrap">
+            <div className="text-[10px] sm:text-[11px] text-zinc-400 mt-2 flex items-center justify-center gap-1.5 font-mono text-center">
               <FileText className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-              <span className="whitespace-nowrap">
+              <span>
                 {activeProject
                   ? 'Click another project to switch, or click selected to close'
                   : 'Click any project document in the folder to inspect details →'}
@@ -167,7 +161,6 @@ export default function Projects() {
                 coneSpread={25}
                 animated={true}
                 glowColor="275 85 75"
-                colors={PROJECT_GLOW_COLORS}
                 fillOpacity={0.4}
               >
                 <div className="flex flex-col justify-between h-full rounded-[15px] overflow-hidden">
@@ -258,7 +251,7 @@ export default function Projects() {
                         </a>
 
                         <a
-                          href={activeProject.githubUrl}
+                          href={`${activeProject.githubUrl}#readme`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium text-xs text-zinc-200 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 transition-colors cursor-pointer"

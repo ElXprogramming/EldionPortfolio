@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, type ComponentType, type FormEvent } from 'react';
 import {
   Mail,
   Send,
@@ -17,9 +17,46 @@ import { PROFILE, EXTERNAL_LINKS } from '../lib/constants';
 import BorderGlow from './BorderGlow';
 
 const EMAIL_GLOW_COLORS = ['#fb7185', '#f472b6', '#c084fc'] as const;
-const LINKEDIN_GLOW_COLORS = ['#38bdf8', '#60a5fa', '#818cf8'] as const;
-const GITHUB_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
-const FORM_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
+
+interface SocialCardConfig {
+  label: string;
+  displayValue: string;
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+  glowColor: string;
+  colors: readonly [string, string, string];
+  focusRingClass: string;
+  iconBoxClass: string;
+  arrowHoverClass: string;
+  valueHoverClass: string;
+}
+
+const SOCIAL_CARDS: readonly SocialCardConfig[] = [
+  {
+    label: 'LinkedIn',
+    displayValue: PROFILE.name,
+    href: EXTERNAL_LINKS.linkedin,
+    icon: LinkedinIcon,
+    glowColor: '205 90 72',
+    colors: ['#38bdf8', '#60a5fa', '#818cf8'],
+    focusRingClass: 'focus-visible:ring-sky-400/70',
+    iconBoxClass: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+    arrowHoverClass: 'group-hover:bg-sky-500/10 group-hover:text-sky-300',
+    valueHoverClass: 'group-hover:text-sky-300',
+  },
+  {
+    label: 'GitHub',
+    displayValue: `@${PROFILE.githubUsername}`,
+    href: EXTERNAL_LINKS.github,
+    icon: GithubIcon,
+    glowColor: '275 85 75',
+    colors: ['#c084fc', '#a855f7', '#38bdf8'],
+    focusRingClass: 'focus-visible:ring-purple-400/70',
+    iconBoxClass: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+    arrowHoverClass: 'group-hover:bg-purple-500/10 group-hover:text-purple-300',
+    valueHoverClass: 'group-hover:text-purple-300',
+  },
+];
 
 const INITIAL_FORM_DATA = {
   name: '',
@@ -28,24 +65,34 @@ const INITIAL_FORM_DATA = {
   message: '',
 };
 
+const INPUT_CLASSES =
+  'w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50 font-mono';
+
 export default function Contact() {
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const handleCopyEmail = async () => {
     const success = await copyToClipboard(PROFILE.email);
     if (success) {
       setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2500);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopiedEmail(false), 2500);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
@@ -84,7 +131,7 @@ export default function Contact() {
 
         {/* Symmetrical 2-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
-          {/* Direct Contact Cards (Left Column: Chunky Standalone Boxes aligned with title) */}
+          {/* Direct Contact Cards (Left Column) */}
           <div className="flex flex-col justify-between gap-4 w-full max-w-[420px]">
             {/* Email Box */}
             <BorderGlow
@@ -131,81 +178,53 @@ export default function Contact() {
               </div>
             </BorderGlow>
 
-            {/* LinkedIn Box */}
-            <BorderGlow
-              className="flex-1"
-              backgroundColor="#111116"
-              borderRadius={16}
-              glowRadius={30}
-              glowIntensity={0.9}
-              edgeSensitivity={25}
-              coneSpread={25}
-              glowColor="205 90 72"
-              colors={LINKEDIN_GLOW_COLORS}
-              fillOpacity={0.35}
-            >
-              <a
-                href={EXTERNAL_LINKS.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-[15px]"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
-                    <LinkedinIcon className="w-5 h-5" />
-                  </div>
-                  <div className="p-2 rounded-xl bg-white/5 group-hover:bg-sky-500/10 text-zinc-400 group-hover:text-sky-300 transition-colors border border-white/5">
-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-                    LinkedIn
-                  </div>
-                  <div className="text-sm sm:text-base font-semibold text-white group-hover:text-sky-300 transition-colors truncate mt-0.5">
-                    {PROFILE.name}
-                  </div>
-                </div>
-              </a>
-            </BorderGlow>
-
-            {/* GitHub Box */}
-            <BorderGlow
-              className="flex-1"
-              backgroundColor="#111116"
-              borderRadius={16}
-              glowRadius={30}
-              glowIntensity={0.9}
-              edgeSensitivity={25}
-              coneSpread={25}
-              glowColor="275 85 75"
-              colors={GITHUB_GLOW_COLORS}
-              fillOpacity={0.35}
-            >
-              <a
-                href={EXTERNAL_LINKS.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70 rounded-[15px]"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-                    <GithubIcon className="w-5 h-5" />
-                  </div>
-                  <div className="p-2 rounded-xl bg-white/5 group-hover:bg-purple-500/10 text-zinc-400 group-hover:text-purple-300 transition-colors border border-white/5">
-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-                    GitHub
-                  </div>
-                  <div className="text-sm sm:text-base font-semibold text-white group-hover:text-purple-300 transition-colors truncate mt-0.5">
-                    @{PROFILE.githubUsername}
-                  </div>
-                </div>
-              </a>
-            </BorderGlow>
+            {/* Social Profile Boxes */}
+            {SOCIAL_CARDS.map((card) => {
+              const Icon = card.icon;
+              return (
+                <BorderGlow
+                  key={card.label}
+                  className="flex-1"
+                  backgroundColor="#111116"
+                  borderRadius={16}
+                  glowRadius={30}
+                  glowIntensity={0.9}
+                  edgeSensitivity={25}
+                  coneSpread={25}
+                  glowColor={card.glowColor}
+                  colors={card.colors}
+                  fillOpacity={0.35}
+                >
+                  <a
+                    href={card.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`p-5 sm:p-6 flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 ${card.focusRingClass} rounded-[15px]`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`p-2.5 rounded-xl border shrink-0 ${card.iconBoxClass}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div
+                        className={`p-2 rounded-xl bg-white/5 text-zinc-400 transition-colors border border-white/5 ${card.arrowHoverClass}`}
+                      >
+                        <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
+                        {card.label}
+                      </div>
+                      <div
+                        className={`text-sm sm:text-base font-semibold text-white transition-colors truncate mt-0.5 ${card.valueHoverClass}`}
+                      >
+                        {card.displayValue}
+                      </div>
+                    </div>
+                  </a>
+                </BorderGlow>
+              );
+            })}
           </div>
 
           {/* Quick Interactive Message Form (Right Column) */}
@@ -219,15 +238,12 @@ export default function Contact() {
             edgeSensitivity={28}
             coneSpread={25}
             glowColor="275 85 75"
-            colors={FORM_GLOW_COLORS}
             fillOpacity={0.35}
           >
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-purple-400" />
-                <h3 className="text-xl font-bold text-white">
-                  Send a Message
-                </h3>
+                <h3 className="text-xl font-bold text-white">Send a Message</h3>
               </div>
               <p className="text-xs sm:text-sm text-zinc-400 mb-6 font-mono">
                 Have an idea, project, or role to discuss? Send a direct note to my inbox.
@@ -235,7 +251,10 @@ export default function Contact() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {submitStatus === 'success' && (
-                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm flex items-start gap-3">
+                  <div
+                    role="status"
+                    className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm flex items-start gap-3"
+                  >
                     <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
                       <div className="font-semibold text-white">Message Delivered!</div>
@@ -245,7 +264,10 @@ export default function Contact() {
                 )}
 
                 {submitStatus === 'error' && (
-                  <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-start gap-3">
+                  <div
+                    role="alert"
+                    className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-sm flex items-start gap-3"
+                  >
                     <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                     <div className="flex-grow">
                       <div className="font-semibold text-white">Delivery Notice</div>
@@ -270,10 +292,8 @@ export default function Contact() {
                       disabled={isSubmitting}
                       placeholder="e.g. Alex Tan"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, name: e.target.value }))
-                      }
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50 font-mono"
+                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                      className={INPUT_CLASSES}
                     />
                   </div>
                   <div>
@@ -291,10 +311,8 @@ export default function Contact() {
                       disabled={isSubmitting}
                       placeholder="alex@example.com"
                       value={formData.email}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, email: e.target.value }))
-                      }
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50 font-mono"
+                      onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                      className={INPUT_CLASSES}
                     />
                   </div>
                 </div>
@@ -312,12 +330,10 @@ export default function Contact() {
                     required
                     maxLength={150}
                     disabled={isSubmitting}
-                    placeholder="Internship opportunity / Project inquiry"
+                    placeholder="Internship / Project inquiry"
                     value={formData.subject}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, subject: e.target.value }))
-                    }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors disabled:opacity-50 font-mono"
+                    onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
+                    className={INPUT_CLASSES}
                   />
                 </div>
 
@@ -336,10 +352,8 @@ export default function Contact() {
                     disabled={isSubmitting}
                     placeholder="Hi Eldion, I'd like to talk about..."
                     value={formData.message}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, message: e.target.value }))
-                    }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#141419] border border-white/10 text-sm text-white placeholder-zinc-500 focus:outline-hidden focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors resize-none disabled:opacity-50 font-mono"
+                    onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+                    className={`${INPUT_CLASSES} resize-none`}
                   />
                 </div>
 

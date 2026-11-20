@@ -1,23 +1,10 @@
-import {
-  sanitizeExternalUrl,
-  sanitizeInternalRoute,
-  sanitizeMailtoUrl,
-} from './security';
+import { sanitizeExternalUrl, sanitizeMailtoUrl } from './security';
 
 export const PROFILE = {
   name: 'Eldion Ryan Godius',
   role: 'Software Engineering',
   email: 'nayrnoidle@gmail.com',
   githubUsername: 'ElXprogramming',
-} as const;
-
-export const ROUTES = {
-  home: sanitizeInternalRoute('#'),
-  about: sanitizeInternalRoute('#about'),
-  skills: sanitizeInternalRoute('#skills'),
-  projects: sanitizeInternalRoute('#projects'),
-  contact: sanitizeInternalRoute('#contact'),
-  inbox: sanitizeInternalRoute('#inbox'),
 } as const;
 
 export const EXTERNAL_LINKS = {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type FormEvent } from 'react';
 import {
   Lock,
   Unlock,
@@ -33,16 +33,43 @@ interface SecretInboxProps {
   onBackToHome: () => void;
 }
 
+type FilterMode = 'all' | 'unread' | 'read';
+
 const SESSION_AUTH_KEY = 'eldion_inbox_authenticated';
+const LOAD_ERROR_FALLBACK =
+  'Unable to load inbox messages. Please verify your database connection.';
+
+function readUnlockState(): boolean {
+  try {
+    return sessionStorage.getItem(SESSION_AUTH_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function writeUnlockState(unlocked: boolean): void {
+  try {
+    if (unlocked) sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
+    else sessionStorage.removeItem(SESSION_AUTH_KEY);
+  } catch {
+    // Ignore storage unavailability
+  }
+}
+
+function formatMessageDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return isoDate;
+  return date.toLocaleDateString('en-MY', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    try {
-      return sessionStorage.getItem(SESSION_AUTH_KEY) === 'true';
-    } catch {
-      return false;
-    }
-  });
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(readUnlockState);
   const [passcode, setPasscode] = useState('');
   const [unlockErrorMessage, setUnlockErrorMessage] = useState<string | null>(null);
   const [isUnlocking, setIsUnlocking] = useState(false);
@@ -55,21 +82,25 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   const [isLoading, setIsLoading] = useState<boolean>(isUnlocked);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterMode, setFilterMode] = useState<'all' | 'unread' | 'read'>('all');
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
-  const loadMessages = useCallback(async () => {
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
+
+  const loadMessages = useCallback(async (preserveError = false) => {
+    setIsLoading(true);
     try {
       const data = await fetchContactMessages();
       setMessages(data);
-      setErrorMessage(null);
+      if (!preserveError) setErrorMessage(null);
     } catch (err: unknown) {
-      setErrorMessage(
-        createSafeErrorMessage(
-          err,
-          'Unable to load inbox messages. Please verify your database connection.'
-        )
-      );
+      setErrorMessage(createSafeErrorMessage(err, LOAD_ERROR_FALLBACK));
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +108,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   useEffect(() => {
     let isMounted = true;
+
     if (isUnlocked) {
       fetchContactMessages()
         .then((data) => {
@@ -87,12 +119,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         })
         .catch((err: unknown) => {
           if (isMounted) {
-            setErrorMessage(
-              createSafeErrorMessage(
-                err,
-                'Unable to load inbox messages. Please verify your database connection.'
-              )
-            );
+            setErrorMessage(createSafeErrorMessage(err, LOAD_ERROR_FALLBACK));
           }
         })
         .finally(() => {
@@ -105,6 +132,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         .then((email) => {
           if (isMounted && email) {
             setAuthenticatedEmail(email);
+            setIsLoading(true);
             setIsUnlocked(true);
           }
         })
@@ -114,37 +142,31 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           }
         });
     }
+
     return () => {
       isMounted = false;
     };
   }, [isUnlocked]);
 
-  const handlePasscodeUnlock = async (e: React.FormEvent) => {
+  const handlePasscodeUnlock = (e: FormEvent) => {
     e.preventDefault();
     setIsUnlocking(true);
     setUnlockErrorMessage(null);
 
     try {
       verifyInboxPasscode(passcode);
-      try {
-        sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
-      } catch {
-        // Safe fallback if storage unavailable
-      }
-      setIsUnlocked(true);
-      setIsLoading(true);
+      writeUnlockState(true);
       setPasscode('');
-      await loadMessages();
+      setIsLoading(true);
+      setIsUnlocked(true);
     } catch (err: unknown) {
-      setUnlockErrorMessage(
-        createSafeErrorMessage(err, 'Incorrect passcode. Please try again.')
-      );
+      setUnlockErrorMessage(createSafeErrorMessage(err, 'Incorrect passcode. Please try again.'));
     } finally {
       setIsUnlocking(false);
     }
   };
 
-  const handleAdminAuthUnlock = async (e: React.FormEvent) => {
+  const handleAdminAuthUnlock = async (e: FormEvent) => {
     e.preventDefault();
     setIsUnlocking(true);
     setUnlockErrorMessage(null);
@@ -152,15 +174,10 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
     try {
       const email = await signInAdmin(credentials);
       setAuthenticatedEmail(email);
-      try {
-        sessionStorage.setItem(SESSION_AUTH_KEY, 'true');
-      } catch {
-        // Safe fallback
-      }
-      setIsUnlocked(true);
-      setIsLoading(true);
+      writeUnlockState(true);
       setCredentials({ email: '', password: '' });
-      await loadMessages();
+      setIsLoading(true);
+      setIsUnlocked(true);
     } catch (err: unknown) {
       setUnlockErrorMessage(
         createSafeErrorMessage(err, 'Authentication failed. Please check your credentials.')
@@ -171,11 +188,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
   };
 
   const handleLock = async () => {
-    try {
-      sessionStorage.removeItem(SESSION_AUTH_KEY);
-    } catch {
-      // Safe fallback
-    }
+    writeUnlockState(false);
     await signOutAdmin();
     setAuthenticatedEmail(null);
     setIsUnlocked(false);
@@ -186,38 +199,34 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   const handleToggleRead = async (message: ContactMessage) => {
     const newStatus = !message.is_read;
+    setMessages((prev) =>
+      prev.map((m) => (m.id === message.id ? { ...m, is_read: newStatus } : m))
+    );
     try {
-      setMessages((prev) =>
-        prev.map((m) => (m.id === message.id ? { ...m, is_read: newStatus } : m))
-      );
       await toggleMessageReadStatus(message.id, newStatus);
-    } catch {
-      setIsLoading(true);
-      void loadMessages();
+    } catch (err: unknown) {
+      setErrorMessage(createSafeErrorMessage(err, 'Unable to update message read status.'));
+      void loadMessages(true);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this message?')) return;
+    setMessages((prev) => prev.filter((m) => m.id !== id));
     try {
-      setMessages((prev) => prev.filter((m) => m.id !== id));
       await deleteContactMessage(id);
-    } catch {
-      setIsLoading(true);
-      void loadMessages();
+    } catch (err: unknown) {
+      setErrorMessage(createSafeErrorMessage(err, 'Unable to delete message.'));
+      void loadMessages(true);
     }
-  };
-
-  const handleRefreshMessages = () => {
-    setIsLoading(true);
-    void loadMessages();
   };
 
   const handleCopyEmail = async (email: string) => {
     const success = await copyToClipboard(email);
     if (success) {
       setCopiedEmail(email);
-      setTimeout(() => setCopiedEmail(null), 2000);
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = setTimeout(() => setCopiedEmail(null), 2000);
     }
   };
 
@@ -231,22 +240,30 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         msg.message.toLowerCase().includes(normalizedQuery);
 
       if (!matchesSearch) return false;
-
       if (filterMode === 'unread') return !msg.is_read;
-      if (filterMode === 'read') return !!msg.is_read;
+      if (filterMode === 'read') return msg.is_read;
       return true;
     });
   }, [messages, searchQuery, filterMode]);
 
-  const unreadCount = useMemo(() => {
-    return messages.filter((m) => !m.is_read).length;
-  }, [messages]);
+  const unreadCount = useMemo(
+    () => messages.filter((m) => !m.is_read).length,
+    [messages]
+  );
+
+  const filterTabs: readonly { mode: FilterMode; label: string; count: number }[] = [
+    { mode: 'all', label: 'All', count: messages.length },
+    { mode: 'unread', label: 'Unread', count: unreadCount },
+    { mode: 'read', label: 'Read', count: messages.length - unreadCount },
+  ];
 
   if (!isUnlocked) {
+    const errorInputRing = unlockErrorMessage
+      ? 'border-rose-500 ring-1 ring-rose-500'
+      : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500';
+
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative selection:bg-[#B497CF]/30 selection:text-purple-200">
-        <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none" />
-
         <div className="glass-panel max-w-md w-full p-8 rounded-3xl border border-slate-800/80 shadow-2xl relative z-10">
           <div className="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center mx-auto mb-6 text-purple-300">
             {showAdminLogin ? <Lock className="w-7 h-7" /> : <KeyRound className="w-7 h-7" />}
@@ -283,14 +300,10 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                     setPasscode(e.target.value);
                     if (unlockErrorMessage) setUnlockErrorMessage(null);
                   }}
-                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
-                    unlockErrorMessage
-                      ? 'border-rose-500 ring-1 ring-rose-500'
-                      : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
-                  }`}
+                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${errorInputRing}`}
                 />
                 {unlockErrorMessage && (
-                  <p className="text-rose-400 text-xs mt-2 text-center">
+                  <p role="alert" className="text-rose-400 text-xs mt-2 text-center">
                     {unlockErrorMessage}
                   </p>
                 )}
@@ -364,14 +377,10 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                     setCredentials((prev) => ({ ...prev, password: e.target.value }));
                     if (unlockErrorMessage) setUnlockErrorMessage(null);
                   }}
-                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${
-                    unlockErrorMessage
-                      ? 'border-rose-500 ring-1 ring-rose-500'
-                      : 'border-slate-800 focus:border-purple-500 focus:ring-1 focus:ring-purple-500'
-                  }`}
+                  className={`w-full px-4 py-2.5 rounded-xl bg-slate-900 border text-sm text-white placeholder-slate-500 focus:outline-hidden transition-colors ${errorInputRing}`}
                 />
                 {unlockErrorMessage && (
-                  <p className="text-rose-400 text-xs mt-2 text-center">
+                  <p role="alert" className="text-rose-400 text-xs mt-2 text-center">
                     {unlockErrorMessage}
                   </p>
                 )}
@@ -419,8 +428,6 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-[#B497CF]/30 selection:text-purple-200">
-      <div className="fixed inset-0 bg-grid-pattern opacity-15 pointer-events-none" />
-
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-30 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
@@ -430,6 +437,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               onClick={onBackToHome}
               className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer"
               title="Return to Portfolio"
+              aria-label="Return to Portfolio"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Portfolio</span>
@@ -458,10 +466,11 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleRefreshMessages}
+              onClick={() => void loadMessages()}
               disabled={isLoading}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer disabled:opacity-50"
               title="Refresh messages"
+              aria-label="Refresh messages"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-purple-400' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -472,6 +481,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
               onClick={handleLock}
               className="p-2 sm:px-3 sm:py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors flex items-center gap-2 text-xs font-medium cursor-pointer"
               title="Sign out and lock inbox session"
+              aria-label="Sign out and lock inbox session"
             >
               <Lock className="w-4 h-4" />
               <span className="hidden sm:inline">Lock</span>
@@ -489,6 +499,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
             <input
               type="text"
               maxLength={150}
+              aria-label="Search messages"
               placeholder="Search sender, email, subject, or message..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -497,45 +508,29 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
           </div>
 
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-slate-800 self-start sm:self-auto">
-            <button
-              type="button"
-              onClick={() => setFilterMode('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                filterMode === 'all'
-                  ? 'bg-purple-600 text-white font-semibold'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              All ({messages.length})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterMode('unread')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                filterMode === 'unread'
-                  ? 'bg-purple-600 text-white font-semibold'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Unread ({unreadCount})
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterMode('read')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                filterMode === 'read'
-                  ? 'bg-purple-600 text-white font-semibold'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Read ({messages.length - unreadCount})
-            </button>
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.mode}
+                type="button"
+                onClick={() => setFilterMode(tab.mode)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                  filterMode === tab.mode
+                    ? 'bg-purple-600 text-white font-semibold'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Error Notification */}
         {errorMessage && (
-          <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3 text-sm text-rose-300">
+          <div
+            role="alert"
+            className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-3 text-sm text-rose-300"
+          >
             <AlertCircle className="w-5 h-5 shrink-0 text-rose-400 mt-0.5" />
             <div>
               <p className="font-semibold text-rose-200">Inbox Notice</p>
@@ -570,14 +565,6 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
         {/* Messages Feed */}
         <div className="space-y-4">
           {filteredMessages.map((msg) => {
-            const formattedDate = new Date(msg.created_at).toLocaleDateString('en-MY', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            });
-
             const safeSenderMailto = sanitizeMailtoUrl(msg.email);
             const safeReplyMailto = sanitizeMailtoUrl(msg.email, msg.subject);
 
@@ -623,6 +610,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
                           onClick={() => handleCopyEmail(msg.email)}
                           className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
                           title="Copy email address"
+                          aria-label={`Copy ${msg.email}`}
                         >
                           {copiedEmail === msg.email ? (
                             <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -636,7 +624,7 @@ export default function SecretInbox({ onBackToHome }: SecretInboxProps) {
 
                   <div className="flex items-center gap-2 text-xs text-slate-500 self-start sm:self-auto">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{formattedDate}</span>
+                    <span>{formatMessageDate(msg.created_at)}</span>
                   </div>
                 </div>
 

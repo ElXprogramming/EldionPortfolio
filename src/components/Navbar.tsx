@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Home,
   User,
@@ -6,58 +6,63 @@ import {
   FolderGit2,
   Mail,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import BranchedMenu, { type BranchedMenuItem } from './BranchedMenu';
 import { PROFILE } from '../lib/constants';
+import { sanitizeInternalRoute } from '../lib/security';
 
 interface NavbarProps {
   activeSection: string;
 }
 
+const MENU_ITEMS: readonly BranchedMenuItem[] = [
+  {
+    label: 'Portfolio',
+    children: [
+      { value: 'hero', label: 'Home', icon: Home },
+      { value: 'about', label: 'About', icon: User },
+      { value: 'skills', label: 'Skills', icon: Layers },
+      { value: 'projects', label: 'Projects', icon: FolderGit2 },
+      { value: 'contact', label: 'Contact', icon: Mail },
+    ],
+  },
+];
+
 export default function Navbar({ activeSection }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Close mobile drawer on resize to desktop
+  // Close mobile drawer on resize to desktop or Escape key
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setMobileOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+      }
+    };
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
-  const handleSelect = (value: string) => {
-    if (value === 'inbox') {
-      window.location.hash = '#inbox';
-      return;
-    }
-
-    // Scroll to section
+  const handleSelect = useCallback((value: string) => {
     const target = document.getElementById(value);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
+      const safeHash = sanitizeInternalRoute(`#${value}`);
       if (window.history.pushState) {
-        window.history.pushState(null, '', `#${value}`);
+        window.history.pushState(null, '', safeHash);
       }
     }
     setMobileOpen(false);
-  };
-
-  const menuItems: BranchedMenuItem[] = [
-    {
-      label: 'Portfolio',
-      children: [
-        { value: 'hero', label: 'Home', icon: Home },
-        { value: 'about', label: 'About', icon: User },
-        { value: 'skills', label: 'Skills', icon: Layers },
-        { value: 'projects', label: 'Projects', icon: FolderGit2 },
-        { value: 'contact', label: 'Contact', icon: Mail }
-      ]
-    }
-  ];
+  }, []);
 
   return (
     <>
@@ -68,7 +73,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
       >
         <div className="bg-[#0c0c11]/85 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 shadow-2xl shadow-black/60 transition-all hover:border-white/20">
           <BranchedMenu
-            items={menuItems}
+            items={MENU_ITEMS}
             defaultOpen={[0]}
             defaultActive={activeSection || 'hero'}
             onSelect={handleSelect}
@@ -94,9 +99,10 @@ export default function Navbar({ activeSection }: NavbarProps) {
         </a>
         <button
           type="button"
-          onClick={() => setMobileOpen(prev => !prev)}
+          onClick={() => setMobileOpen((prev) => !prev)}
           className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white cursor-pointer"
           aria-label="Toggle navigation menu"
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -117,7 +123,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -125,7 +131,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
               </div>
 
               <BranchedMenu
-                items={menuItems}
+                items={MENU_ITEMS}
                 defaultOpen={[0]}
                 defaultActive={activeSection || 'hero'}
                 onSelect={handleSelect}

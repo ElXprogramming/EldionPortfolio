@@ -14,8 +14,8 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
     "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: blob: https://avatars.githubusercontent.com",
-    "connect-src 'self' https://*.supabase.co https://github-contributions-api.jogruber.de https://api.github.com ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*",
+    "img-src 'self' data: blob:",
+    "connect-src 'self' https://*.supabase.co https://github-contributions-api.jogruber.de ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -30,12 +30,6 @@ export default defineConfig({
     port: 5173,
     allowedHosts: true, // allow all hosts including cloudflared tunnel domain
     headers: SECURITY_HEADERS,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:5000',
-        changeOrigin: true,
-      },
-    },
   },
   preview: {
     host: true, // listen on 0.0.0.0

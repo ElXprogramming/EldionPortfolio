@@ -234,13 +234,65 @@ describe('supabase security & data layer', () => {
 
       await expect(service.deleteContactMessage(validId)).resolves.toBeUndefined();
     });
+
+    it('skips malformed database rows and masks database errors without leaking internals', async () => {
+      const { client } = createMockSupabaseClient({
+        selectData: [
+          {
+            id: '550e8400-e29b-41d4-a716-446655440000',
+            name: 'Valid User',
+            email: 'valid@example.com',
+            subject: 'Hi',
+            message: 'Body',
+            created_at: '2026-10-17T00:00:00Z',
+            is_read: null,
+          },
+          {
+            id: 'not-a-uuid',
+            name: 'Corrupt Row',
+            email: 'bad-email',
+          },
+        ],
+      });
+      const service = createSupabaseService({ client, isConfigured: true });
+      const rows = await service.fetchContactMessages();
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.is_read).toBe(false);
+
+      const failing = createSupabaseService({
+        client: createMockSupabaseClient({
+          insertError: new Error('pg internal relation error'),
+          selectError: new Error('pg internal select error'),
+          updateError: new Error('pg internal update error'),
+          deleteError: new Error('pg internal delete error'),
+        }).client,
+        isConfigured: true,
+      });
+
+      await expect(
+        failing.submitContactMessage({
+          name: 'Alex',
+          email: 'alex@example.com',
+          subject: 'Hi',
+          message: 'Test',
+        })
+      ).rejects.toThrow('Database insert failed');
+      await expect(failing.fetchContactMessages()).rejects.toThrow('Database select failed');
+      await expect(
+        failing.toggleMessageReadStatus('550e8400-e29b-41d4-a716-446655440000', true)
+      ).rejects.toThrow('Database update failed');
+      await expect(
+        failing.deleteContactMessage('550e8400-e29b-41d4-a716-446655440000')
+      ).rejects.toThrow('Database delete failed');
+    });
   });
 
   describe('verifyInboxPasscode', () => {
-    it('verifies correct passcode and resets rate limiter on success', () => {
+    it('verifies correct passcode, rejects empty format, and resets rate limiter on success', () => {
       const { client } = createMockSupabaseClient();
       const service = createSupabaseService({ client, isConfigured: true });
 
+      expect(() => service.verifyInboxPasscode('   ')).toThrow('Invalid passcode format.');
       expect(service.verifyInboxPasscode('eldion')).toBe(true);
       expect(service.verifyInboxPasscode('  eldion  ')).toBe(true);
     });

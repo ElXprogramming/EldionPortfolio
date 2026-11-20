@@ -44,7 +44,7 @@ try {
 }
 
 const rpcEndpoint = `${parsedBaseUrl.origin}/rest/v1/rpc/ping_keep_alive`;
-console.log(`📡 Pinging Supabase Keep-Alive RPC at: ${parsedBaseUrl.origin}/rest/v1/rpc/ping_keep_alive`);
+console.log(`📡 Pinging Supabase Keep-Alive RPC at: ${rpcEndpoint}`);
 
 const startTime = Date.now();
 

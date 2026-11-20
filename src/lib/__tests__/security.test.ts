@@ -1,7 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  copyToClipboard,
   createRateLimiter,
   createSafeErrorMessage,
+  resolveAppView,
+  SafeUserError,
   sanitizeExternalUrl,
   sanitizeInternalRoute,
   sanitizeMailtoUrl,
@@ -10,9 +13,13 @@ import {
 import { EXTERNAL_LINKS } from '../constants';
 
 describe('security utilities', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe('sanitizeText', () => {
-    it('strips HTML tags, script payloads, and ASCII control characters', () => {
-      const dirty = '  Hello <script>alert("xss")</script>\x00\x07World!  ';
+    it('strips HTML tags, script payloads (including whitespace closing tags), and ASCII control characters', () => {
+      const dirty = '  Hello <script>alert("xss")</script >\x00\x07World!  ';
       expect(sanitizeText(dirty)).toBe('Hello World!');
     });
 
@@ -74,14 +81,16 @@ describe('security utilities', () => {
   });
 
   describe('sanitizeInternalRoute', () => {
-    it('allows known safe hash anchors and internal paths', () => {
+    it('allows known safe hash anchors and internal paths case-insensitively', () => {
       expect(sanitizeInternalRoute('#about')).toBe('#about');
-      expect(sanitizeInternalRoute('#projects')).toBe('#projects');
+      expect(sanitizeInternalRoute('#PROJECTS')).toBe('#projects');
       expect(sanitizeInternalRoute('#inbox')).toBe('#inbox');
       expect(sanitizeInternalRoute('/inbox')).toBe('/inbox');
+      expect(sanitizeInternalRoute('/ADMIN')).toBe('/admin');
     });
 
-    it('blocks open redirects and dangerous schemes', () => {
+    it('blocks unknown anchors, open redirects, and dangerous schemes', () => {
+      expect(sanitizeInternalRoute('#education')).toBe('#');
       expect(sanitizeInternalRoute('//evil.com')).toBe('#');
       expect(sanitizeInternalRoute('https://evil.com')).toBe('#');
       expect(sanitizeInternalRoute('javascript:alert(1)')).toBe('#');
@@ -89,8 +98,20 @@ describe('security utilities', () => {
     });
   });
 
+  describe('resolveAppView', () => {
+    it('resolves inbox routes from hashes or paths and defaults to home otherwise', () => {
+      expect(resolveAppView('#inbox', '/')).toBe('inbox');
+      expect(resolveAppView('#ADMIN', '/')).toBe('inbox');
+      expect(resolveAppView('#secret-inbox', '/')).toBe('inbox');
+      expect(resolveAppView('', '/inbox')).toBe('inbox');
+      expect(resolveAppView('', '/ADMIN')).toBe('inbox');
+      expect(resolveAppView('#projects', '/')).toBe('home');
+      expect(resolveAppView('javascript:alert(1)', '//evil.com')).toBe('home');
+    });
+  });
+
   describe('createRateLimiter', () => {
-    it('allows requests within quota and blocks once quota is exceeded', () => {
+    it('allows requests within quota, blocks on overflow, and supports reset', () => {
       let currentTime = 1_000;
       const limiter = createRateLimiter({
         maxRequests: 2,
@@ -104,6 +125,9 @@ describe('security utilities', () => {
       const thirdAttempt = limiter.tryConsume('contact');
       expect(thirdAttempt.allowed).toBe(false);
       expect(thirdAttempt.retryAfterSeconds).toBe(60);
+
+      limiter.reset('contact');
+      expect(limiter.tryConsume('contact').allowed).toBe(true);
 
       currentTime += 60_001;
       expect(limiter.tryConsume('contact').allowed).toBe(true);
@@ -122,11 +146,26 @@ describe('security utilities', () => {
     });
 
     it('preserves safe validation or rate-limit user notices when explicitly marked safe', () => {
-      const rateError = new Error('Too many requests. Please wait 30 seconds before trying again.');
-      rateError.name = 'SafeUserError';
+      const rateError = new SafeUserError('Too many requests. Please wait 30 seconds before trying again.');
       expect(createSafeErrorMessage(rateError, 'Fallback')).toBe(
         'Too many requests. Please wait 30 seconds before trying again.'
       );
+    });
+  });
+
+  describe('copyToClipboard', () => {
+    it('returns true when clipboard API succeeds and false when unavailable or rejected', async () => {
+      const writeText = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('Denied'));
+      vi.stubGlobal('navigator', { clipboard: { writeText } });
+
+      expect(await copyToClipboard('hello@example.com')).toBe(true);
+      expect(writeText).toHaveBeenCalledWith('hello@example.com');
+
+      expect(await copyToClipboard('hello@example.com')).toBe(false);
+
+      vi.stubGlobal('navigator', {});
+      expect(await copyToClipboard('hello@example.com')).toBe(false);
+      vi.unstubAllGlobals();
     });
   });
 });

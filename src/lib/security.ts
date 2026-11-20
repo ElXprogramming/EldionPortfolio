@@ -1,7 +1,7 @@
 import DOMPurify from 'dompurify';
 
 const CRLF_REGEX = /[\r\n]+/g;
-const SCRIPT_STYLE_BLOCK_REGEX = /<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1>/gi;
+const SCRIPT_STYLE_BLOCK_REGEX = /<(script|style|iframe|object|embed)\b[^>]*>[\s\S]*?<\/\1\s*>/gi;
 const HTML_TAG_REGEX = /<[^>]*>/g;
 const SAFE_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
@@ -24,10 +24,6 @@ const ALLOWED_INTERNAL_HASHES: ReadonlySet<string> = new Set([
   '#about',
   '#skills',
   '#projects',
-  '#contributions',
-  '#github',
-  '#activity',
-  '#education',
   '#contact',
   '#inbox',
   '#admin',
@@ -108,17 +104,23 @@ export function sanitizeMailtoUrl(email: string, subject?: string): string {
 }
 
 export function sanitizeInternalRoute(hashOrPath: string): string {
-  const trimmed = hashOrPath.trim();
-  if (!trimmed || trimmed.startsWith('//') || trimmed.startsWith('/\\')) {
+  const normalized = hashOrPath.trim().toLowerCase();
+  if (!normalized || normalized.startsWith('//') || normalized.startsWith('/\\')) {
     return '#';
   }
-  if (ALLOWED_INTERNAL_HASHES.has(trimmed.toLowerCase())) {
-    return trimmed;
-  }
-  if (ALLOWED_INTERNAL_PATHS.has(trimmed)) {
-    return trimmed;
+  if (ALLOWED_INTERNAL_HASHES.has(normalized) || ALLOWED_INTERNAL_PATHS.has(normalized)) {
+    return normalized;
   }
   return '#';
+}
+
+const INBOX_HASHES: ReadonlySet<string> = new Set(['#inbox', '#admin', '#secret-inbox']);
+const INBOX_PATHS: ReadonlySet<string> = new Set(['/inbox', '/admin']);
+
+export function resolveAppView(hash: string, pathname: string): 'home' | 'inbox' {
+  const safeHash = sanitizeInternalRoute(hash);
+  const safePath = sanitizeInternalRoute(pathname);
+  return INBOX_HASHES.has(safeHash) || INBOX_PATHS.has(safePath) ? 'inbox' : 'home';
 }
 
 export interface RateLimiterOptions {
@@ -151,6 +153,7 @@ export function createRateLimiter({
     const recentTimestamps = existing ? existing.filter((ts) => ts > windowStart) : [];
 
     if (recentTimestamps.length >= maxRequests) {
+      buckets.set(key, recentTimestamps);
       const oldestTimestamp = recentTimestamps[0] ?? now;
       const retryAfterMs = Math.max(1_000, oldestTimestamp + windowMs - now);
       return {
@@ -176,7 +179,7 @@ export function createRateLimiter({
 }
 
 export function createSafeErrorMessage(error: unknown, fallbackMessage: string): string {
-  if (error instanceof Error && error.name === 'SafeUserError') {
+  if (error instanceof SafeUserError || (error instanceof Error && error.name === 'SafeUserError')) {
     return error.message;
   }
   return fallbackMessage;

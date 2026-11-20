@@ -4,7 +4,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/ElXprogramming/EldionPortfolio?color=blue)](https://github.com/ElXprogramming/EldionPortfolio/releases)
 [![CI](https://github.com/ElXprogramming/EldionPortfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/ElXprogramming/EldionPortfolio/actions/workflows/ci.yml)
-[![Live Demo](https://img.shields.io/badge/Demo-Eldion%20Portfolio-indigo.svg)](https://declaraform.netlify.app/)
+[![Live Demo](https://img.shields.io/badge/Demo-Eldion%20Portfolio-indigo.svg)](https://eldionryanportfolio.vercel.app/)
 [![GitHub](https://img.shields.io/badge/GitHub-ElXprogramming-181717.svg?logo=github)](https://github.com/ElXprogramming)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Eldion%20Ryan%20Godius-0A66C2.svg?logo=linkedin)](https://www.linkedin.com/in/eldion-ryan-godius-897064235)
 [![GitHub Stars](https://img.shields.io/github/stars/ElXprogramming/EldionPortfolio?style=social)](https://github.com/ElXprogramming/EldionPortfolio/stargazers)
@@ -36,7 +36,7 @@
 - **Build Tool**: Vite 8 with Fast HMR
 - **Testing**: Vitest + ESLint
 - **Icons**: Lucide React
-- **Typography**: Plus Jakarta Sans & Fira Code
+- **Typography**: Fira Code
 
 ---
 

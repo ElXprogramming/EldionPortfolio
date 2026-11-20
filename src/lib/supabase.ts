@@ -176,23 +176,30 @@ export function createSupabaseService({ client, isConfigured }: SupabaseServiceO
     }
 
     const rows = Array.isArray(data) ? data : [];
-    return rows.reduce<ContactMessage[]>((acc, row) => {
+    const validMessages: ContactMessage[] = [];
+    for (const row of rows) {
       const parsed = contactMessageResponseSchema.safeParse(row);
-      return parsed.success ? [...acc, parsed.data] : acc;
-    }, []);
+      if (parsed.success) {
+        validMessages.push(parsed.data);
+      }
+    }
+    return validMessages;
   };
 
   const toggleMessageReadStatus = async (
     id: string,
     isRead: boolean
   ): Promise<{ id: string; is_read: boolean }> => {
-    const validated = toggleReadInputSchema.parse({ id, isRead });
+    const parsed = toggleReadInputSchema.safeParse({ id, isRead });
+    if (!parsed.success) {
+      throw new SafeUserError(parsed.error.issues[0]?.message ?? 'Invalid message update input.');
+    }
     ensureConfigured();
 
     const { data, error } = await client
       .from('contact_messages')
-      .update({ is_read: validated.isRead })
-      .eq('id', validated.id)
+      .update({ is_read: parsed.data.isRead })
+      .eq('id', parsed.data.id)
       .select('id, is_read')
       .single();
 
@@ -207,13 +214,16 @@ export function createSupabaseService({ client, isConfigured }: SupabaseServiceO
   };
 
   const deleteContactMessage = async (id: string): Promise<void> => {
-    const validatedId = messageIdSchema.parse(id);
+    const parsed = messageIdSchema.safeParse(id);
+    if (!parsed.success) {
+      throw new SafeUserError(parsed.error.issues[0]?.message ?? 'Invalid message identifier.');
+    }
     ensureConfigured();
 
     const { error } = await client
       .from('contact_messages')
       .delete()
-      .eq('id', validatedId);
+      .eq('id', parsed.data);
 
     if (error) {
       throw new Error('Database delete failed');
@@ -235,7 +245,7 @@ export function createSupabaseService({ client, isConfigured }: SupabaseServiceO
 const envConfig = validateClientEnv(import.meta.env as Record<string, unknown>);
 const inMemoryStorage = createInMemoryAuthStorage();
 
-export const supabase = createClient(
+const supabase = createClient(
   envConfig.isConfigured ? envConfig.supabaseUrl : 'https://placeholder.supabase.co',
   envConfig.isConfigured ? envConfig.supabaseAnonKey : 'placeholder-anon-key',
   {

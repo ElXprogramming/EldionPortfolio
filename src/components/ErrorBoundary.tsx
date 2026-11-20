@@ -19,8 +19,9 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // In production, log generic error without leaking sensitive internals
-    console.error('ErrorBoundary caught an error:', error.message, errorInfo.componentStack);
+    if (import.meta.env.DEV) {
+      console.error('ErrorBoundary caught an error:', error.message, errorInfo.componentStack);
+    }
   }
 
   public override render(): ReactNode {

@@ -1,20 +1,21 @@
-import { 
-  Code2, 
-  BrainCircuit, 
-  Database, 
-  CheckCircle2 
+import type { ComponentType } from 'react';
+import {
+  Code2,
+  BrainCircuit,
+  Database,
+  CheckCircle2,
 } from 'lucide-react';
 import BorderGlow from './BorderGlow';
 
 interface SkillCategory {
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   color: string;
   glowColor: string;
   glowColors: readonly [string, string, string];
   badge: string;
   description: string;
-  skills: { name: string; highlight?: boolean }[];
+  skills: readonly { name: string; highlight?: boolean }[];
 }
 
 const SKILL_CATEGORIES: readonly SkillCategory[] = [
@@ -94,13 +95,13 @@ export default function Skills() {
         </div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {SKILL_CATEGORIES.map((cat, idx) => {
             const Icon = cat.icon;
             return (
               <BorderGlow
                 key={cat.title}
-                className={`group ${idx === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                className={`group ${idx === 0 ? 'md:col-span-2 xl:col-span-1' : ''}`}
                 innerClassName="p-6 sm:p-7 justify-between"
                 backgroundColor="#111116"
                 borderRadius={16}
@@ -113,19 +114,17 @@ export default function Skills() {
                 fillOpacity={0.38}
               >
                 <div>
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl border bg-black/40 ${cat.color}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
-                          {cat.title}
-                        </h3>
-                        <span className="text-xs text-purple-300/80 font-mono font-medium">
-                          {cat.badge}
-                        </span>
-                      </div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`p-2.5 rounded-xl border bg-black/40 ${cat.color}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
+                        {cat.title}
+                      </h3>
+                      <span className="text-xs text-purple-300/80 font-mono font-medium">
+                        {cat.badge}
+                      </span>
                     </div>
                   </div>
 
@@ -136,9 +135,9 @@ export default function Skills() {
 
                 {/* Skills tags */}
                 <div className="flex flex-wrap gap-2">
-                  {cat.skills.map((skill, sIdx) => (
+                  {cat.skills.map((skill) => (
                     <span
-                      key={sIdx}
+                      key={skill.name}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
                         skill.highlight
                           ? 'bg-purple-950/60 text-purple-200 border border-purple-500/40 shadow-xs'
