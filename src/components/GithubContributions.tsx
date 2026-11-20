@@ -8,6 +8,9 @@ import {
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from '../lib/githubFallback';
 import type { GithubContributionsResponse, GithubContributionDay } from '../lib/schemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
+import BorderGlow from './BorderGlow';
+
+const GITHUB_GLOW_COLORS = ['#1ee9a7', '#2dd4bf', '#38bdf8'] as const;
 
 const getLevelColor = (level: number) => {
   switch (level) {
@@ -135,7 +138,18 @@ export default function GithubContributions() {
   }, [data.contributions]);
 
   return (
-    <div className="rounded-xl sm:rounded-2xl p-3.5 sm:p-4 bg-[#08080a] border border-white/10 shadow-lg">
+    <BorderGlow
+      innerClassName="p-3.5 sm:p-4"
+      backgroundColor="#08080a"
+      borderRadius={16}
+      glowRadius={30}
+      glowIntensity={0.85}
+      edgeSensitivity={28}
+      coneSpread={25}
+      glowColor="160 85 68"
+      colors={GITHUB_GLOW_COLORS}
+      fillOpacity={0.3}
+    >
       {/* Top Header: Badge on left, dynamic status text on right */}
       <div className="flex items-center justify-between gap-3 mb-3">
         <a
@@ -206,6 +220,6 @@ export default function GithubContributions() {
           Last pushed on {lastPushedText}
         </div>
       </div>
-    </div>
+    </BorderGlow>
   );
 }

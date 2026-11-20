@@ -12,6 +12,9 @@ import neurosortImg from '../assets/projects/neurosort-preview.webp';
 import restaurantscraperImg from '../assets/projects/restaurantscraper-preview.webp';
 import chessGameReviewImg from '../assets/projects/chess-game-review-preview.webp';
 import { EXTERNAL_LINKS } from '../lib/constants';
+import BorderGlow from './BorderGlow';
+
+const PROJECT_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
 
 interface ProjectItem {
   id: string;
@@ -152,8 +155,22 @@ export default function Projects() {
           {/* Right Column: Opened Compact Project Details Card */}
           {activeProject && (
             <div className="w-full max-w-[380px] sm:max-w-[400px] shrink-0 transition-all duration-300 relative z-0">
-              <div className="rounded-2xl border border-white/10 bg-[#111116] overflow-hidden shadow-2xl relative flex flex-col justify-between h-[340px] sm:h-[350px]">
-                
+              <BorderGlow
+                key={activeProject.id}
+                className="h-[340px] sm:h-[350px]"
+                innerClassName="p-[1px]"
+                backgroundColor="#111116"
+                borderRadius={16}
+                glowRadius={38}
+                glowIntensity={1.0}
+                edgeSensitivity={28}
+                coneSpread={25}
+                animated={true}
+                glowColor="275 85 75"
+                colors={PROJECT_GLOW_COLORS}
+                fillOpacity={0.4}
+              >
+                <div className="flex flex-col justify-between h-full rounded-[15px] overflow-hidden">
                 {/* Visual Preview Header */}
                 <div className="relative bg-zinc-950 h-28 sm:h-32 overflow-hidden border-b border-white/10 shrink-0">
                   <img
@@ -254,7 +271,8 @@ export default function Projects() {
                   </div>
 
                 </div>
-              </div>
+                </div>
+              </BorderGlow>
             </div>
           )}
 

@@ -14,6 +14,12 @@ import { GithubIcon, LinkedinIcon } from './Icons';
 import { submitContactMessage } from '../lib/supabase';
 import { createSafeErrorMessage, copyToClipboard } from '../lib/security';
 import { PROFILE, EXTERNAL_LINKS } from '../lib/constants';
+import BorderGlow from './BorderGlow';
+
+const EMAIL_GLOW_COLORS = ['#fb7185', '#f472b6', '#c084fc'] as const;
+const LINKEDIN_GLOW_COLORS = ['#38bdf8', '#60a5fa', '#818cf8'] as const;
+const GITHUB_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
+const FORM_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
 
 const INITIAL_FORM_DATA = {
   name: '',
@@ -81,7 +87,19 @@ export default function Contact() {
           {/* Direct Contact Cards (Left Column: Chunky Standalone Boxes aligned with title) */}
           <div className="flex flex-col justify-between gap-4 w-full max-w-[420px]">
             {/* Email Box */}
-            <div className="rounded-2xl p-5 sm:p-6 border border-white/10 bg-[#111116] hover:border-purple-500/30 transition-all shadow-lg flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px]">
+            <BorderGlow
+              className="flex-1"
+              innerClassName="p-5 sm:p-6 justify-between min-h-[115px] sm:min-h-[125px]"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={30}
+              glowIntensity={0.9}
+              edgeSensitivity={25}
+              coneSpread={25}
+              glowColor="345 85 75"
+              colors={EMAIL_GLOW_COLORS}
+              fillOpacity={0.35}
+            >
               <div className="flex items-center justify-between mb-3">
                 <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 shrink-0">
                   <Mail className="w-5 h-5" />
@@ -111,61 +129,99 @@ export default function Contact() {
                   {PROFILE.email}
                 </a>
               </div>
-            </div>
+            </BorderGlow>
 
             {/* LinkedIn Box */}
-            <a
-              href={EXTERNAL_LINKS.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl p-5 sm:p-6 border border-white/10 bg-[#111116] hover:border-sky-500/30 transition-all shadow-lg flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer"
+            <BorderGlow
+              className="flex-1"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={30}
+              glowIntensity={0.9}
+              edgeSensitivity={25}
+              coneSpread={25}
+              glowColor="205 90 72"
+              colors={LINKEDIN_GLOW_COLORS}
+              fillOpacity={0.35}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
-                  <LinkedinIcon className="w-5 h-5" />
+              <a
+                href={EXTERNAL_LINKS.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-[15px]"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2.5 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shrink-0">
+                    <LinkedinIcon className="w-5 h-5" />
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/5 group-hover:bg-sky-500/10 text-zinc-400 group-hover:text-sky-300 transition-colors border border-white/5">
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </div>
                 </div>
-                <div className="p-2 rounded-xl bg-white/5 group-hover:bg-sky-500/10 text-zinc-400 group-hover:text-sky-300 transition-colors border border-white/5">
-                  <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <div>
+                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
+                    LinkedIn
+                  </div>
+                  <div className="text-sm sm:text-base font-semibold text-white group-hover:text-sky-300 transition-colors truncate mt-0.5">
+                    {PROFILE.name}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-                  LinkedIn
-                </div>
-                <div className="text-sm sm:text-base font-semibold text-white group-hover:text-sky-300 transition-colors truncate mt-0.5">
-                  {PROFILE.name}
-                </div>
-              </div>
-            </a>
+              </a>
+            </BorderGlow>
 
             {/* GitHub Box */}
-            <a
-              href={EXTERNAL_LINKS.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl p-5 sm:p-6 border border-white/10 bg-[#111116] hover:border-purple-500/30 transition-all shadow-lg flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer"
+            <BorderGlow
+              className="flex-1"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={30}
+              glowIntensity={0.9}
+              edgeSensitivity={25}
+              coneSpread={25}
+              glowColor="275 85 75"
+              colors={GITHUB_GLOW_COLORS}
+              fillOpacity={0.35}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-                  <GithubIcon className="w-5 h-5" />
+              <a
+                href={EXTERNAL_LINKS.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-5 sm:p-6 flex-1 flex flex-col justify-between min-h-[115px] sm:min-h-[125px] group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/70 rounded-[15px]"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                    <GithubIcon className="w-5 h-5" />
+                  </div>
+                  <div className="p-2 rounded-xl bg-white/5 group-hover:bg-purple-500/10 text-zinc-400 group-hover:text-purple-300 transition-colors border border-white/5">
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </div>
                 </div>
-                <div className="p-2 rounded-xl bg-white/5 group-hover:bg-purple-500/10 text-zinc-400 group-hover:text-purple-300 transition-colors border border-white/5">
-                  <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <div>
+                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
+                    GitHub
+                  </div>
+                  <div className="text-sm sm:text-base font-semibold text-white group-hover:text-purple-300 transition-colors truncate mt-0.5">
+                    @{PROFILE.githubUsername}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">
-                  GitHub
-                </div>
-                <div className="text-sm sm:text-base font-semibold text-white group-hover:text-purple-300 transition-colors truncate mt-0.5">
-                  @{PROFILE.githubUsername}
-                </div>
-              </div>
-            </a>
+              </a>
+            </BorderGlow>
           </div>
 
           {/* Quick Interactive Message Form (Right Column) */}
-          <div className="rounded-2xl p-6 sm:p-8 border border-white/10 bg-[#111116] shadow-xl w-full max-w-[480px] lg:ml-auto flex flex-col justify-between">
+          <BorderGlow
+            className="w-full max-w-[480px] lg:ml-auto"
+            innerClassName="p-6 sm:p-8 justify-between"
+            backgroundColor="#111116"
+            borderRadius={16}
+            glowRadius={36}
+            glowIntensity={0.95}
+            edgeSensitivity={28}
+            coneSpread={25}
+            glowColor="275 85 75"
+            colors={FORM_GLOW_COLORS}
+            fillOpacity={0.35}
+          >
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-purple-400" />
@@ -306,7 +362,7 @@ export default function Contact() {
                 </button>
               </form>
             </div>
-          </div>
+          </BorderGlow>
         </div>
       </div>
     </section>

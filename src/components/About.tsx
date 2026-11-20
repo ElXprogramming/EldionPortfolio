@@ -5,6 +5,10 @@ import {
   MapPin 
 } from 'lucide-react';
 import GithubContributions from './GithubContributions';
+import BorderGlow from './BorderGlow';
+
+const ABOUT_GLOW_COLORS = ['#c084fc', '#f472b6', '#38bdf8'] as const;
+const EDUCATION_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
 
 const EDUCATION_ITEMS = [
   {
@@ -58,7 +62,19 @@ export default function About() {
           
           {/* Left Column: Narrative Box */}
           <div className="lg:col-span-6 flex flex-col">
-            <div className="rounded-2xl p-6 sm:p-8 bg-[#111116] border border-white/10 shadow-xl flex-1 flex flex-col justify-center">
+            <BorderGlow
+              className="flex-1"
+              innerClassName="p-6 sm:p-8 justify-center"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={36}
+              glowIntensity={0.9}
+              edgeSensitivity={28}
+              coneSpread={25}
+              glowColor="275 85 75"
+              colors={ABOUT_GLOW_COLORS}
+              fillOpacity={0.35}
+            >
               <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
                 Turning Ideas into High-Quality Software
               </h3>
@@ -77,13 +93,24 @@ export default function About() {
                   I prioritize writing maintainable, clean code with TypeScript, structuring resilient databases, and delivering user-friendly experiences.
                 </p>
               </div>
-            </div>
+            </BorderGlow>
           </div>
 
           {/* Right Column: Education Background & Languages */}
           <div className="lg:col-span-6 flex flex-col gap-5">
             {/* Education Card */}
-            <div className="rounded-2xl p-5 sm:p-6 bg-[#111116] border border-white/10 shadow-xl">
+            <BorderGlow
+              innerClassName="p-5 sm:p-6"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={32}
+              glowIntensity={0.85}
+              edgeSensitivity={28}
+              coneSpread={25}
+              glowColor="275 85 75"
+              colors={EDUCATION_GLOW_COLORS}
+              fillOpacity={0.35}
+            >
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-4 font-mono">
                 <GraduationCap className="w-4 h-4" />
                 <span>Education</span>
@@ -121,10 +148,21 @@ export default function About() {
                   </div>
                 ))}
               </div>
-            </div>
+            </BorderGlow>
 
             {/* Languages Card (Below Education) */}
-            <div className="rounded-2xl p-5 sm:p-6 bg-[#111116] border border-white/10 shadow-xl">
+            <BorderGlow
+              innerClassName="p-5 sm:p-6"
+              backgroundColor="#111116"
+              borderRadius={16}
+              glowRadius={32}
+              glowIntensity={0.85}
+              edgeSensitivity={28}
+              coneSpread={25}
+              glowColor="275 85 75"
+              colors={ABOUT_GLOW_COLORS}
+              fillOpacity={0.35}
+            >
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300 mb-3.5 font-mono">
                 <Languages className="w-4 h-4" />
                 <span>Languages</span>
@@ -142,7 +180,7 @@ export default function About() {
                   </div>
                 ))}
               </div>
-            </div>
+            </BorderGlow>
 
             {/* GitHub Contributions Monitoring Card */}
             <GithubContributions />

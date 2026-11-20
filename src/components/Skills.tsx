@@ -4,11 +4,14 @@ import {
   Database, 
   CheckCircle2 
 } from 'lucide-react';
+import BorderGlow from './BorderGlow';
 
 interface SkillCategory {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
+  glowColor: string;
+  glowColors: readonly [string, string, string];
   badge: string;
   description: string;
   skills: { name: string; highlight?: boolean }[];
@@ -19,6 +22,8 @@ const SKILL_CATEGORIES: readonly SkillCategory[] = [
     title: 'Full Stack Dev',
     icon: Code2,
     color: 'from-sky-500/20 to-blue-500/5 text-sky-400 border-sky-500/30',
+    glowColor: '205 90 72',
+    glowColors: ['#38bdf8', '#818cf8', '#c084fc'],
     badge: 'Client & Server Systems',
     description: 'Engineering responsive client interfaces with React and scalable backend APIs with Node.js and Python.',
     skills: [
@@ -38,6 +43,8 @@ const SKILL_CATEGORIES: readonly SkillCategory[] = [
     title: 'Artificial Intelligence',
     icon: BrainCircuit,
     color: 'from-amber-500/20 to-rose-500/5 text-amber-400 border-amber-500/30',
+    glowColor: '345 85 75',
+    glowColors: ['#fbbf24', '#fb7185', '#c084fc'],
     badge: 'Intelligent Systems',
     description: 'Deploying local LLMs, retrieval-augmented generation pipelines, and deterministic AI workflows.',
     skills: [
@@ -54,6 +61,8 @@ const SKILL_CATEGORIES: readonly SkillCategory[] = [
     title: 'Databases & System Tools',
     icon: Database,
     color: 'from-emerald-500/20 to-teal-500/5 text-emerald-400 border-emerald-500/30',
+    glowColor: '165 80 68',
+    glowColors: ['#34d399', '#2dd4bf', '#38bdf8'],
     badge: 'Data & Infrastructure',
     description: 'Relational database architecture, transactional ledgers, version control, and Linux systems.',
     skills: [
@@ -89,11 +98,19 @@ export default function Skills() {
           {SKILL_CATEGORIES.map((cat, idx) => {
             const Icon = cat.icon;
             return (
-              <div
-                key={idx}
-                className={`rounded-2xl p-6 sm:p-7 border border-white/10 bg-[#111116] relative overflow-hidden shadow-xl group flex flex-col justify-between ${
-                  idx === 0 ? 'md:col-span-2 lg:col-span-1' : ''
-                }`}
+              <BorderGlow
+                key={cat.title}
+                className={`group ${idx === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                innerClassName="p-6 sm:p-7 justify-between"
+                backgroundColor="#111116"
+                borderRadius={16}
+                glowRadius={36}
+                glowIntensity={0.95}
+                edgeSensitivity={28}
+                coneSpread={25}
+                glowColor={cat.glowColor}
+                colors={cat.glowColors}
+                fillOpacity={0.38}
               >
                 <div>
                   <div className="flex items-start justify-between gap-4 mb-4">
@@ -135,7 +152,7 @@ export default function Skills() {
                     </span>
                   ))}
                 </div>
-              </div>
+              </BorderGlow>
             );
           })}
         </div>
