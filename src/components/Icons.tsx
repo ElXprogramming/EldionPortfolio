@@ -34,3 +34,22 @@ export function LinkedinIcon({ className = 'w-4 h-4' }: { className?: string }) 
     </svg>
   );
 }
+
+export function LeetCodeIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M13.5 3.5 6.8 10.2a4.5 4.5 0 0 0 0 6.4l1.1 1.1a4.5 4.5 0 0 0 6.4 0l3.2-3.2" />
+      <path d="M9.5 7.5 14 3" />
+      <path d="M11 13.5h8.5" />
+    </svg>
+  );
+}

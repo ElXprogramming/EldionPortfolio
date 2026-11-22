@@ -5,6 +5,7 @@ import {
   MapPin 
 } from 'lucide-react';
 import GithubContributions from './GithubContributions';
+import LeetCodeStats from './LeetCodeStats';
 import BorderGlow from './BorderGlow';
 
 const EDUCATION_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
@@ -59,8 +60,8 @@ export default function About() {
         {/* Content Grid: Narrative (Left) | Education & Languages (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
-          {/* Left Column: Narrative Box */}
-          <div className="lg:col-span-6 flex flex-col">
+          {/* Left Column: Narrative Box & Compact LeetCode Card */}
+          <div className="lg:col-span-6 flex flex-col gap-5">
             <BorderGlow
               className="flex-1"
               innerClassName="p-6 sm:p-8 justify-center"
@@ -83,8 +84,7 @@ export default function About() {
                 </p>
                 
                 <p>
-                  My journey centers around practical building: from engineering 
-                  <span className="text-purple-300 font-medium"> Declaraform</span> to eliminate the friction of manual academic PDF editing for peers in FKI, to developing full-stack web applications and intelligent data-driven solutions.
+                  My journey centers around practical building, developing full-stack web applications and intelligent data-driven solutions.
                 </p>
 
                 <p>
@@ -92,6 +92,9 @@ export default function About() {
                 </p>
               </div>
             </BorderGlow>
+
+            {/* Compact LeetCode Stats Card */}
+            <LeetCodeStats />
           </div>
 
           {/* Right Column: Education Background & Languages */}

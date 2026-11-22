@@ -1,6 +1,71 @@
-import { defineConfig } from 'vite';
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { GET as handleLeetCodeGet } from './api/leetcode.ts';
+
+function attachLeetCodeMiddleware(
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: () => void
+): void {
+  const pathname = (req.url ?? '').split('?')[0];
+  if (pathname !== '/api/leetcode') {
+    next();
+    return;
+  }
+
+  if ((req.method ?? 'GET').toUpperCase() !== 'GET') {
+    res.statusCode = 405;
+    res.setHeader('Allow', 'GET');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.end(JSON.stringify({ error: 'Method not allowed.' }));
+    return;
+  }
+
+  const host = req.headers.host ?? 'localhost:5173';
+  const requestUrl = `http://${host}${req.url ?? '/api/leetcode'}`;
+  const headers = new Headers();
+
+  for (const key of ['origin', 'x-forwarded-for', 'x-real-ip'] as const) {
+    const raw = req.headers[key];
+    if (typeof raw === 'string') {
+      headers.set(key, raw);
+    } else if (Array.isArray(raw) && raw.length > 0) {
+      headers.set(key, raw.join(', '));
+    }
+  }
+
+  void handleLeetCodeGet(new Request(requestUrl, { method: 'GET', headers }))
+    .then(async (webRes) => {
+      res.statusCode = webRes.status;
+      webRes.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
+      res.end(await webRes.text());
+    })
+    .catch(() => {
+      res.statusCode = 502;
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.end(JSON.stringify({ error: 'Unable to fetch LeetCode statistics.' }));
+    });
+}
+
+function leetcodeApiDevPlugin(): Plugin {
+  return {
+    name: 'leetcode-api-dev-proxy',
+    configureServer(server) {
+      server.middlewares.use(attachLeetCodeMiddleware);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(attachLeetCodeMiddleware);
+    },
+  };
+}
 
 const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   'X-Content-Type-Options': 'nosniff',
@@ -24,7 +89,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), leetcodeApiDevPlugin()],
   server: {
     host: true, // listen on 0.0.0.0 (required for tunnel)
     port: 5173,

@@ -5,11 +5,15 @@ export const PROFILE = {
   role: 'Software Engineering',
   email: 'nayrnoidle@gmail.com',
   githubUsername: 'ElXprogramming',
+  leetcodeUsername: 'catbeast1000',
 } as const;
 
 export const EXTERNAL_LINKS = {
   github:
     sanitizeExternalUrl(`https://github.com/${PROFILE.githubUsername}`, ['github.com']) ?? '#',
+  leetcode:
+    sanitizeExternalUrl(`https://leetcode.com/u/${PROFILE.leetcodeUsername}/`, ['leetcode.com']) ??
+    '#',
   linkedin:
     sanitizeExternalUrl(
       'https://www.linkedin.com/in/eldion-ryan-godius-897064235',

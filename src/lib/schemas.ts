@@ -161,3 +161,22 @@ export const githubContributionsResponseSchema = z
   .strip();
 
 export type GithubContributionsResponse = z.infer<typeof githubContributionsResponseSchema>;
+
+export const leetcodeStatsResponseSchema = z
+  .object({
+    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
+    totalSolved: z.number().int().nonnegative(),
+    totalQuestions: z.number().int().nonnegative(),
+    easySolved: z.number().int().nonnegative(),
+    totalEasy: z.number().int().nonnegative(),
+    mediumSolved: z.number().int().nonnegative(),
+    totalMedium: z.number().int().nonnegative(),
+    hardSolved: z.number().int().nonnegative(),
+    totalHard: z.number().int().nonnegative(),
+    ranking: z.number().int().nonnegative(),
+    streak: z.number().int().nonnegative(),
+    totalActiveDays: z.number().int().nonnegative(),
+  })
+  .strip();
+
+export type LeetCodeStatsResponse = z.infer<typeof leetcodeStatsResponseSchema>;
