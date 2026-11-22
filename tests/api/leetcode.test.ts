@@ -10,7 +10,7 @@ const MOCK_UPSTREAM_RESPONSE = {
       { difficulty: 'Hard', count: 993 },
     ],
     matchedUser: {
-      username: 'catbeast1000',
+      username: 'eldion03',
       profile: {
         ranking: 5000001,
         secretInternalField: 'do-not-expose',
@@ -61,7 +61,7 @@ describe('GET /api/leetcode serverless proxy', () => {
 
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'catbeast1000',
+      username: 'eldion03',
       totalSolved: 3,
       totalQuestions: 4123,
       easySolved: 3,

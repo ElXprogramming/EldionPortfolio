@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const LEETCODE_GRAPHQL_URL = 'https://leetcode.com/graphql';
-const LEETCODE_USERNAME = 'catbeast1000';
+const LEETCODE_USERNAME = 'eldion03';
 const UPSTREAM_TIMEOUT_MS = 8_000;
 const MAX_UPSTREAM_BYTES = 64 * 1024;
 const RATE_LIMIT_MAX_REQUESTS = 30;

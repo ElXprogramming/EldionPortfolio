@@ -5,7 +5,7 @@ export const PROFILE = {
   role: 'Software Engineering',
   email: 'nayrnoidle@gmail.com',
   githubUsername: 'ElXprogramming',
-  leetcodeUsername: 'catbeast1000',
+  leetcodeUsername: 'eldion03',
 } as const;
 
 export const EXTERNAL_LINKS = {
