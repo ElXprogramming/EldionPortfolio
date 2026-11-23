@@ -23,9 +23,6 @@ const LEETCODE_STATS_QUERY = `
       count
     }
     matchedUser(username: $username) {
-      profile {
-        ranking
-      }
       submitStatsGlobal {
         acSubmissionNum {
           difficulty
@@ -56,13 +53,6 @@ const upstreamGraphqlResponseSchema = z
         allQuestionsCount: z.array(difficultyCountSchema),
         matchedUser: z
           .object({
-            profile: z
-              .object({
-                ranking: z.number().int().nonnegative().nullable().optional(),
-              })
-              .strip()
-              .nullable()
-              .optional(),
             submitStatsGlobal: z
               .object({
                 acSubmissionNum: z.array(difficultyCountSchema),
@@ -94,7 +84,6 @@ const leetcodeStatsPayloadSchema = z
     totalMedium: z.number().int().nonnegative(),
     hardSolved: z.number().int().nonnegative(),
     totalHard: z.number().int().nonnegative(),
-    ranking: z.number().int().nonnegative(),
     streak: z.number().int().nonnegative(),
     totalActiveDays: z.number().int().nonnegative(),
   })
@@ -297,7 +286,6 @@ export async function GET(request: Request): Promise<Response> {
       totalMedium: getCountByDifficulty(allQuestions, 'Medium'),
       hardSolved: getCountByDifficulty(solvedCounts, 'Hard'),
       totalHard: getCountByDifficulty(allQuestions, 'Hard'),
-      ranking: matchedUser.profile?.ranking ?? 0,
       streak: matchedUser.userCalendar?.streak ?? 0,
       totalActiveDays: matchedUser.userCalendar?.totalActiveDays ?? 0,
     });

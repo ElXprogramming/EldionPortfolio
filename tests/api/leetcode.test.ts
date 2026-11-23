@@ -69,11 +69,11 @@ describe('GET /api/leetcode serverless proxy', () => {
       totalMedium: 2152,
       hardSolved: 0,
       totalHard: 993,
-      ranking: 5000001,
       streak: 2,
       totalActiveDays: 3,
     });
     expect('username' in body).toBe(false);
+    expect('ranking' in body).toBe(false);
     expect('secretInternalField' in body).toBe(false);
 
     expect(res.headers.get('cache-control')).toContain('s-maxage=3600');

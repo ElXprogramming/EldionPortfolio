@@ -6,7 +6,6 @@ import {
   calculateDifficultyBarWidth,
   calculateOverallProgress,
   fetchLeetCodeStats,
-  formatLeetCodeRank,
 } from '../lib/leetcode';
 import { LEETCODE_STATS_FALLBACK } from '../lib/leetcodeFallback';
 import type { LeetCodeStatsResponse } from '../lib/schemas';
@@ -34,8 +33,6 @@ export default function LeetCodeStats() {
       isMounted = false;
     };
   }, []);
-
-  const formattedRank = useMemo(() => formatLeetCodeRank(stats.ranking), [stats.ranking]);
 
   const ringStrokeOffset = useMemo(() => {
     const progress = calculateOverallProgress(stats.totalSolved, stats.totalQuestions);
@@ -85,7 +82,7 @@ export default function LeetCodeStats() {
       colors={LEETCODE_GLOW_COLORS}
       fillOpacity={0.3}
     >
-      {/* Top Header: Profile pill + Global rank */}
+      {/* Top Header: Profile pill */}
       <div className="flex items-center justify-between gap-2 mb-2.5">
         <a
           href={EXTERNAL_LINKS.leetcode}
@@ -96,10 +93,6 @@ export default function LeetCodeStats() {
           <LeetCodeIcon className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-300 transition-colors" />
           <span>LeetCode stats</span>
         </a>
-
-        <div className="text-[11px] text-zinc-400 font-normal text-right truncate">
-          Rank <span className="font-semibold text-zinc-200 font-mono">{formattedRank}</span>
-        </div>
       </div>
 
       {/* Compact Stats Row: Mini solved ring + Easy/Med/Hard micro-bars */}

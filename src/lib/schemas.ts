@@ -172,7 +172,6 @@ export const leetcodeStatsResponseSchema = z
     totalMedium: z.number().int().nonnegative(),
     hardSolved: z.number().int().nonnegative(),
     totalHard: z.number().int().nonnegative(),
-    ranking: z.number().int().nonnegative(),
     streak: z.number().int().nonnegative(),
     totalActiveDays: z.number().int().nonnegative(),
   })

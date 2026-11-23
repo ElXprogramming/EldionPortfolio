@@ -4,7 +4,6 @@ import { LEETCODE_STATS_FALLBACK } from './leetcodeFallback';
 const LEETCODE_API_PATH = '/api/leetcode';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const REQUEST_TIMEOUT_MS = 8_000;
-const UNRANKED_THRESHOLD = 5_000_000;
 
 interface CacheEntry<T> {
   data: T;
@@ -64,16 +63,6 @@ export async function fetchLeetCodeStats(): Promise<LeetCodeStatsResponse> {
 
   inFlightRequest = request;
   return request;
-}
-
-export function formatLeetCodeRank(ranking: number): string {
-  if (!Number.isFinite(ranking) || ranking <= 0) {
-    return 'Unranked';
-  }
-  if (ranking > UNRANKED_THRESHOLD) {
-    return '>5,000,000';
-  }
-  return `#${Math.floor(ranking).toLocaleString('en-US')}`;
 }
 
 export function calculateDifficultyBarWidth(solved: number, total: number): number {

@@ -4,23 +4,11 @@ import {
   calculateOverallProgress,
   clearLeetCodeCache,
   fetchLeetCodeStats,
-  formatLeetCodeRank,
 } from '../leetcode';
 import { LEETCODE_STATS_FALLBACK } from '../leetcodeFallback';
 import { leetcodeStatsResponseSchema } from '../schemas';
 
 describe('LeetCode Utilities & Schema', () => {
-  describe('formatLeetCodeRank', () => {
-    it('formats active ranks with commas, caps >5M sentinel, and handles unranked values', () => {
-      expect(formatLeetCodeRank(123456)).toBe('#123,456');
-      expect(formatLeetCodeRank(5000000)).toBe('#5,000,000');
-      expect(formatLeetCodeRank(5000001)).toBe('>5,000,000');
-      expect(formatLeetCodeRank(0)).toBe('Unranked');
-      expect(formatLeetCodeRank(-10)).toBe('Unranked');
-      expect(formatLeetCodeRank(Number.NaN)).toBe('Unranked');
-    });
-  });
-
   describe('progress bar calculations', () => {
     it('returns 0 for zero/invalid values and applies visible minimum width for positive solves', () => {
       expect(calculateDifficultyBarWidth(0, 978)).toBe(0);
@@ -55,6 +43,7 @@ describe('LeetCode Utilities & Schema', () => {
 
       expect(parsed.totalSolved).toBe(15);
       expect('username' in parsed).toBe(false);
+      expect('ranking' in parsed).toBe(false);
       expect('injectedField' in parsed).toBe(false);
     });
 
@@ -83,7 +72,6 @@ describe('fetchLeetCodeStats', () => {
     totalMedium: 2152,
     hardSolved: 0,
     totalHard: 993,
-    ranking: 1450200,
     streak: 4,
     totalActiveDays: 9,
   };
