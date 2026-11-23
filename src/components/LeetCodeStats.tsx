@@ -162,9 +162,8 @@ export default function LeetCodeStats() {
         </div>
       </div>
 
-      {/* Bottom Footer: Handle + Streak / Active Days */}
-      <div className="flex items-center justify-between gap-2 pt-0.5 text-[10px] sm:text-[11px] text-zinc-500">
-        <span className="font-mono truncate">@{stats.username}</span>
+      {/* Bottom Footer: Streak / Active Days */}
+      <div className="flex items-center justify-end gap-2 pt-0.5 text-[10px] sm:text-[11px] text-zinc-500">
         <div className="flex items-center gap-2 shrink-0">
           <span className="inline-flex items-center gap-1 text-zinc-400">
             <Flame className="w-3 h-3 text-amber-400" aria-hidden="true" />

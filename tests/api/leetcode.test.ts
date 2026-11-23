@@ -61,7 +61,6 @@ describe('GET /api/leetcode serverless proxy', () => {
 
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion03',
       totalSolved: 3,
       totalQuestions: 4123,
       easySolved: 3,
@@ -74,6 +73,7 @@ describe('GET /api/leetcode serverless proxy', () => {
       streak: 2,
       totalActiveDays: 3,
     });
+    expect('username' in body).toBe(false);
     expect('secretInternalField' in body).toBe(false);
 
     expect(res.headers.get('cache-control')).toContain('s-maxage=3600');

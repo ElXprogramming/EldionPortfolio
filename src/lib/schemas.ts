@@ -164,7 +164,6 @@ export type GithubContributionsResponse = z.infer<typeof githubContributionsResp
 
 export const leetcodeStatsResponseSchema = z
   .object({
-    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
     totalSolved: z.number().int().nonnegative(),
     totalQuestions: z.number().int().nonnegative(),
     easySolved: z.number().int().nonnegative(),

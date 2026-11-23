@@ -1,9 +1,7 @@
-import { PROFILE } from './constants';
 import type { LeetCodeStatsResponse } from './schemas';
 
 // Bundled snapshot for instant initial render and offline resilience
 export const LEETCODE_STATS_FALLBACK: LeetCodeStatsResponse = {
-  username: PROFILE.leetcodeUsername,
   totalSolved: 3,
   totalQuestions: 4123,
   easySolved: 3,

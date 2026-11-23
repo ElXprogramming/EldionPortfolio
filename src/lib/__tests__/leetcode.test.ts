@@ -36,9 +36,9 @@ describe('LeetCode Utilities & Schema', () => {
   });
 
   describe('leetcodeStatsResponseSchema & fallback snapshot', () => {
-    it('validates clean payloads, sanitizes username, and strips unexpected fields', () => {
+    it('validates clean payloads and strips unexpected fields', () => {
       const parsed = leetcodeStatsResponseSchema.parse({
-        username: '  eldion03<script>alert(1)</script>  ',
+        username: 'eldion03',
         totalSolved: 15,
         totalQuestions: 4123,
         easySolved: 10,
@@ -53,15 +53,14 @@ describe('LeetCode Utilities & Schema', () => {
         injectedField: 'should-be-stripped',
       });
 
-      expect(parsed.username).toBe('eldion03');
       expect(parsed.totalSolved).toBe(15);
+      expect('username' in parsed).toBe(false);
       expect('injectedField' in parsed).toBe(false);
     });
 
     it('rejects malformed or negative stat payloads', () => {
       expect(() =>
         leetcodeStatsResponseSchema.parse({
-          username: 'eldion03',
           totalSolved: -1,
         })
       ).toThrow();
@@ -69,7 +68,6 @@ describe('LeetCode Utilities & Schema', () => {
 
     it('validates the bundled fallback snapshot', () => {
       const parsed = leetcodeStatsResponseSchema.parse(LEETCODE_STATS_FALLBACK);
-      expect(parsed.username).toBe('eldion03');
       expect(parsed.totalSolved).toBeGreaterThanOrEqual(0);
     });
   });
@@ -77,7 +75,6 @@ describe('LeetCode Utilities & Schema', () => {
 
 describe('fetchLeetCodeStats', () => {
   const sampleStats = {
-    username: 'eldion03',
     totalSolved: 12,
     totalQuestions: 4123,
     easySolved: 9,
