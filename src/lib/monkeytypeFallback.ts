@@ -1,9 +1,9 @@
 import type { MonkeytypeStatsResponse } from './schemas';
 
-// Bundled snapshot for instant initial render and offline resilience
+// Bundled snapshot (30s time mode) for instant initial render and offline resilience
 export const MONKEYTYPE_STATS_FALLBACK: MonkeytypeStatsResponse = {
-  topWpm: 128,
-  accuracy: 100,
-  mode: 'words',
-  modeValue: '10',
+  topWpm: 108,
+  accuracy: 93,
+  mode: 'time',
+  modeValue: '30',
 };

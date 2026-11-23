@@ -189,11 +189,8 @@ export const monkeytypeStatsResponseSchema = z
   .object({
     topWpm: z.number().int().nonnegative(),
     accuracy: z.number().int().min(0).max(100),
-    mode: z.enum(['time', 'words']).nullable(),
-    modeValue: z
-      .string()
-      .regex(/^\d{1,5}$/)
-      .nullable(),
+    mode: z.literal('time').nullable(),
+    modeValue: z.literal('30').nullable(),
   })
   .strip();
 

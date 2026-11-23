@@ -1,7 +1,7 @@
 import { monkeytypeStatsResponseSchema, type MonkeytypeStatsResponse } from './schemas';
 import { MONKEYTYPE_STATS_FALLBACK } from './monkeytypeFallback';
 
-const MONKEYTYPE_API_PATH = '/api/monkeytype';
+const MONKEYTYPE_API_PATH = '/api/monkeytype?mode=30s';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const REQUEST_TIMEOUT_MS = 8_000;
 
@@ -79,5 +79,5 @@ export function formatMonkeytypeMode(
   if (!mode || !modeValue) {
     return null;
   }
-  return mode === 'time' ? `${modeValue}s` : `${modeValue} words`;
+  return `${modeValue}s`;
 }

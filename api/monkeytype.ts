@@ -9,7 +9,6 @@ const MAX_UPSTREAM_BYTES = 64 * 1024;
 const RATE_LIMIT_MAX_REQUESTS = 30;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const MAX_RATE_LIMIT_BUCKETS = 500;
-const SAFE_MODE_VALUE_REGEX = /^\d{1,5}$/;
 
 const ALLOWED_ORIGINS: ReadonlySet<string> = new Set([
   'https://eldionryanportfolio.vercel.app',
@@ -19,7 +18,13 @@ const ALLOWED_ORIGINS: ReadonlySet<string> = new Set([
   'http://127.0.0.1:4173',
 ]);
 
-const queryParamsSchema = z.object({}).strip();
+const MONKEYTYPE_TARGET_TIME_SECONDS = '30';
+
+const queryParamsSchema = z
+  .object({
+    mode: z.literal('30s').optional(),
+  })
+  .strip();
 
 const upstreamPersonalBestEntrySchema = z
   .object({
@@ -28,19 +33,20 @@ const upstreamPersonalBestEntrySchema = z
   })
   .strip();
 
-const upstreamPersonalBestsBucketSchema = z.record(
-  z.string(),
-  z.array(upstreamPersonalBestEntrySchema)
-);
-
 const upstreamMonkeytypeProfileSchema = z
   .object({
     data: z
       .object({
         personalBests: z
           .object({
-            time: upstreamPersonalBestsBucketSchema.optional(),
-            words: upstreamPersonalBestsBucketSchema.optional(),
+            time: z
+              .object({
+                [MONKEYTYPE_TARGET_TIME_SECONDS]: z
+                  .array(upstreamPersonalBestEntrySchema)
+                  .optional(),
+              })
+              .strip()
+              .optional(),
           })
           .strip()
           .optional(),
@@ -53,23 +59,18 @@ const monkeytypeStatsPayloadSchema = z
   .object({
     topWpm: z.number().int().nonnegative(),
     accuracy: z.number().int().min(0).max(100),
-    mode: z.enum(['time', 'words']).nullable(),
-    modeValue: z
-      .string()
-      .regex(SAFE_MODE_VALUE_REGEX)
-      .nullable(),
+    mode: z.literal('time').nullable(),
+    modeValue: z.literal(MONKEYTYPE_TARGET_TIME_SECONDS).nullable(),
   })
   .strip();
 
-type UpstreamPersonalBests = NonNullable<
-  z.infer<typeof upstreamMonkeytypeProfileSchema>['data']['personalBests']
->;
+type UpstreamPersonalBestEntry = z.infer<typeof upstreamPersonalBestEntrySchema>;
 
 interface TopPersonalBest {
   topWpm: number;
   accuracy: number;
-  mode: 'time' | 'words' | null;
-  modeValue: string | null;
+  mode: 'time' | null;
+  modeValue: typeof MONKEYTYPE_TARGET_TIME_SECONDS | null;
 }
 
 const rateLimitBuckets = new Map<string, number[]>();
@@ -140,31 +141,19 @@ function buildSecurityHeaders(request: Request, cacheControl: string): Headers {
   return headers;
 }
 
-function extractTopPersonalBest(personalBests?: UpstreamPersonalBests): TopPersonalBest {
+function extractTopTime30Best(entries?: readonly UpstreamPersonalBestEntry[]): TopPersonalBest {
   let bestWpmRaw = 0;
   let bestAccRaw = 0;
-  let bestMode: 'time' | 'words' | null = null;
-  let bestModeValue: string | null = null;
 
-  const modes: ReadonlyArray<'time' | 'words'> = ['time', 'words'];
-  for (const mode of modes) {
-    const bucket = personalBests?.[mode];
-    if (!bucket) continue;
+  if (entries) {
+    for (const entry of entries) {
+      const acc = entry.acc ?? 0;
+      const isFaster = entry.wpm > bestWpmRaw;
+      const isTieWithBetterAcc = entry.wpm === bestWpmRaw && bestWpmRaw > 0 && acc > bestAccRaw;
 
-    for (const [modeValue, entries] of Object.entries(bucket)) {
-      if (!SAFE_MODE_VALUE_REGEX.test(modeValue)) continue;
-
-      for (const entry of entries) {
-        const acc = entry.acc ?? 0;
-        const isFaster = entry.wpm > bestWpmRaw;
-        const isTieWithBetterAcc = entry.wpm === bestWpmRaw && bestWpmRaw > 0 && acc > bestAccRaw;
-
-        if (isFaster || isTieWithBetterAcc) {
-          bestWpmRaw = entry.wpm;
-          bestAccRaw = acc;
-          bestMode = mode;
-          bestModeValue = modeValue;
-        }
+      if (isFaster || isTieWithBetterAcc) {
+        bestWpmRaw = entry.wpm;
+        bestAccRaw = acc;
       }
     }
   }
@@ -172,8 +161,8 @@ function extractTopPersonalBest(personalBests?: UpstreamPersonalBests): TopPerso
   return {
     topWpm: Math.round(bestWpmRaw),
     accuracy: Math.min(100, Math.max(0, Math.round(bestAccRaw))),
-    mode: bestWpmRaw > 0 ? bestMode : null,
-    modeValue: bestWpmRaw > 0 ? bestModeValue : null,
+    mode: bestWpmRaw > 0 ? 'time' : null,
+    modeValue: bestWpmRaw > 0 ? MONKEYTYPE_TARGET_TIME_SECONDS : null,
   };
 }
 
@@ -283,7 +272,9 @@ export async function GET(request: Request): Promise<Response> {
     const rawJson: unknown = JSON.parse(rawText);
     const validatedUpstream = upstreamMonkeytypeProfileSchema.parse(rawJson);
 
-    const best = extractTopPersonalBest(validatedUpstream.data.personalBests);
+    const best = extractTopTime30Best(
+      validatedUpstream.data.personalBests?.time?.[MONKEYTYPE_TARGET_TIME_SECONDS]
+    );
 
     const payload = monkeytypeStatsPayloadSchema.parse({
       topWpm: best.topWpm,

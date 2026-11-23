@@ -21,53 +21,52 @@ describe('Monkeytype Utilities & Schema', () => {
   });
 
   describe('formatMonkeytypeMode', () => {
-    it('formats time and words modes cleanly and handles missing values', () => {
-      expect(formatMonkeytypeMode('words', '10')).toBe('10 words');
+    it('formats 30s time mode cleanly and handles missing values', () => {
       expect(formatMonkeytypeMode('time', '30')).toBe('30s');
       expect(formatMonkeytypeMode(null, null)).toBeNull();
-      expect(formatMonkeytypeMode('words', null)).toBeNull();
+      expect(formatMonkeytypeMode('time', null)).toBeNull();
     });
   });
 
   describe('monkeytypeStatsResponseSchema & fallback snapshot', () => {
-    it('validates clean payloads and strips unexpected fields', () => {
+    it('validates clean 30s time payloads and strips unexpected fields', () => {
       const parsed = monkeytypeStatsResponseSchema.parse({
         username: 'eldion',
-        topWpm: 128,
-        accuracy: 100,
-        mode: 'words',
-        modeValue: '10',
+        topWpm: 108,
+        accuracy: 93,
+        mode: 'time',
+        modeValue: '30',
         uid: 'secret-uid-should-be-stripped',
         xp: 586802,
       });
 
       expect(parsed).toEqual({
-        topWpm: 128,
-        accuracy: 100,
-        mode: 'words',
-        modeValue: '10',
+        topWpm: 108,
+        accuracy: 93,
+        mode: 'time',
+        modeValue: '30',
       });
       expect('username' in parsed).toBe(false);
       expect('uid' in parsed).toBe(false);
       expect('xp' in parsed).toBe(false);
     });
 
-    it('rejects malformed accuracy, negative WPM, or invalid modeValue payloads', () => {
+    it('rejects malformed accuracy, negative WPM, non-30s modes, or invalid modeValue payloads', () => {
       expect(() =>
         monkeytypeStatsResponseSchema.parse({
           topWpm: -5,
-          accuracy: 100,
-          mode: 'words',
-          modeValue: '10',
+          accuracy: 93,
+          mode: 'time',
+          modeValue: '30',
         })
       ).toThrow();
 
       expect(() =>
         monkeytypeStatsResponseSchema.parse({
-          topWpm: 128,
+          topWpm: 108,
           accuracy: 105,
-          mode: 'words',
-          modeValue: '10',
+          mode: 'time',
+          modeValue: '30',
         })
       ).toThrow();
 
@@ -76,6 +75,15 @@ describe('Monkeytype Utilities & Schema', () => {
           topWpm: 128,
           accuracy: 100,
           mode: 'words',
+          modeValue: '10',
+        })
+      ).toThrow();
+
+      expect(() =>
+        monkeytypeStatsResponseSchema.parse({
+          topWpm: 108,
+          accuracy: 93,
+          mode: 'time',
           modeValue: '<img src=x>',
         })
       ).toThrow();
@@ -84,16 +92,18 @@ describe('Monkeytype Utilities & Schema', () => {
     it('validates the bundled fallback snapshot', () => {
       const parsed = monkeytypeStatsResponseSchema.parse(MONKEYTYPE_STATS_FALLBACK);
       expect(parsed.topWpm).toBeGreaterThan(0);
+      expect(parsed.mode).toBe('time');
+      expect(parsed.modeValue).toBe('30');
     });
   });
 });
 
 describe('fetchMonkeytypeStats', () => {
   const sampleStats = {
-    topWpm: 135,
-    accuracy: 99,
-    mode: 'words' as const,
-    modeValue: '10',
+    topWpm: 115,
+    accuracy: 96,
+    mode: 'time' as const,
+    modeValue: '30' as const,
   };
 
   beforeEach(() => {
@@ -106,7 +116,7 @@ describe('fetchMonkeytypeStats', () => {
     clearMonkeytypeCache();
   });
 
-  it('deduplicates concurrent in-flight requests to /api/monkeytype', async () => {
+  it('deduplicates concurrent in-flight requests to /api/monkeytype?mode=30s', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       status: 200,
@@ -118,7 +128,7 @@ describe('fetchMonkeytypeStats', () => {
     expect(b).toEqual(sampleStats);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/monkeytype',
+      '/api/monkeytype?mode=30s',
       expect.objectContaining({ headers: { Accept: 'application/json' } })
     );
   });

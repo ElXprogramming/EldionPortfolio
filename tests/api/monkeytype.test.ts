@@ -55,7 +55,7 @@ describe('GET /api/monkeytype serverless proxy', () => {
     vi.restoreAllMocks();
   });
 
-  it('proxies Monkeytype profile, picks highest WPM, filters sensitive fields, and sets cache + security headers', async () => {
+  it('proxies Monkeytype profile, picks best 30s time WPM, filters sensitive fields, and sets cache + security headers', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
       new Response(JSON.stringify(MOCK_UPSTREAM_RESPONSE), {
         status: 200,
@@ -63,7 +63,9 @@ describe('GET /api/monkeytype serverless proxy', () => {
       })
     );
 
-    const res = await GET(makeRequest('198.51.100.30', 'https://eldionryanportfolio.vercel.app'));
+    const res = await GET(
+      makeRequest('198.51.100.30', 'https://eldionryanportfolio.vercel.app', '?mode=30s')
+    );
     expect(res.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -79,10 +81,10 @@ describe('GET /api/monkeytype serverless proxy', () => {
 
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      topWpm: 128,
-      accuracy: 100,
-      mode: 'words',
-      modeValue: '10',
+      topWpm: 108,
+      accuracy: 93,
+      mode: 'time',
+      modeValue: '30',
     });
     expect('username' in body).toBe(false);
     expect('uid' in body).toBe(false);
@@ -100,7 +102,7 @@ describe('GET /api/monkeytype serverless proxy', () => {
     );
   });
 
-  it('breaks WPM ties using highest accuracy and ignores unsafe mode keys', async () => {
+  it('breaks 30s WPM ties using highest accuracy and ignores other modes or unsafe keys', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
       new Response(
         JSON.stringify({
@@ -108,9 +110,15 @@ describe('GET /api/monkeytype serverless proxy', () => {
             name: 'eldion',
             personalBests: {
               time: {
-                '15': [{ wpm: 120, acc: 94.2 }],
-                '30': [{ wpm: 120, acc: 98.7 }],
+                '15': [{ wpm: 145, acc: 100 }],
+                '30': [
+                  { wpm: 120, acc: 94.2 },
+                  { wpm: 120, acc: 98.7 },
+                ],
                 '<script>': [{ wpm: 999, acc: 100 }],
+              },
+              words: {
+                '10': [{ wpm: 160, acc: 100 }],
               },
             },
           },
@@ -152,6 +160,12 @@ describe('GET /api/monkeytype serverless proxy', () => {
       mode: null,
       modeValue: null,
     });
+  });
+
+  it('rejects invalid mode query parameters with 400', async () => {
+    const res = await GET(makeRequest('198.51.100.38', undefined, '?mode=invalid'));
+    expect(res.status).toBe(400);
+    expect(res.headers.get('cache-control')).toBe('no-store');
   });
 
   it('does not reflect untrusted origins in Access-Control-Allow-Origin', async () => {
