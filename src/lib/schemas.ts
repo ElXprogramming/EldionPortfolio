@@ -181,25 +181,26 @@ export const leetcodeStatsResponseSchema = z
 
 export type LeetCodeStatsResponse = z.infer<typeof leetcodeStatsResponseSchema>;
 
-export const chessModeStatsSchema = z
-  .object({
-    rating: z.number().int().nonnegative(),
-    best: z.number().int().nonnegative(),
-    win: z.number().int().nonnegative(),
-    loss: z.number().int().nonnegative(),
-    draw: z.number().int().nonnegative(),
-  })
-  .strip();
-
-export type ChessModeStats = z.infer<typeof chessModeStatsSchema>;
-
 export const chessStatsResponseSchema = z
   .object({
     username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
-    rapid: chessModeStatsSchema,
-    blitz: chessModeStatsSchema,
-    bullet: chessModeStatsSchema,
+    rapidRating: z.number().int().nonnegative(),
   })
   .strip();
 
 export type ChessStatsResponse = z.infer<typeof chessStatsResponseSchema>;
+
+export const monkeytypeStatsResponseSchema = z
+  .object({
+    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
+    topWpm: z.number().int().nonnegative(),
+    accuracy: z.number().int().min(0).max(100),
+    mode: z.enum(['time', 'words']).nullable(),
+    modeValue: z
+      .string()
+      .regex(/^\d{1,5}$/)
+      .nullable(),
+  })
+  .strip();
+
+export type MonkeytypeStatsResponse = z.infer<typeof monkeytypeStatsResponseSchema>;

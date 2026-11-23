@@ -7,6 +7,7 @@ export const PROFILE = {
   githubUsername: 'ElXprogramming',
   leetcodeUsername: 'eldion03',
   chessUsername: 'eldion_03',
+  monkeytypeUsername: 'eldion',
 } as const;
 
 export const EXTERNAL_LINKS = {
@@ -18,6 +19,10 @@ export const EXTERNAL_LINKS = {
   chess:
     sanitizeExternalUrl(`https://www.chess.com/member/${PROFILE.chessUsername}`, ['www.chess.com']) ??
     '#',
+  monkeytype:
+    sanitizeExternalUrl(`https://monkeytype.com/profile/${PROFILE.monkeytypeUsername}`, [
+      'monkeytype.com',
+    ]) ?? '#',
   linkedin:
     sanitizeExternalUrl(
       'https://www.linkedin.com/in/eldion-ryan-godius-897064235',

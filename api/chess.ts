@@ -20,25 +20,11 @@ const ALLOWED_ORIGINS: ReadonlySet<string> = new Set([
 
 const queryParamsSchema = z.object({}).strip();
 
-const upstreamModeStatsSchema = z
+const upstreamRapidStatsSchema = z
   .object({
     last: z
       .object({
         rating: z.number().int().nonnegative(),
-      })
-      .strip()
-      .optional(),
-    best: z
-      .object({
-        rating: z.number().int().nonnegative(),
-      })
-      .strip()
-      .optional(),
-    record: z
-      .object({
-        win: z.number().int().nonnegative().optional(),
-        loss: z.number().int().nonnegative().optional(),
-        draw: z.number().int().nonnegative().optional(),
       })
       .strip()
       .optional(),
@@ -47,33 +33,16 @@ const upstreamModeStatsSchema = z
 
 const upstreamChessStatsSchema = z
   .object({
-    chess_rapid: upstreamModeStatsSchema.optional(),
-    chess_blitz: upstreamModeStatsSchema.optional(),
-    chess_bullet: upstreamModeStatsSchema.optional(),
-  })
-  .strip();
-
-const chessModePayloadSchema = z
-  .object({
-    rating: z.number().int().nonnegative(),
-    best: z.number().int().nonnegative(),
-    win: z.number().int().nonnegative(),
-    loss: z.number().int().nonnegative(),
-    draw: z.number().int().nonnegative(),
+    chess_rapid: upstreamRapidStatsSchema.optional(),
   })
   .strip();
 
 const chessStatsPayloadSchema = z
   .object({
     username: z.string().trim().min(1).max(64),
-    rapid: chessModePayloadSchema,
-    blitz: chessModePayloadSchema,
-    bullet: chessModePayloadSchema,
+    rapidRating: z.number().int().nonnegative(),
   })
   .strip();
-
-type UpstreamModeStats = z.infer<typeof upstreamModeStatsSchema>;
-type ChessModePayload = z.infer<typeof chessModePayloadSchema>;
 
 const rateLimitBuckets = new Map<string, number[]>();
 
@@ -138,18 +107,6 @@ function buildSecurityHeaders(request: Request, cacheControl: string): Headers {
   }
 
   return headers;
-}
-
-function normalizeModeStats(mode?: UpstreamModeStats): ChessModePayload {
-  const rating = mode?.last?.rating ?? 0;
-  const best = Math.max(rating, mode?.best?.rating ?? 0);
-  return {
-    rating,
-    best,
-    win: mode?.record?.win ?? 0,
-    loss: mode?.record?.loss ?? 0,
-    draw: mode?.record?.draw ?? 0,
-  };
 }
 
 async function readBoundedText(response: Response, maxBytes: number): Promise<string> {
@@ -260,9 +217,7 @@ export async function GET(request: Request): Promise<Response> {
 
     const payload = chessStatsPayloadSchema.parse({
       username: CHESS_USERNAME,
-      rapid: normalizeModeStats(validatedUpstream.chess_rapid),
-      blitz: normalizeModeStats(validatedUpstream.chess_blitz),
-      bullet: normalizeModeStats(validatedUpstream.chess_bullet),
+      rapidRating: validatedUpstream.chess_rapid?.last?.rating ?? 0,
     });
 
     return new Response(JSON.stringify(payload), {

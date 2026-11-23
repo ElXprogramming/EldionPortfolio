@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { GET as handleLeetCodeGet } from './api/leetcode.ts';
 import { GET as handleChessGet } from './api/chess.ts';
+import { GET as handleMonkeytypeGet } from './api/monkeytype.ts';
 
 const LOCAL_API_ROUTES: Readonly<
   Record<string, { handler: (request: Request) => Promise<Response>; fallbackError: string }>
@@ -15,6 +16,10 @@ const LOCAL_API_ROUTES: Readonly<
   '/api/chess': {
     handler: handleChessGet,
     fallbackError: 'Unable to fetch Chess.com statistics.',
+  },
+  '/api/monkeytype': {
+    handler: handleMonkeytypeGet,
+    fallbackError: 'Unable to fetch Monkeytype statistics.',
   },
 };
 

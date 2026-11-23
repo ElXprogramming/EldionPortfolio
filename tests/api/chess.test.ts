@@ -54,7 +54,7 @@ describe('GET /api/chess serverless proxy', () => {
     vi.restoreAllMocks();
   });
 
-  it('proxies Chess.com stats, sends User-Agent, filters fields, and sets cache + security headers', async () => {
+  it('proxies Chess.com rapid rating only, sends User-Agent, filters fields, and sets cache + security headers', async () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
       new Response(JSON.stringify(MOCK_UPSTREAM_RESPONSE), {
         status: 200,
@@ -79,10 +79,10 @@ describe('GET /api/chess serverless proxy', () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
       username: 'eldion_03',
-      rapid: { rating: 1552, best: 1603, win: 770, loss: 726, draw: 75 },
-      blitz: { rating: 978, best: 1303, win: 571, loss: 605, draw: 47 },
-      bullet: { rating: 935, best: 1162, win: 685, loss: 661, draw: 28 },
+      rapidRating: 1552,
     });
+    expect('blitz' in body).toBe(false);
+    expect('bullet' in body).toBe(false);
     expect('chess_daily' in body).toBe(false);
     expect('tactics' in body).toBe(false);
     expect('puzzle_rush' in body).toBe(false);
@@ -96,17 +96,9 @@ describe('GET /api/chess serverless proxy', () => {
     );
   });
 
-  it('normalizes missing optional modes or missing best ratings safely', async () => {
+  it('normalizes missing chess_rapid rating safely to 0', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          chess_rapid: {
-            last: { rating: 1400 },
-            record: { win: 10, loss: 5 },
-          },
-        }),
-        { status: 200 }
-      )
+      new Response(JSON.stringify({}), { status: 200 })
     );
 
     const res = await GET(makeRequest('198.51.100.21'));
@@ -114,9 +106,7 @@ describe('GET /api/chess serverless proxy', () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
       username: 'eldion_03',
-      rapid: { rating: 1400, best: 1400, win: 10, loss: 5, draw: 0 },
-      blitz: { rating: 0, best: 0, win: 0, loss: 0, draw: 0 },
-      bullet: { rating: 0, best: 0, win: 0, loss: 0, draw: 0 },
+      rapidRating: 0,
     });
   });
 
