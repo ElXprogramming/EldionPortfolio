@@ -19,7 +19,6 @@
   - **[NeuroSort](https://github.com/ElXprogramming/neurosort)**: Local-first file management daemon and CLI powered by Ollama semantic classification and SQLite WAL audit ledgers.
   - **[RestaurantScraper](https://github.com/ElXprogramming/RestaurantScraper)**: Passive network menu extraction engine for GrabFood and foodpanda with deduplication and a local SQLite explorer.
   - **[Declaraform](https://declaraform.netlify.app/)**: UMS Declaration Form PDF generator with 3D WebGL background and interactive digital signature pad.
-  - **[ChessGameReview](https://chessgamereview-two.vercel.app/)**: Browser-native chess game review tool powered by Stockfish 16 WebAssembly workers and CAPS2 move accuracy analysis.
 - **Curated Technical Stack Bento**: Categorized into Frontend, Backend & APIs, AI & LLMs, and Databases & System Tools.
 - **Education & Credentials**: Universiti Malaysia Sabah (B.CompSc Software Engineering) & Kolej Matrikulasi Labuan (Physical Science).
 - **Interactive Contact Features**: 1-click clipboard copy for email, instant mail composer, and quick links to LinkedIn & GitHub.

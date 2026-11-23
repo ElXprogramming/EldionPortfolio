@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildFlipTransform,
   buildFolderBackPath,
   chainMatrices,
   clamp,
+  computeFlipDelta,
   luma,
   matrixToCss,
   measureFolder,
@@ -10,6 +12,7 @@ import {
   multiplyMatrices,
   parseHexColor,
   placeFlapCard,
+  rectToBox,
   rgbString,
   rotateXMatrix,
   rotateYMatrix,
@@ -90,6 +93,41 @@ describe('Folder utilities', () => {
       expect(receive.x).not.toBe(rest.x);
       expect(openLeft.x).toBeLessThan(openRight.x);
       expect(openLeft.s).toBeGreaterThan(0);
+    });
+
+    it('computes FLIP transform deltas safely between folder file and project card rects', () => {
+      const cardBox = rectToBox({ left: 600, top: 200, width: 400, height: 350 });
+      expect(cardBox).toEqual({
+        centerX: 800,
+        centerY: 375,
+        width: 400,
+        height: 350,
+        rotation: 0,
+      });
+
+      const fileSnapshot = {
+        centerX: 300,
+        centerY: 325,
+        width: 120,
+        height: 140,
+        rotation: -4.5,
+      };
+      const delta = computeFlipDelta(fileSnapshot, cardBox);
+      expect(delta.dx).toBe(-500);
+      expect(delta.dy).toBe(-50);
+      expect(delta.sx).toBeCloseTo(0.3, 4);
+      expect(delta.sy).toBeCloseTo(0.4, 4);
+      expect(delta.rotation).toBeCloseTo(-4.5, 4);
+
+      const css = buildFlipTransform(delta);
+      expect(css).toBe('translate3d(-500.00px, -50.00px, 0) rotate(-4.50deg) scale(0.3000, 0.4000)');
+
+      const degenerate = computeFlipDelta(
+        { centerX: 0, centerY: 0, width: 0, height: 0 },
+        { centerX: 0, centerY: 0, width: 0, height: 0 }
+      );
+      expect(degenerate.sx).toBe(1);
+      expect(degenerate.sy).toBe(1);
     });
   });
 });

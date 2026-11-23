@@ -35,13 +35,6 @@ export const EXTERNAL_LINKS = {
       'https://github.com/ElXprogramming/GitCanvas',
       ['github.com']
     ) ?? '#',
-  chessGameReviewLive:
-    sanitizeExternalUrl('https://chessgamereview-two.vercel.app/', ['chessgamereview-two.vercel.app']) ?? '#',
-  chessGameReviewRepo:
-    sanitizeExternalUrl(
-      'https://github.com/ElXprogramming/chess-game-review',
-      ['github.com']
-    ) ?? '#',
   declaraformLive:
     sanitizeExternalUrl('https://declaraform.netlify.app/', ['declaraform.netlify.app']) ?? '#',
   declaraformRepo:

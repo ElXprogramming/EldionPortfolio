@@ -233,3 +233,27 @@
   );
   color: #faf5ff;
 }
+
+.folder-item[data-extracted] {
+  background: rgba(168, 85, 247, 0.05);
+  border: 1.5px dashed rgba(168, 85, 247, 0.35);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 200ms ease, border-color 200ms ease;
+}
+
+.folder-item[data-extracted]:hover {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(192, 132, 252, 0.65);
+}
+
+.folder-item[data-extracted] .folder-photo {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.folder-root:not([data-open]) .folder-item[data-extracted],
+.folder-item[data-in-flight] {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -24,6 +24,22 @@ export interface CardPlacement {
   s: number;
 }
 
+export interface RectBox {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+  rotation?: number;
+}
+
+export interface FlipDelta {
+  dx: number;
+  dy: number;
+  sx: number;
+  sy: number;
+  rotation: number;
+}
+
 const FLAP_REST = [
   { x: 0.16, rise: 0, r: 3 },
   { x: -0.17, rise: 0.05, r: -3.5 },
@@ -245,4 +261,38 @@ export function placeFlapCard(
     r: rest.r * 1.6,
     s: 1,
   };
+}
+
+export function rectToBox(rect: Pick<DOMRectReadOnly, 'left' | 'top' | 'width' | 'height'>): RectBox {
+  return {
+    centerX: rect.left + rect.width / 2,
+    centerY: rect.top + rect.height / 2,
+    width: rect.width,
+    height: rect.height,
+    rotation: 0,
+  };
+}
+
+export function computeFlipDelta(from: RectBox, to: RectBox): FlipDelta {
+  const safeToW = Number.isFinite(to.width) && to.width > 0 ? to.width : 1;
+  const safeToH = Number.isFinite(to.height) && to.height > 0 ? to.height : 1;
+  const safeFromW = Number.isFinite(from.width) && from.width > 0 ? from.width : safeToW;
+  const safeFromH = Number.isFinite(from.height) && from.height > 0 ? from.height : safeToH;
+  const dx = Number.isFinite(from.centerX - to.centerX) ? from.centerX - to.centerX : 0;
+  const dy = Number.isFinite(from.centerY - to.centerY) ? from.centerY - to.centerY : 0;
+  const rotation = Number.isFinite((from.rotation ?? 0) - (to.rotation ?? 0))
+    ? (from.rotation ?? 0) - (to.rotation ?? 0)
+    : 0;
+
+  return {
+    dx,
+    dy,
+    sx: clamp(safeFromW / safeToW, 0.08, 4),
+    sy: clamp(safeFromH / safeToH, 0.08, 4),
+    rotation,
+  };
+}
+
+export function buildFlipTransform(delta: FlipDelta): string {
+  return `translate3d(${delta.dx.toFixed(2)}px, ${delta.dy.toFixed(2)}px, 0) rotate(${delta.rotation.toFixed(2)}deg) scale(${delta.sx.toFixed(4)}, ${delta.sy.toFixed(4)})`;
 }

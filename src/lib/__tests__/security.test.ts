@@ -60,8 +60,6 @@ describe('security utilities', () => {
       expect(EXTERNAL_LINKS.monkeytype).toBe('https://monkeytype.com/profile/eldion');
       expect(EXTERNAL_LINKS.gitCanvasLive).toContain('https://githubstatreadme.vercel.app');
       expect(EXTERNAL_LINKS.gitCanvasRepo).toContain('https://github.com/ElXprogramming/GitCanvas');
-      expect(EXTERNAL_LINKS.chessGameReviewLive).toContain('https://chessgamereview-two.vercel.app');
-      expect(EXTERNAL_LINKS.chessGameReviewRepo).toContain('https://github.com/ElXprogramming/chess-game-review');
       expect(EXTERNAL_LINKS.declaraformLive).toContain('https://declaraform.netlify.app');
       expect(EXTERNAL_LINKS.declaraformRepo).toContain('https://github.com/ElXprogramming/declaration-form-filler');
       expect(EXTERNAL_LINKS.neurosortRepo).toContain('https://github.com/ElXprogramming/neurosort');

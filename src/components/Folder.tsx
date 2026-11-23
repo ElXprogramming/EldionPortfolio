@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -8,6 +9,7 @@ import {
   type CSSProperties,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
+  type Ref,
 } from 'react';
 import {
   DROP_TURN,
@@ -41,7 +43,20 @@ export interface FolderItem {
   alt?: string;
 }
 
+export interface FolderItemSnapshot {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+  rotation: number;
+}
+
+export interface FolderHandle {
+  getItemSnapshot: (index: number) => FolderItemSnapshot | null;
+}
+
 export interface FolderProps {
+  ref?: Ref<FolderHandle>;
   items: readonly FolderItem[];
   label?: string;
   color?: string;
@@ -50,7 +65,13 @@ export interface FolderProps {
   size?: number;
   defaultOpen?: boolean;
   selectedIndex?: number | null;
-  onItemClick?: (item: FolderItem, index: number) => void;
+  extractSelected?: boolean;
+  inFlightIndices?: readonly number[];
+  onItemClick?: (
+    item: FolderItem,
+    index: number,
+    snapshot: FolderItemSnapshot | null
+  ) => void;
   draggable?: boolean;
   zoomOnClick?: boolean;
   className?: string;
@@ -117,6 +138,7 @@ interface FolderEngineHandle {
   select: (index: number) => void;
   setFocus: (index: number) => void;
   blur: () => boolean;
+  getItemSnapshot: (index: number) => FolderItemSnapshot | null;
 }
 
 interface FolderRuntimeSettings {
@@ -124,6 +146,8 @@ interface FolderRuntimeSettings {
   draggable: boolean;
   zoomOnClick: boolean;
   selectedIndex: number | null | undefined;
+  extractSelected: boolean;
+  inFlightIndices: readonly number[];
   onItemClick: FolderProps['onItemClick'];
   count: number;
   entries: readonly FolderItem[];
@@ -163,7 +187,10 @@ const velocityOf = (samples: readonly [number, number, number][]): [number, numb
   return [(last[1] - first[1]) / span, (last[2] - first[2]) / span];
 };
 
+const EMPTY_IN_FLIGHT: readonly number[] = [];
+
 export default function Folder({
+  ref,
   items,
   label,
   color = '#3b1d60',
@@ -172,6 +199,8 @@ export default function Folder({
   size = 1,
   defaultOpen = false,
   selectedIndex,
+  extractSelected = false,
+  inFlightIndices = EMPTY_IN_FLIGHT,
   onItemClick,
   draggable = true,
   zoomOnClick = true,
@@ -220,11 +249,21 @@ export default function Folder({
     draggable,
     zoomOnClick,
     selectedIndex,
+    extractSelected,
+    inFlightIndices,
     onItemClick,
     count,
     entries,
     g,
   });
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      getItemSnapshot: (index: number) => engineRef.current?.getItemSnapshot(index) ?? null,
+    }),
+    []
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -806,7 +845,14 @@ export default function Folder({
       }
 
       const target = (event.target as HTMLElement).closest?.('[data-folder-item]');
-      const index = target && root.contains(target) ? Number(target.getAttribute('data-folder-item')) : -1;
+      const rawIndex =
+        target && root.contains(target) ? Number(target.getAttribute('data-folder-item')) : -1;
+      const s = settingsRef.current;
+      const isGhost =
+        rawIndex >= 0 &&
+        ((s.extractSelected && s.selectedIndex === rawIndex) ||
+          s.inFlightIndices.includes(rawIndex));
+      const index = isGhost ? -1 : rawIndex;
       state.hoveredItem = index;
       if (target && index >= 0 && !state.drag?.active) {
         const rect = target.getBoundingClientRect();
@@ -834,12 +880,20 @@ export default function Folder({
       if (event.button > 0) return;
       state.suppressClick = false;
       const target = (event.target as HTMLElement).closest?.('[data-folder-item]');
-      if (target && root.contains(target) && settingsRef.current.draggable) {
+      const targetIndex =
+        target && root.contains(target) ? Number(target.getAttribute('data-folder-item')) : -1;
+      const s = settingsRef.current;
+      const canDragTarget =
+        targetIndex >= 0 &&
+        s.draggable &&
+        !(s.extractSelected && s.selectedIndex === targetIndex) &&
+        !s.inFlightIndices.includes(targetIndex);
+      if (target && canDragTarget) {
         const [x, y] = toDesk(event.clientX, event.clientY);
         state.deskX = x;
         state.deskY = y;
         state.drag = {
-          index: Number(target.getAttribute('data-folder-item')),
+          index: targetIndex,
           id: event.pointerId,
           clientX: event.clientX,
           clientY: event.clientY,
@@ -857,7 +911,7 @@ export default function Folder({
         } catch {
           // Ignore pointer capture failures on synthetic/unsupported events
         }
-      } else {
+      } else if (!target || !root.contains(target)) {
         state.pressed = true;
       }
       wake();
@@ -878,6 +932,9 @@ export default function Folder({
       if (state.focus >= 0) {
         state.focus = -1;
         wake();
+        return;
+      }
+      if (settingsRef.current.extractSelected && settingsRef.current.selectedIndex != null) {
         return;
       }
       if (settingsRef.current.open) setOpenRef.current(false);
@@ -909,9 +966,28 @@ export default function Folder({
       }
     }
 
-    if (settingsRef.current.selectedIndex != null) {
+    if (settingsRef.current.selectedIndex != null && !settingsRef.current.extractSelected) {
       state.focus = settingsRef.current.selectedIndex;
     }
+
+    const getItemSnapshot = (index: number): FolderItemSnapshot | null => {
+      const node = itemRefs.current[index];
+      const sim = state.items[index];
+      const s = settingsRef.current;
+      if (!node || !sim) return null;
+      const rect = node.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return null;
+      const rootBox = root.getBoundingClientRect();
+      const scaleRatioX = root.offsetWidth > 0 ? rootBox.width / root.offsetWidth : 1;
+      const scaleRatioY = root.offsetHeight > 0 ? rootBox.height / root.offsetHeight : 1;
+      return {
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2,
+        width: s.g.docW * sim.s.value * scaleRatioX,
+        height: s.g.docH * sim.s.value * scaleRatioY,
+        rotation: sim.r.value,
+      };
+    };
 
     engineRef.current = {
       wake,
@@ -924,10 +1000,11 @@ export default function Folder({
         settingsRef.current.open || state.items[index]?.place === 'out' || state.focus === index,
       select: (index) => {
         const s = settingsRef.current;
-        if (s.selectedIndex === undefined && s.zoomOnClick) {
+        const snapshot = getItemSnapshot(index);
+        if (s.selectedIndex === undefined && !s.extractSelected && s.zoomOnClick) {
           state.focus = state.focus === index ? -1 : index;
         }
-        s.onItemClick?.(s.entries[index], index);
+        s.onItemClick?.(s.entries[index], index, snapshot);
         wake();
       },
       setFocus: (idx: number) => {
@@ -942,6 +1019,7 @@ export default function Folder({
         wake();
         return true;
       },
+      getItemSnapshot,
     };
     wake();
 
@@ -965,19 +1043,34 @@ export default function Folder({
       draggable,
       zoomOnClick,
       selectedIndex,
+      extractSelected,
+      inFlightIndices,
       onItemClick,
       count,
       entries,
       g,
     };
     engineRef.current?.wake();
-  }, [isOpen, draggable, zoomOnClick, selectedIndex, onItemClick, count, entries, g]);
+  }, [
+    isOpen,
+    draggable,
+    zoomOnClick,
+    selectedIndex,
+    extractSelected,
+    inFlightIndices,
+    onItemClick,
+    count,
+    entries,
+    g,
+  ]);
 
   useEffect(() => {
-    if (selectedIndex !== undefined) {
+    if (extractSelected) {
+      engineRef.current?.setFocus(-1);
+    } else if (selectedIndex !== undefined) {
       engineRef.current?.setFocus(selectedIndex === null ? -1 : selectedIndex);
     }
-  }, [selectedIndex]);
+  }, [selectedIndex, extractSelected]);
 
   const toggle = useCallback(() => {
     if (engineRef.current?.blur()) return;
@@ -1073,6 +1166,8 @@ export default function Folder({
 
         {entries.map((item, index) => {
           const interactive = isOpen || outside.includes(index);
+          const isExtracted = extractSelected && selectedIndex === index;
+          const isInFlight = inFlightIndices.includes(index);
           return (
             <div
               key={item.title ?? index}
@@ -1081,8 +1176,17 @@ export default function Folder({
               }}
               className="folder-layer folder-item"
               data-folder-item={index}
-              data-selected={selectedIndex === index ? '' : undefined}
+              data-selected={!extractSelected && selectedIndex === index ? '' : undefined}
+              data-extracted={isExtracted ? '' : undefined}
+              data-in-flight={isInFlight ? '' : undefined}
               role={interactive ? 'button' : undefined}
+              aria-label={
+                item.title
+                  ? isExtracted
+                    ? `Return ${item.title} to folder`
+                    : `Open ${item.title}`
+                  : undefined
+              }
               tabIndex={interactive ? 0 : -1}
               onClick={(event) => onItemActivate(event, index)}
               onKeyDown={(event) => {
