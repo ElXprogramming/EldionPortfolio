@@ -6,6 +6,7 @@ export const PROFILE = {
   email: 'nayrnoidle@gmail.com',
   githubUsername: 'ElXprogramming',
   leetcodeUsername: 'eldion03',
+  chessUsername: 'eldion_03',
 } as const;
 
 export const EXTERNAL_LINKS = {
@@ -13,6 +14,9 @@ export const EXTERNAL_LINKS = {
     sanitizeExternalUrl(`https://github.com/${PROFILE.githubUsername}`, ['github.com']) ?? '#',
   leetcode:
     sanitizeExternalUrl(`https://leetcode.com/u/${PROFILE.leetcodeUsername}/`, ['leetcode.com']) ??
+    '#',
+  chess:
+    sanitizeExternalUrl(`https://www.chess.com/member/${PROFILE.chessUsername}`, ['www.chess.com']) ??
     '#',
   linkedin:
     sanitizeExternalUrl(

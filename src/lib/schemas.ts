@@ -180,3 +180,26 @@ export const leetcodeStatsResponseSchema = z
   .strip();
 
 export type LeetCodeStatsResponse = z.infer<typeof leetcodeStatsResponseSchema>;
+
+export const chessModeStatsSchema = z
+  .object({
+    rating: z.number().int().nonnegative(),
+    best: z.number().int().nonnegative(),
+    win: z.number().int().nonnegative(),
+    loss: z.number().int().nonnegative(),
+    draw: z.number().int().nonnegative(),
+  })
+  .strip();
+
+export type ChessModeStats = z.infer<typeof chessModeStatsSchema>;
+
+export const chessStatsResponseSchema = z
+  .object({
+    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
+    rapid: chessModeStatsSchema,
+    blitz: chessModeStatsSchema,
+    bullet: chessModeStatsSchema,
+  })
+  .strip();
+
+export type ChessStatsResponse = z.infer<typeof chessStatsResponseSchema>;

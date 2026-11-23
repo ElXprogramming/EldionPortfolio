@@ -53,3 +53,23 @@ export function LeetCodeIcon({ className = 'w-4 h-4' }: { className?: string }) 
     </svg>
   );
 }
+
+export function ChessIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="6" r="3" />
+      <path d="M9 11h6" />
+      <path d="M10 11c-.2 3-1.4 5.2-3 7h10c-1.6-1.8-2.8-4-3-7" />
+      <path d="M6 21h12" />
+    </svg>
+  );
+}

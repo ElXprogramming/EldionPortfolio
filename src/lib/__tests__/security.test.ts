@@ -56,6 +56,7 @@ describe('security utilities', () => {
 
     it('correctly validates production project links in EXTERNAL_LINKS', () => {
       expect(EXTERNAL_LINKS.leetcode).toBe('https://leetcode.com/u/eldion03/');
+      expect(EXTERNAL_LINKS.chess).toBe('https://www.chess.com/member/eldion_03');
       expect(EXTERNAL_LINKS.gitCanvasLive).toContain('https://githubstatreadme.vercel.app');
       expect(EXTERNAL_LINKS.gitCanvasRepo).toContain('https://github.com/ElXprogramming/GitCanvas');
       expect(EXTERNAL_LINKS.chessGameReviewLive).toContain('https://chessgamereview-two.vercel.app');

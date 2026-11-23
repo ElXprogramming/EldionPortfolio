@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import GithubContributions from './GithubContributions';
 import LeetCodeStats from './LeetCodeStats';
+import ChessStats from './ChessStats';
 import BorderGlow from './BorderGlow';
 
 const EDUCATION_GLOW_COLORS = ['#c084fc', '#a855f7', '#38bdf8'] as const;
@@ -60,7 +61,7 @@ export default function About() {
         {/* Content Grid: Narrative (Left) | Education & Languages (Right) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
-          {/* Left Column: Narrative Box & Compact LeetCode Card */}
+          {/* Left Column: Narrative Box, LeetCode Card & Chess.com Card */}
           <div className="lg:col-span-6 flex flex-col gap-5">
             <BorderGlow
               className="flex-1"
@@ -95,13 +96,17 @@ export default function About() {
 
             {/* Compact LeetCode Stats Card */}
             <LeetCodeStats />
+
+            {/* Compact Chess.com Stats Card */}
+            <ChessStats />
           </div>
 
           {/* Right Column: Education Background & Languages */}
           <div className="lg:col-span-6 flex flex-col gap-5">
             {/* Education Card */}
             <BorderGlow
-              innerClassName="p-5 sm:p-6"
+              className="flex-1"
+              innerClassName="p-5 sm:p-6 justify-center"
               backgroundColor="#111116"
               borderRadius={16}
               glowRadius={32}

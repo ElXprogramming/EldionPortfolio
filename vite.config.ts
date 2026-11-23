@@ -3,14 +3,29 @@ import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { GET as handleLeetCodeGet } from './api/leetcode.ts';
+import { GET as handleChessGet } from './api/chess.ts';
 
-function attachLeetCodeMiddleware(
+const LOCAL_API_ROUTES: Readonly<
+  Record<string, { handler: (request: Request) => Promise<Response>; fallbackError: string }>
+> = {
+  '/api/leetcode': {
+    handler: handleLeetCodeGet,
+    fallbackError: 'Unable to fetch LeetCode statistics.',
+  },
+  '/api/chess': {
+    handler: handleChessGet,
+    fallbackError: 'Unable to fetch Chess.com statistics.',
+  },
+};
+
+function attachLocalApiMiddleware(
   req: IncomingMessage,
   res: ServerResponse,
   next: () => void
 ): void {
   const pathname = (req.url ?? '').split('?')[0];
-  if (pathname !== '/api/leetcode') {
+  const route = LOCAL_API_ROUTES[pathname];
+  if (!route) {
     next();
     return;
   }
@@ -26,7 +41,7 @@ function attachLeetCodeMiddleware(
   }
 
   const host = req.headers.host ?? 'localhost:5173';
-  const requestUrl = `http://${host}${req.url ?? '/api/leetcode'}`;
+  const requestUrl = `http://${host}${req.url ?? pathname}`;
   const headers = new Headers();
 
   for (const key of ['origin', 'x-forwarded-for', 'x-real-ip'] as const) {
@@ -38,7 +53,8 @@ function attachLeetCodeMiddleware(
     }
   }
 
-  void handleLeetCodeGet(new Request(requestUrl, { method: 'GET', headers }))
+  void route
+    .handler(new Request(requestUrl, { method: 'GET', headers }))
     .then(async (webRes) => {
       res.statusCode = webRes.status;
       webRes.headers.forEach((value, key) => {
@@ -51,18 +67,18 @@ function attachLeetCodeMiddleware(
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.setHeader('Cache-Control', 'no-store');
       res.setHeader('X-Content-Type-Options', 'nosniff');
-      res.end(JSON.stringify({ error: 'Unable to fetch LeetCode statistics.' }));
+      res.end(JSON.stringify({ error: route.fallbackError }));
     });
 }
 
-function leetcodeApiDevPlugin(): Plugin {
+function localApiDevPlugin(): Plugin {
   return {
-    name: 'leetcode-api-dev-proxy',
+    name: 'local-api-dev-proxy',
     configureServer(server) {
-      server.middlewares.use(attachLeetCodeMiddleware);
+      server.middlewares.use(attachLocalApiMiddleware);
     },
     configurePreviewServer(server) {
-      server.middlewares.use(attachLeetCodeMiddleware);
+      server.middlewares.use(attachLocalApiMiddleware);
     },
   };
 }
@@ -89,7 +105,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), leetcodeApiDevPlugin()],
+  plugins: [react(), tailwindcss(), localApiDevPlugin()],
   server: {
     host: true, // listen on 0.0.0.0 (required for tunnel)
     port: 5173,
