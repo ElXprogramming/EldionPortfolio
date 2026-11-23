@@ -79,12 +79,12 @@ describe('GET /api/monkeytype serverless proxy', () => {
 
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion',
       topWpm: 128,
       accuracy: 100,
       mode: 'words',
       modeValue: '10',
     });
+    expect('username' in body).toBe(false);
     expect('uid' in body).toBe(false);
     expect('xp' in body).toBe(false);
     expect('typingStats' in body).toBe(false);
@@ -123,7 +123,6 @@ describe('GET /api/monkeytype serverless proxy', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion',
       topWpm: 120,
       accuracy: 99,
       mode: 'time',
@@ -148,7 +147,6 @@ describe('GET /api/monkeytype serverless proxy', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion',
       topWpm: 0,
       accuracy: 0,
       mode: null,

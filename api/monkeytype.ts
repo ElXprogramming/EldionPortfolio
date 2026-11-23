@@ -37,7 +37,6 @@ const upstreamMonkeytypeProfileSchema = z
   .object({
     data: z
       .object({
-        name: z.string().trim().min(1).max(64).optional(),
         personalBests: z
           .object({
             time: upstreamPersonalBestsBucketSchema.optional(),
@@ -52,7 +51,6 @@ const upstreamMonkeytypeProfileSchema = z
 
 const monkeytypeStatsPayloadSchema = z
   .object({
-    username: z.string().trim().min(1).max(64),
     topWpm: z.number().int().nonnegative(),
     accuracy: z.number().int().min(0).max(100),
     mode: z.enum(['time', 'words']).nullable(),
@@ -288,7 +286,6 @@ export async function GET(request: Request): Promise<Response> {
     const best = extractTopPersonalBest(validatedUpstream.data.personalBests);
 
     const payload = monkeytypeStatsPayloadSchema.parse({
-      username: validatedUpstream.data.name ?? MONKEYTYPE_USERNAME,
       topWpm: best.topWpm,
       accuracy: best.accuracy,
       mode: best.mode,

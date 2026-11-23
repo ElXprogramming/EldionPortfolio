@@ -30,9 +30,9 @@ describe('Monkeytype Utilities & Schema', () => {
   });
 
   describe('monkeytypeStatsResponseSchema & fallback snapshot', () => {
-    it('validates clean payloads, sanitizes username, and strips unexpected fields', () => {
+    it('validates clean payloads and strips unexpected fields', () => {
       const parsed = monkeytypeStatsResponseSchema.parse({
-        username: '  eldion<script>alert(1)</script>  ',
+        username: 'eldion',
         topWpm: 128,
         accuracy: 100,
         mode: 'words',
@@ -42,12 +42,12 @@ describe('Monkeytype Utilities & Schema', () => {
       });
 
       expect(parsed).toEqual({
-        username: 'eldion',
         topWpm: 128,
         accuracy: 100,
         mode: 'words',
         modeValue: '10',
       });
+      expect('username' in parsed).toBe(false);
       expect('uid' in parsed).toBe(false);
       expect('xp' in parsed).toBe(false);
     });
@@ -55,7 +55,6 @@ describe('Monkeytype Utilities & Schema', () => {
     it('rejects malformed accuracy, negative WPM, or invalid modeValue payloads', () => {
       expect(() =>
         monkeytypeStatsResponseSchema.parse({
-          username: 'eldion',
           topWpm: -5,
           accuracy: 100,
           mode: 'words',
@@ -65,7 +64,6 @@ describe('Monkeytype Utilities & Schema', () => {
 
       expect(() =>
         monkeytypeStatsResponseSchema.parse({
-          username: 'eldion',
           topWpm: 128,
           accuracy: 105,
           mode: 'words',
@@ -75,7 +73,6 @@ describe('Monkeytype Utilities & Schema', () => {
 
       expect(() =>
         monkeytypeStatsResponseSchema.parse({
-          username: 'eldion',
           topWpm: 128,
           accuracy: 100,
           mode: 'words',
@@ -86,7 +83,6 @@ describe('Monkeytype Utilities & Schema', () => {
 
     it('validates the bundled fallback snapshot', () => {
       const parsed = monkeytypeStatsResponseSchema.parse(MONKEYTYPE_STATS_FALLBACK);
-      expect(parsed.username).toBe('eldion');
       expect(parsed.topWpm).toBeGreaterThan(0);
     });
   });
@@ -94,7 +90,6 @@ describe('Monkeytype Utilities & Schema', () => {
 
 describe('fetchMonkeytypeStats', () => {
   const sampleStats = {
-    username: 'eldion',
     topWpm: 135,
     accuracy: 99,
     mode: 'words' as const,

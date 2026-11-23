@@ -39,7 +39,7 @@ export default function MonkeytypeStats() {
   return (
     <BorderGlow
       className="h-full"
-      innerClassName="p-3.5 sm:p-4 justify-between"
+      innerClassName="p-3.5 sm:p-4"
       backgroundColor="#08080a"
       borderRadius={16}
       glowRadius={30}
@@ -64,7 +64,7 @@ export default function MonkeytypeStats() {
       </div>
 
       {/* Main Stat Tile: Top Typing Speed */}
-      <div className="rounded-lg bg-[#111116] border border-white/5 px-3 py-2.5 mb-2.5 min-w-0">
+      <div className="flex-1 flex flex-col justify-center rounded-lg bg-[#111116] border border-white/5 px-3 py-2.5 min-w-0">
         <div className="flex items-center justify-between gap-1 mb-1.5">
           <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold text-[#e2b714]">
             <Gauge className="w-3 h-3 shrink-0" aria-hidden="true" />
@@ -90,11 +90,6 @@ export default function MonkeytypeStats() {
             </span>
           )}
         </div>
-      </div>
-
-      {/* Bottom Footer: Handle */}
-      <div className="flex items-center justify-between gap-2 pt-0.5 text-[10px] sm:text-[11px] text-zinc-500">
-        <span className="font-mono truncate">@{stats.username}</span>
       </div>
     </BorderGlow>
   );

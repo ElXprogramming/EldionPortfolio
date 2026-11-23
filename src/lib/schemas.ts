@@ -191,7 +191,6 @@ export type ChessStatsResponse = z.infer<typeof chessStatsResponseSchema>;
 
 export const monkeytypeStatsResponseSchema = z
   .object({
-    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
     topWpm: z.number().int().nonnegative(),
     accuracy: z.number().int().min(0).max(100),
     mode: z.enum(['time', 'words']).nullable(),
