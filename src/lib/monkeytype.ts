@@ -1,4 +1,4 @@
-import { monkeytypeStatsResponseSchema, type MonkeytypeStatsResponse } from './schemas';
+import type { MonkeytypeStatsResponse } from './statsSchemas';
 import { MONKEYTYPE_STATS_FALLBACK } from './monkeytypeFallback';
 
 const MONKEYTYPE_API_PATH = '/api/monkeytype?mode=30s';
@@ -32,10 +32,13 @@ export async function fetchMonkeytypeStats(): Promise<MonkeytypeStatsResponse> {
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(MONKEYTYPE_API_PATH, {
-        signal: controller.signal,
-        headers: { Accept: 'application/json' },
-      });
+      const [response, { monkeytypeStatsResponseSchema }] = await Promise.all([
+        fetch(MONKEYTYPE_API_PATH, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        }),
+        import('./statsSchemas'),
+      ]);
 
       if (!response.ok) {
         throw new Error(`HTTP_${response.status}`);

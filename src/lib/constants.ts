@@ -1,4 +1,4 @@
-import { sanitizeExternalUrl, sanitizeMailtoUrl } from './security';
+import { sanitizeExternalUrl, sanitizeMailtoUrl } from './urlSecurity';
 
 export const PROFILE = {
   name: 'Eldion Ryan Godius',

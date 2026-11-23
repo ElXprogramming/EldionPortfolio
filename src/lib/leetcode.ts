@@ -1,4 +1,4 @@
-import { leetcodeStatsResponseSchema, type LeetCodeStatsResponse } from './schemas';
+import type { LeetCodeStatsResponse } from './statsSchemas';
 import { LEETCODE_STATS_FALLBACK } from './leetcodeFallback';
 
 const LEETCODE_API_PATH = '/api/leetcode';
@@ -32,10 +32,13 @@ export async function fetchLeetCodeStats(): Promise<LeetCodeStatsResponse> {
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(LEETCODE_API_PATH, {
-        signal: controller.signal,
-        headers: { Accept: 'application/json' },
-      });
+      const [response, { leetcodeStatsResponseSchema }] = await Promise.all([
+        fetch(LEETCODE_API_PATH, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        }),
+        import('./statsSchemas'),
+      ]);
 
       if (!response.ok) {
         throw new Error(`HTTP_${response.status}`);

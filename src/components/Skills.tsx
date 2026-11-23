@@ -80,7 +80,7 @@ const SKILL_CATEGORIES: readonly SkillCategory[] = [
 
 export default function Skills() {
   return (
-    <section id="skills" className="py-24 relative">
+    <section id="skills" className="py-24 relative section-defer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

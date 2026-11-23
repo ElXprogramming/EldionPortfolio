@@ -1,4 +1,4 @@
-import type { LeetCodeStatsResponse } from './schemas';
+import type { LeetCodeStatsResponse } from './statsSchemas';
 
 // Bundled snapshot for instant initial render and offline resilience
 export const LEETCODE_STATS_FALLBACK: LeetCodeStatsResponse = {

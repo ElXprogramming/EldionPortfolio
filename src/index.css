@@ -41,6 +41,12 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Skip layout/paint for off-screen sections until near viewport */
+.section-defer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 /* Clean gradient text */
 .text-gradient {
   background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 60%, #c084fc 100%);

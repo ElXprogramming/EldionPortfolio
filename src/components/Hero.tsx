@@ -1,10 +1,20 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import eldionPortrait from '../assets/eldion-portrait.webp';
 import { PROFILE } from '../lib/constants';
 
 const Lanyard = lazy(() => import('./Lanyard'));
 
 export default function Hero() {
+  const [mountLanyard, setMountLanyard] = useState(false);
+
+  // Defer WebGL lanyard chunk load until after first paint so Hero text renders immediately
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setMountLanyard(true);
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
     <section
       id="hero"
@@ -15,19 +25,21 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full z-0 pointer-events-auto"
         aria-label="Interactive 3D Profile Card hanging on lanyard"
       >
-        <Suspense fallback={null}>
-          <Lanyard
-            frontImage={eldionPortrait}
-            backImage={eldionPortrait}
-            cardColor="#141419"
-            strapColor="#27272a"
-            size={0.28}
-            anchor="right"
-            strapLength={0.45}
-            interactive={true}
-            breeze={0.25}
-          />
-        </Suspense>
+        {mountLanyard && (
+          <Suspense fallback={null}>
+            <Lanyard
+              frontImage={eldionPortrait}
+              backImage={eldionPortrait}
+              cardColor="#141419"
+              strapColor="#27272a"
+              size={0.28}
+              anchor="right"
+              strapLength={0.45}
+              interactive={true}
+              breeze={0.25}
+            />
+          </Suspense>
+        )}
       </div>
 
       {/* Hero Content - in front of the 3D canvas (z-10) with text pass-through */}

@@ -7,7 +7,7 @@ import {
   fetchLeetCodeStats,
 } from '../lib/leetcode';
 import { LEETCODE_STATS_FALLBACK } from '../lib/leetcodeFallback';
-import type { LeetCodeStatsResponse } from '../lib/schemas';
+import type { LeetCodeStatsResponse } from '../lib/statsSchemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 const LEETCODE_GLOW_COLORS = ['#ffa116', '#f59e0b', '#fbbf24'] as const;
@@ -15,10 +15,11 @@ const LEETCODE_GLOW_COLORS = ['#ffa116', '#f59e0b', '#fbbf24'] as const;
 const RING_RADIUS = 19;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-export default function LeetCodeStats() {
+export default function LeetCodeStats({ shouldFetch = true }: { shouldFetch?: boolean }) {
   const [stats, setStats] = useState<LeetCodeStatsResponse>(LEETCODE_STATS_FALLBACK);
 
   useEffect(() => {
+    if (!shouldFetch) return undefined;
     let isMounted = true;
     fetchLeetCodeStats()
       .then((res) => {
@@ -31,7 +32,7 @@ export default function LeetCodeStats() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [shouldFetch]);
 
   const ringStrokeOffset = useMemo(() => {
     const progress = calculateOverallProgress(stats.totalSolved, stats.totalQuestions);

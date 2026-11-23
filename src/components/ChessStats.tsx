@@ -4,15 +4,16 @@ import { ChessIcon } from './Icons';
 import BorderGlow from './BorderGlow';
 import { fetchChessStats, formatChessRating } from '../lib/chess';
 import { CHESS_STATS_FALLBACK } from '../lib/chessFallback';
-import type { ChessStatsResponse } from '../lib/schemas';
+import type { ChessStatsResponse } from '../lib/statsSchemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 const CHESS_GLOW_COLORS = ['#81b64c', '#a3e635', '#4ade80'] as const;
 
-export default function ChessStats() {
+export default function ChessStats({ shouldFetch = true }: { shouldFetch?: boolean }) {
   const [stats, setStats] = useState<ChessStatsResponse>(CHESS_STATS_FALLBACK);
 
   useEffect(() => {
+    if (!shouldFetch) return undefined;
     let isMounted = true;
     fetchChessStats()
       .then((res) => {
@@ -25,7 +26,7 @@ export default function ChessStats() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [shouldFetch]);
 
   return (
     <BorderGlow

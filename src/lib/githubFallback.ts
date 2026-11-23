@@ -1,4 +1,4 @@
-import type { GithubContributionDay, GithubContributionsResponse } from './schemas';
+import type { GithubContributionDay, GithubContributionsResponse } from './statsSchemas';
 
 // Active days snapshot for offline resilience (2025-10-19 to 2026-10-21, total = 100)
 const ACTIVE_FALLBACK_DAYS: Readonly<Record<string, readonly [count: number, level: number]>> = {

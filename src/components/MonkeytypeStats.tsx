@@ -8,15 +8,16 @@ import {
   formatMonkeytypeWpm,
 } from '../lib/monkeytype';
 import { MONKEYTYPE_STATS_FALLBACK } from '../lib/monkeytypeFallback';
-import type { MonkeytypeStatsResponse } from '../lib/schemas';
+import type { MonkeytypeStatsResponse } from '../lib/statsSchemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
 
 const MONKEYTYPE_GLOW_COLORS = ['#e2b714', '#fde047', '#eab308'] as const;
 
-export default function MonkeytypeStats() {
+export default function MonkeytypeStats({ shouldFetch = true }: { shouldFetch?: boolean }) {
   const [stats, setStats] = useState<MonkeytypeStatsResponse>(MONKEYTYPE_STATS_FALLBACK);
 
   useEffect(() => {
+    if (!shouldFetch) return undefined;
     let isMounted = true;
     fetchMonkeytypeStats()
       .then((res) => {
@@ -29,7 +30,7 @@ export default function MonkeytypeStats() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [shouldFetch]);
 
   const modeLabel = useMemo(
     () => formatMonkeytypeMode(stats.mode, stats.modeValue),

@@ -408,7 +408,7 @@ export default function Projects() {
   }, [openingFlight, returningFlight]);
 
   return (
-    <section id="projects" className="py-24 relative">
+    <section id="projects" className="py-24 relative section-defer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-left max-w-2xl mb-8 sm:mb-10">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback, type MouseEvent } from 'react';
 import { GithubIcon } from './Icons';
 import {
   fetchGithubContributions,
@@ -7,7 +7,7 @@ import {
   sumContributions,
 } from '../lib/github';
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from '../lib/githubFallback';
-import type { GithubContributionsResponse, GithubContributionDay } from '../lib/schemas';
+import type { GithubContributionsResponse, GithubContributionDay } from '../lib/statsSchemas';
 import { EXTERNAL_LINKS } from '../lib/constants';
 import BorderGlow from './BorderGlow';
 
@@ -47,13 +47,14 @@ function calculateYearProgress(): number {
   return Math.min(100, Math.max(5, Math.round((dayOfYear / (isLeap ? 366 : 365)) * 100)));
 }
 
-export default function GithubContributions() {
+export default function GithubContributions({ shouldFetch = true }: { shouldFetch?: boolean }) {
   const [data, setData] = useState<GithubContributionsResponse>(GITHUB_CONTRIBUTIONS_FALLBACK);
   const [hoveredDay, setHoveredDay] = useState<GithubContributionDay | null>(null);
   const [columnsCount, setColumnsCount] = useState<number>(27);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!shouldFetch) return undefined;
     let isMounted = true;
     fetchGithubContributions('last')
       .then((res) => {
@@ -66,7 +67,7 @@ export default function GithubContributions() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [shouldFetch]);
 
   // Compute how many columns comfortably fit without horizontal scrolling
   useEffect(() => {
@@ -121,6 +122,50 @@ export default function GithubContributions() {
     });
   }, [data.contributions]);
 
+  const dayLookup = useMemo(() => {
+    const map = new Map<string, GithubContributionDay>();
+    for (const day of data.contributions) {
+      map.set(day.date, day);
+    }
+    return map;
+  }, [data.contributions]);
+
+  const handleGridMouseOver = useCallback(
+    (event: MouseEvent<HTMLDivElement>) => {
+      const date = (event.target as HTMLElement).dataset.dayDate;
+      if (!date) return;
+      const found = dayLookup.get(date);
+      if (found) setHoveredDay((prev) => (prev?.date === found.date ? prev : found));
+    },
+    [dayLookup]
+  );
+
+  const contributionGrid = useMemo(
+    () => (
+      <div className="flex justify-between w-full">
+        {displayWeeks.map((week, wIdx) => (
+          <div key={wIdx} className="flex flex-col gap-0.5 sm:gap-1">
+            {week.map((day, dIdx) =>
+              day ? (
+                <div
+                  key={day.date}
+                  data-day-date={day.date}
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] ${LEVEL_CLASSES[day.level] ?? LEVEL_CLASSES[0]} cursor-pointer`}
+                />
+              ) : (
+                <div
+                  key={`empty-${wIdx}-${dIdx}`}
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] opacity-0 pointer-events-none"
+                />
+              )
+            )}
+          </div>
+        ))}
+      </div>
+    ),
+    [displayWeeks]
+  );
+
   return (
     <BorderGlow
       innerClassName="p-3.5 sm:p-4"
@@ -164,29 +209,11 @@ export default function GithubContributions() {
       {/* Contribution Grid: fits 100% of the card with no scroll */}
       <div
         ref={containerRef}
+        onMouseOver={handleGridMouseOver}
         onMouseLeave={() => setHoveredDay(null)}
         className="w-full overflow-hidden py-0.5 mb-3"
       >
-        <div className="flex justify-between w-full">
-          {displayWeeks.map((week, wIdx) => (
-            <div key={wIdx} className="flex flex-col gap-0.5 sm:gap-1">
-              {week.map((day, dIdx) =>
-                day ? (
-                  <div
-                    key={day.date}
-                    onMouseEnter={() => setHoveredDay(day)}
-                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] ${LEVEL_CLASSES[day.level] ?? LEVEL_CLASSES[0]} cursor-pointer`}
-                  />
-                ) : (
-                  <div
-                    key={`empty-${wIdx}-${dIdx}`}
-                    className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-[2px] sm:rounded-[2.5px] opacity-0 pointer-events-none"
-                  />
-                )
-              )}
-            </div>
-          ))}
-        </div>
+        {contributionGrid}
       </div>
 
       {/* Bottom Bar: Progress on Left, Last Pushed on Right */}

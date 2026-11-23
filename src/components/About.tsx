@@ -1,8 +1,9 @@
-import { 
-  GraduationCap, 
-  Languages, 
-  Calendar, 
-  MapPin 
+import { useEffect, useRef, useState } from 'react';
+import {
+  GraduationCap,
+  Languages,
+  Calendar,
+  MapPin,
 } from 'lucide-react';
 import GithubContributions from './GithubContributions';
 import LeetCodeStats from './LeetCodeStats';
@@ -45,8 +46,31 @@ const LANGUAGES = [
 ] as const;
 
 export default function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [shouldFetchStats, setShouldFetchStats] = useState(
+    () => typeof IntersectionObserver === 'undefined'
+  );
+
+  useEffect(() => {
+    if (shouldFetchStats) return undefined;
+    const node = sectionRef.current;
+    if (!node) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldFetchStats(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px 0px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldFetchStats]);
+
   return (
-    <section id="about" className="py-24 relative">
+    <section id="about" ref={sectionRef} className="py-24 relative section-defer">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -96,12 +120,12 @@ export default function About() {
             </BorderGlow>
 
             {/* Compact LeetCode Stats Card */}
-            <LeetCodeStats />
+            <LeetCodeStats shouldFetch={shouldFetchStats} />
 
             {/* Compact Chess.com & Monkeytype Stats Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <ChessStats />
-              <MonkeytypeStats />
+              <ChessStats shouldFetch={shouldFetchStats} />
+              <MonkeytypeStats shouldFetch={shouldFetchStats} />
             </div>
           </div>
 
@@ -192,7 +216,7 @@ export default function About() {
             </BorderGlow>
 
             {/* GitHub Contributions Monitoring Card */}
-            <GithubContributions />
+            <GithubContributions shouldFetch={shouldFetchStats} />
           </div>
 
         </div>

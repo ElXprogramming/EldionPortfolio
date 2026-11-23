@@ -11,8 +11,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
-import { submitContactMessage } from '../lib/supabase';
-import { createSafeErrorMessage, copyToClipboard } from '../lib/security';
+import { createSafeErrorMessage, copyToClipboard } from '../lib/urlSecurity';
 import { PROFILE, EXTERNAL_LINKS } from '../lib/constants';
 import BorderGlow from './BorderGlow';
 
@@ -99,6 +98,7 @@ export default function Contact() {
     setStatusMessage('');
 
     try {
+      const { submitContactMessage } = await import('../lib/supabase');
       await submitContactMessage(formData);
       setSubmitStatus('success');
       setStatusMessage('Thank you! Your message has been sent directly to Eldion.');
@@ -117,7 +117,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 relative">
+    <section id="contact" className="py-24 relative section-defer">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-left max-w-2xl mb-8 sm:mb-10">

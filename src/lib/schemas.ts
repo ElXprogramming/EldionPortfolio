@@ -143,55 +143,14 @@ export function validateClientEnv(rawEnv: Record<string, unknown>): ClientEnvCon
   };
 }
 
-const githubContributionDaySchema = z
-  .object({
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-    count: z.number().int().nonnegative(),
-    level: z.number().int().min(0).max(4),
-  })
-  .strip();
-
-export type GithubContributionDay = z.infer<typeof githubContributionDaySchema>;
-
-export const githubContributionsResponseSchema = z
-  .object({
-    total: z.record(z.string(), z.number().int().nonnegative()),
-    contributions: z.array(githubContributionDaySchema),
-  })
-  .strip();
-
-export type GithubContributionsResponse = z.infer<typeof githubContributionsResponseSchema>;
-
-export const leetcodeStatsResponseSchema = z
-  .object({
-    totalSolved: z.number().int().nonnegative(),
-    totalQuestions: z.number().int().nonnegative(),
-    easySolved: z.number().int().nonnegative(),
-    totalEasy: z.number().int().nonnegative(),
-    mediumSolved: z.number().int().nonnegative(),
-    totalMedium: z.number().int().nonnegative(),
-    hardSolved: z.number().int().nonnegative(),
-    totalHard: z.number().int().nonnegative(),
-  })
-  .strip();
-
-export type LeetCodeStatsResponse = z.infer<typeof leetcodeStatsResponseSchema>;
-
-export const chessStatsResponseSchema = z
-  .object({
-    rapidRating: z.number().int().nonnegative(),
-  })
-  .strip();
-
-export type ChessStatsResponse = z.infer<typeof chessStatsResponseSchema>;
-
-export const monkeytypeStatsResponseSchema = z
-  .object({
-    topWpm: z.number().int().nonnegative(),
-    accuracy: z.number().int().min(0).max(100),
-    mode: z.literal('time').nullable(),
-    modeValue: z.literal('30').nullable(),
-  })
-  .strip();
-
-export type MonkeytypeStatsResponse = z.infer<typeof monkeytypeStatsResponseSchema>;
+export {
+  githubContributionsResponseSchema,
+  leetcodeStatsResponseSchema,
+  chessStatsResponseSchema,
+  monkeytypeStatsResponseSchema,
+  type GithubContributionDay,
+  type GithubContributionsResponse,
+  type LeetCodeStatsResponse,
+  type ChessStatsResponse,
+  type MonkeytypeStatsResponse,
+} from './statsSchemas';

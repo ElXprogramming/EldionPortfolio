@@ -1,11 +1,7 @@
 import { PROFILE } from './constants';
-import {
-  githubContributionsResponseSchema,
-  type GithubContributionsResponse,
-  type GithubContributionDay,
-} from './schemas';
+import type { GithubContributionsResponse, GithubContributionDay } from './statsSchemas';
 import { GITHUB_CONTRIBUTIONS_FALLBACK } from './githubFallback';
-import { SafeUserError } from './security';
+import { SafeUserError } from './urlSecurity';
 
 const GITHUB_API_BASE = 'https://github-contributions-api.jogruber.de/v4';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -45,10 +41,13 @@ export async function fetchGithubContributions(
 
     try {
       const url = `${GITHUB_API_BASE}/${encodeURIComponent(PROFILE.githubUsername)}?y=${encodeURIComponent(year)}`;
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: { Accept: 'application/json' },
-      });
+      const [response, { githubContributionsResponseSchema }] = await Promise.all([
+        fetch(url, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        }),
+        import('./statsSchemas'),
+      ]);
 
       if (!response.ok) {
         throw new SafeUserError(`Failed to fetch GitHub contributions (HTTP ${response.status})`);

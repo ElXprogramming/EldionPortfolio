@@ -10,10 +10,11 @@ import {
 } from 'lucide-react';
 import BranchedMenu, { type BranchedMenuItem } from './BranchedMenu';
 import { PROFILE } from '../lib/constants';
-import { sanitizeInternalRoute } from '../lib/security';
+import { sanitizeInternalRoute } from '../lib/urlSecurity';
 
 interface NavbarProps {
   activeSection: string;
+  onNavigate?: (sectionId: string) => void;
 }
 
 const MENU_ITEMS: readonly BranchedMenuItem[] = [
@@ -29,11 +30,12 @@ const MENU_ITEMS: readonly BranchedMenuItem[] = [
   },
 ];
 
-export default function Navbar({ activeSection }: NavbarProps) {
+export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Close mobile drawer on resize to desktop or Escape key
+  // Only attach window resize/Escape listeners while the mobile drawer is actually open
   useEffect(() => {
+    if (!mobileOpen) return undefined;
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setMobileOpen(false);
@@ -50,19 +52,23 @@ export default function Navbar({ activeSection }: NavbarProps) {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [mobileOpen]);
 
-  const handleSelect = useCallback((value: string) => {
-    const target = document.getElementById(value);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-      const safeHash = sanitizeInternalRoute(`#${value}`);
-      if (window.history.pushState) {
-        window.history.pushState(null, '', safeHash);
+  const handleSelect = useCallback(
+    (value: string) => {
+      onNavigate?.(value);
+      const target = document.getElementById(value);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        const safeHash = sanitizeInternalRoute(`#${value}`);
+        if (window.history.pushState) {
+          window.history.pushState(null, '', safeHash);
+        }
       }
-    }
-    setMobileOpen(false);
-  }, []);
+      setMobileOpen(false);
+    },
+    [onNavigate]
+  );
 
   return (
     <>
@@ -71,7 +77,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
         aria-label="Left side navigation"
         className="hidden lg:block fixed left-5 top-1/2 -translate-y-1/2 z-50 pointer-events-auto"
       >
-        <div className="bg-[#0c0c11]/85 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 shadow-2xl shadow-black/60 transition-all hover:border-white/20">
+        <div className="bg-[#0c0c11]/95 border border-white/10 rounded-2xl p-3.5 shadow-2xl shadow-black/60 transition-colors hover:border-white/20">
           <BranchedMenu
             items={MENU_ITEMS}
             defaultOpen={[0]}
@@ -93,7 +99,7 @@ export default function Navbar({ activeSection }: NavbarProps) {
       </aside>
 
       {/* Mobile Top Bar with Menu Toggle */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#09090b]/90 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#09090b]/95 border-b border-white/10 px-4 py-3 flex items-center justify-between">
         <a href="#" className="font-bold text-sm tracking-wide text-white">
           {PROFILE.name}
         </a>

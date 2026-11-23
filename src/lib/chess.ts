@@ -1,4 +1,4 @@
-import { chessStatsResponseSchema, type ChessStatsResponse } from './schemas';
+import type { ChessStatsResponse } from './statsSchemas';
 import { CHESS_STATS_FALLBACK } from './chessFallback';
 
 const CHESS_API_PATH = '/api/chess';
@@ -32,10 +32,13 @@ export async function fetchChessStats(): Promise<ChessStatsResponse> {
     const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
-      const response = await fetch(CHESS_API_PATH, {
-        signal: controller.signal,
-        headers: { Accept: 'application/json' },
-      });
+      const [response, { chessStatsResponseSchema }] = await Promise.all([
+        fetch(CHESS_API_PATH, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' },
+        }),
+        import('./statsSchemas'),
+      ]);
 
       if (!response.ok) {
         throw new Error(`HTTP_${response.status}`);
