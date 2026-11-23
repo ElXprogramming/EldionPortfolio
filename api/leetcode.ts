@@ -29,10 +29,6 @@ const LEETCODE_STATS_QUERY = `
           count
         }
       }
-      userCalendar {
-        streak
-        totalActiveDays
-      }
     }
   }
 `;
@@ -58,14 +54,6 @@ const upstreamGraphqlResponseSchema = z
                 acSubmissionNum: z.array(difficultyCountSchema),
               })
               .strip(),
-            userCalendar: z
-              .object({
-                streak: z.number().int().nonnegative().nullable().optional(),
-                totalActiveDays: z.number().int().nonnegative().nullable().optional(),
-              })
-              .strip()
-              .nullable()
-              .optional(),
           })
           .strip()
           .nullable(),
@@ -84,8 +72,6 @@ const leetcodeStatsPayloadSchema = z
     totalMedium: z.number().int().nonnegative(),
     hardSolved: z.number().int().nonnegative(),
     totalHard: z.number().int().nonnegative(),
-    streak: z.number().int().nonnegative(),
-    totalActiveDays: z.number().int().nonnegative(),
   })
   .strip();
 
@@ -286,8 +272,6 @@ export async function GET(request: Request): Promise<Response> {
       totalMedium: getCountByDifficulty(allQuestions, 'Medium'),
       hardSolved: getCountByDifficulty(solvedCounts, 'Hard'),
       totalHard: getCountByDifficulty(allQuestions, 'Hard'),
-      streak: matchedUser.userCalendar?.streak ?? 0,
-      totalActiveDays: matchedUser.userCalendar?.totalActiveDays ?? 0,
     });
 
     return new Response(JSON.stringify(payload), {

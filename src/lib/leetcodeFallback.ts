@@ -10,6 +10,4 @@ export const LEETCODE_STATS_FALLBACK: LeetCodeStatsResponse = {
   totalMedium: 2152,
   hardSolved: 0,
   totalHard: 993,
-  streak: 2,
-  totalActiveDays: 3,
 };

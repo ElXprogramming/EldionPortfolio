@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Flame } from 'lucide-react';
 import { LeetCodeIcon } from './Icons';
 import BorderGlow from './BorderGlow';
 import {
@@ -96,7 +95,7 @@ export default function LeetCodeStats() {
       </div>
 
       {/* Compact Stats Row: Mini solved ring + Easy/Med/Hard micro-bars */}
-      <div className="flex items-center gap-3.5 mb-2.5">
+      <div className="flex items-center gap-3.5">
         <div
           className="relative w-12 h-12 shrink-0 flex items-center justify-center"
           role="img"
@@ -152,21 +151,6 @@ export default function LeetCodeStats() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Bottom Footer: Streak / Active Days */}
-      <div className="flex items-center justify-end gap-2 pt-0.5 text-[10px] sm:text-[11px] text-zinc-500">
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="inline-flex items-center gap-1 text-zinc-400">
-            <Flame className="w-3 h-3 text-amber-400" aria-hidden="true" />
-            <span className="font-mono text-zinc-200 font-medium">{stats.streak}d</span> streak
-          </span>
-          <span aria-hidden="true" className="text-zinc-700">·</span>
-          <span>
-            <span className="font-mono text-zinc-300 font-medium">{stats.totalActiveDays}</span>{' '}
-            active {stats.totalActiveDays === 1 ? 'day' : 'days'}
-          </span>
         </div>
       </div>
     </BorderGlow>

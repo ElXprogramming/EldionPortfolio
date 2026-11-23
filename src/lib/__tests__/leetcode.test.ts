@@ -44,6 +44,8 @@ describe('LeetCode Utilities & Schema', () => {
       expect(parsed.totalSolved).toBe(15);
       expect('username' in parsed).toBe(false);
       expect('ranking' in parsed).toBe(false);
+      expect('streak' in parsed).toBe(false);
+      expect('totalActiveDays' in parsed).toBe(false);
       expect('injectedField' in parsed).toBe(false);
     });
 
@@ -72,8 +74,6 @@ describe('fetchLeetCodeStats', () => {
     totalMedium: 2152,
     hardSolved: 0,
     totalHard: 993,
-    streak: 4,
-    totalActiveDays: 9,
   };
 
   beforeEach(() => {
