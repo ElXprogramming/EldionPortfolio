@@ -78,9 +78,9 @@ describe('GET /api/chess serverless proxy', () => {
 
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion_03',
       rapidRating: 1552,
     });
+    expect('username' in body).toBe(false);
     expect('blitz' in body).toBe(false);
     expect('bullet' in body).toBe(false);
     expect('chess_daily' in body).toBe(false);
@@ -105,7 +105,6 @@ describe('GET /api/chess serverless proxy', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body).toEqual({
-      username: 'eldion_03',
       rapidRating: 0,
     });
   });

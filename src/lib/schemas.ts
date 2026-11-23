@@ -183,7 +183,6 @@ export type LeetCodeStatsResponse = z.infer<typeof leetcodeStatsResponseSchema>;
 
 export const chessStatsResponseSchema = z
   .object({
-    username: sanitizedBoundedText(64, 'Username is required.', 'Username is too long.'),
     rapidRating: z.number().int().nonnegative(),
   })
   .strip();

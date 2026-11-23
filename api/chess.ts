@@ -39,7 +39,6 @@ const upstreamChessStatsSchema = z
 
 const chessStatsPayloadSchema = z
   .object({
-    username: z.string().trim().min(1).max(64),
     rapidRating: z.number().int().nonnegative(),
   })
   .strip();
@@ -216,7 +215,6 @@ export async function GET(request: Request): Promise<Response> {
     const validatedUpstream = upstreamChessStatsSchema.parse(rawJson);
 
     const payload = chessStatsPayloadSchema.parse({
-      username: CHESS_USERNAME,
       rapidRating: validatedUpstream.chess_rapid?.last?.rating ?? 0,
     });
 

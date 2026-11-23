@@ -15,9 +15,9 @@ describe('Chess.com Utilities & Schema', () => {
   });
 
   describe('chessStatsResponseSchema & fallback snapshot', () => {
-    it('validates clean rapid-only payloads, sanitizes username, and strips unexpected fields', () => {
+    it('validates clean rapid-only payloads and strips unexpected fields', () => {
       const parsed = chessStatsResponseSchema.parse({
-        username: '  eldion_03<script>alert(1)</script>  ',
+        username: 'eldion_03',
         rapidRating: 1552,
         blitz: { rating: 978 },
         bullet: { rating: 935 },
@@ -25,9 +25,9 @@ describe('Chess.com Utilities & Schema', () => {
       });
 
       expect(parsed).toEqual({
-        username: 'eldion_03',
         rapidRating: 1552,
       });
+      expect('username' in parsed).toBe(false);
       expect('blitz' in parsed).toBe(false);
       expect('bullet' in parsed).toBe(false);
       expect('injectedField' in parsed).toBe(false);
@@ -36,7 +36,6 @@ describe('Chess.com Utilities & Schema', () => {
     it('rejects malformed or negative stat payloads', () => {
       expect(() =>
         chessStatsResponseSchema.parse({
-          username: 'eldion_03',
           rapidRating: -10,
         })
       ).toThrow();
@@ -44,7 +43,6 @@ describe('Chess.com Utilities & Schema', () => {
 
     it('validates the bundled fallback snapshot', () => {
       const parsed = chessStatsResponseSchema.parse(CHESS_STATS_FALLBACK);
-      expect(parsed.username).toBe('eldion_03');
       expect(parsed.rapidRating).toBeGreaterThan(0);
     });
   });
@@ -52,7 +50,6 @@ describe('Chess.com Utilities & Schema', () => {
 
 describe('fetchChessStats', () => {
   const sampleStats = {
-    username: 'eldion_03',
     rapidRating: 1580,
   };
 
