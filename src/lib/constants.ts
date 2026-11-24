@@ -3,7 +3,7 @@ import { sanitizeExternalUrl, sanitizeMailtoUrl } from './urlSecurity';
 export const PROFILE = {
   name: 'Eldion Ryan Godius',
   role: 'Software Engineering',
-  email: 'nayrnoidle@gmail.com',
+  email: 'eldionryangodius@gmail.com',
   githubUsername: 'ElXprogramming',
   leetcodeUsername: 'eldion03',
   chessUsername: 'eldion_03',

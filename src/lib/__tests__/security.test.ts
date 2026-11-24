@@ -58,6 +58,7 @@ describe('security utilities', () => {
       expect(EXTERNAL_LINKS.leetcode).toBe('https://leetcode.com/u/eldion03/');
       expect(EXTERNAL_LINKS.chess).toBe('https://www.chess.com/member/eldion_03');
       expect(EXTERNAL_LINKS.monkeytype).toBe('https://monkeytype.com/profile/eldion');
+      expect(EXTERNAL_LINKS.mailto).toBe('mailto:eldionryangodius@gmail.com');
       expect(EXTERNAL_LINKS.gitCanvasLive).toContain('https://githubstatreadme.vercel.app');
       expect(EXTERNAL_LINKS.gitCanvasRepo).toContain('https://github.com/ElXprogramming/GitCanvas');
       expect(EXTERNAL_LINKS.declaraformLive).toContain('https://declaraform.netlify.app');

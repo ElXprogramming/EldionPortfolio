@@ -67,5 +67,5 @@ Contributions and bug reports are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## 📬 Contact & Connect
 
-- **Email**: [nayrnoidle@gmail.com](mailto:nayrnoidle@gmail.com)
+- **Email**: [eldionryangodius@gmail.com](mailto:eldionryangodius@gmail.com)
 - **LinkedIn**: [Eldion Ryan Godius](https://www.linkedin.com/in/eldion-ryan-godius-897064235)
