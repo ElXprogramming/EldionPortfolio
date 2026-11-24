@@ -24,6 +24,7 @@ import {
   multiplyMatrices,
   parseHexColor,
   placeFlapCard,
+  projectFolderSlot,
   rgbString,
   rotateXMatrix,
   rotateYMatrix,
@@ -51,8 +52,15 @@ export interface FolderItemSnapshot {
   rotation: number;
 }
 
+export interface FolderItemTarget extends FolderItemSnapshot {
+  unitScale: number;
+  intoPocket: boolean;
+}
+
 export interface FolderHandle {
   getItemSnapshot: (index: number) => FolderItemSnapshot | null;
+  prepareItemReturn: (index: number) => FolderItemTarget | null;
+  completeItemReturn: (index: number, intoPocket?: boolean) => void;
 }
 
 export interface FolderProps {
@@ -105,7 +113,8 @@ interface SimItem {
   rank: number;
   layer: 'inside' | 'out' | 'drag' | 'focus';
   elevated: boolean;
-  insertUntil: number;
+  entering: boolean;
+  enterDeadline: number;
   outX: number;
   outY: number;
   outR: number;
@@ -139,6 +148,8 @@ interface FolderEngineHandle {
   setFocus: (index: number) => void;
   blur: () => boolean;
   getItemSnapshot: (index: number) => FolderItemSnapshot | null;
+  prepareItemReturn: (index: number) => FolderItemTarget | null;
+  completeItemReturn: (index: number, intoPocket?: boolean) => void;
 }
 
 interface FolderRuntimeSettings {
@@ -261,6 +272,10 @@ export default function Folder({
     ref,
     () => ({
       getItemSnapshot: (index: number) => engineRef.current?.getItemSnapshot(index) ?? null,
+      prepareItemReturn: (index: number) => engineRef.current?.prepareItemReturn(index) ?? null,
+      completeItemReturn: (index: number, intoPocket?: boolean) => {
+        engineRef.current?.completeItemReturn(index, intoPocket);
+      },
     }),
     []
   );
@@ -284,6 +299,7 @@ export default function Folder({
       phase: 'rest' as FolderPhase,
       previous: 'rest' as FolderPhase,
       changedAt: 0,
+      closedAt: 0,
       front: createSpring(0),
       rx: createSpring(0),
       ry: createSpring(0),
@@ -325,7 +341,8 @@ export default function Folder({
           rank: 0,
           layer: 'inside',
           elevated: false,
-          insertUntil: 0,
+          entering: false,
+          enterDeadline: 0,
           outX: 0,
           outY: 0,
           outR: 0,
@@ -356,6 +373,12 @@ export default function Folder({
       let top = 0;
       let right = window.innerWidth;
       let bottom = window.innerHeight;
+      const mainNode = root.closest('main');
+      if (mainNode) {
+        const mainRect = mainNode.getBoundingClientRect();
+        const padLeft = parseFloat(getComputedStyle(mainNode).paddingLeft) || 0;
+        left = Math.max(left, mainRect.left + padLeft);
+      }
       for (let node = root.parentElement; node && node !== document.body; node = node.parentElement) {
         const computed = getComputedStyle(node);
         if (/(hidden|clip|auto|scroll)/.test(`${computed.overflowX} ${computed.overflowY}`)) {
@@ -377,9 +400,28 @@ export default function Folder({
       };
     };
 
-    const overFolder = (x: number, y: number): boolean => {
-      const { g: geom } = settingsRef.current;
-      return x >= 0 && x <= geom.w && y >= 0 && y <= geom.tabH + geom.h;
+    const overFolder = (x: number, y: number, draggedItem?: SimItem | null): boolean => {
+      const s = settingsRef.current;
+      const { g: geom } = s;
+      const pad = 14 * geom.scale;
+      const topLimit = s.open ? -geom.docH * 0.45 : -pad;
+      if (x >= -pad && x <= geom.w + pad && y >= topLimit && y <= geom.tabH + geom.h + pad) {
+        return true;
+      }
+      // If an inside item in an open folder was only nudged near its own slot, keep it inside
+      if (s.open && draggedItem && draggedItem.place === 'inside') {
+        const insideCount = state.items.reduce(
+          (acc, it) => acc + (it.place === 'inside' ? 1 : 0),
+          0
+        );
+        const slot = placeFlapCard(draggedItem.rank, insideCount, 'open', geom, null);
+        const itemX = x + (state.drag?.grabX ?? 0);
+        const itemY = y + (state.drag?.grabY ?? 0);
+        if (Math.hypot(itemX - slot.x, itemY - slot.y) <= 36 * geom.scale) {
+          return true;
+        }
+      }
+      return false;
     };
 
     const inPocket = (item: SimItem): boolean => {
@@ -405,11 +447,6 @@ export default function Folder({
       const pointer = state.hovered ? ((state.pointerX + 1) / 2) * s.g.w : null;
       return placeFlapCard(rank, inside, phase, s.g, pointer);
     };
-
-    const approach = (slot: CardPlacement, geom: FolderGeometry): CardPlacement => ({
-      ...slot,
-      y: Math.min(slot.y, geom.frontTop - geom.docH * 0.5 * slot.s - 8 * geom.scale),
-    });
 
     const write = () => {
       const s = settingsRef.current;
@@ -510,11 +547,15 @@ export default function Folder({
 
       const phase = phaseOf(s, time);
       if (phase !== state.phase) {
+        if (state.phase === 'open' && phase !== 'open') {
+          state.closedAt = now;
+        }
         state.previous = state.phase;
         state.phase = phase;
         state.changedAt = now;
       }
       const elapsed = (now - state.changedAt) / 1000;
+      const sinceClose = state.closedAt > 0 ? (now - state.closedAt) / 1000 : Infinity;
       let busy = time < state.receiveUntil;
 
       const ranks: number[] = [];
@@ -559,9 +600,9 @@ export default function Folder({
             : 1;
       state.appear = 1 - (1 - appear) ** 3;
 
-      const closing = state.previous === 'open' && phase !== 'open';
-      const frontDelay = closing && !reduce ? (0.06 + 0.035 * inside) / DEFAULT_SPEED : 0;
-      const frontPhase = elapsed < frontDelay ? state.previous : phase;
+      const closingDelay = !s.open && !reduce ? (0.08 + 0.035 * inside) / DEFAULT_SPEED : 0;
+      const holdingOpenForClose = sinceClose < closingDelay;
+      const frontPhase: FolderPhase = holdingOpenForClose ? 'open' : phase;
       const frontTarget = holding ? -42 : FLAP_ANGLES[frontPhase];
 
       if (!state.ready) {
@@ -597,7 +638,7 @@ export default function Folder({
         state.front.value = -state.front.value;
         state.front.velocity = -state.front.velocity * restitution;
       }
-      if (elapsed < frontDelay) busy = true;
+      if (holdingOpenForClose) busy = true;
 
       const engaged = state.hovered && !reduce;
       busy = integrateSpring(state.rx, engaged ? -state.pointerY * 8 * DEFAULT_TILT : 0, soft, 1, dt) || busy;
@@ -615,6 +656,8 @@ export default function Folder({
           : null;
       const focusScale = clamp(((geom.tabH + geom.h) * 1.18) / geom.docH, 1.2, 2.2);
       const focusY = geom.tabH + geom.h * 0.36;
+      const frontAngleRad = (state.front.value * Math.PI) / 180;
+      const frontLipY = geom.tabH + geom.h - geom.frontH * Math.cos(frontAngleRad);
 
       state.items.forEach((item, index) => {
         if (item.fresh) {
@@ -627,6 +670,7 @@ export default function Folder({
 
         let target: CardPlacement;
         let omega = itemOmega;
+        let omegaX = itemOmega;
         let damping = zeta;
         let lift = 0;
         let fade = 1;
@@ -645,6 +689,7 @@ export default function Folder({
             s: drag.scale * 1.05,
           };
           omega = TAU * 5;
+          omegaX = omega;
           damping = 0.78;
           lift = 1.4;
           if (!item.elevated && !inPocket(item)) item.elevated = true;
@@ -660,24 +705,83 @@ export default function Folder({
             : opening
               ? (0.05 + item.rank * 0.045) / DEFAULT_SPEED
               : (item.rank * 0.03) / DEFAULT_SPEED;
-          const activePhase = elapsed >= delay ? phase : state.previous;
-          target = place(item.rank, inside, activePhase, s);
-          if (elapsed < delay) busy = true;
+          const itemElapsed = !s.open && sinceClose < 0.5 ? sinceClose : elapsed;
+          const prevForStagger: FolderPhase = !s.open && sinceClose < 0.5 ? 'open' : state.previous;
+          const activePhase = itemElapsed >= delay ? phase : prevForStagger;
+          const isItemInFlight = s.inFlightIndices.includes(index);
+          target = isItemInFlight
+            ? placeFlapCard(item.rank, inside, activePhase, geom, null)
+            : place(item.rank, inside, activePhase, s);
+          if (itemElapsed < delay) busy = true;
+
+          const rad = Math.abs((item.r.value * Math.PI) / 180);
+          const halfSpanX =
+            ((geom.docW * Math.cos(rad) + geom.docH * Math.sin(rad)) * item.s.value) / 2;
+          const halfSpanY =
+            ((geom.docW * Math.sin(rad) + geom.docH * Math.cos(rad)) * item.s.value) / 2;
+          const wallPad = 4 * geom.scale;
+          const minPocketX = halfSpanX + wallPad;
+          const maxPocketX = Math.max(minPocketX, geom.w - halfSpanX - wallPad);
 
           if (staged && introTime < dropAt(item.rank)) {
             target = introPose(item, target);
             fade = 0;
             item.layer = 'inside';
-          } else if (item.insertUntil > time) {
-            busy = true;
-            target = approach(target, geom);
-            item.layer = 'drag';
-            lift = 0.6;
+          } else if (item.entering) {
+            if (phase === 'open') {
+              const overlapsFlap = item.y.value + halfSpanY > frontLipY - 2 * geom.scale;
+              const stillTraveling =
+                Math.hypot(item.x.value - target.x, item.y.value - target.y) > 14 * geom.scale &&
+                time < item.enterDeadline;
+              if (overlapsFlap || stillTraveling) {
+                busy = true;
+                item.layer = 'drag';
+                lift = 0.5;
+              } else {
+                item.entering = false;
+                item.elevated = false;
+                item.layer = 'inside';
+                lift = 0.2;
+              }
+            } else {
+              const clearedLip = item.y.value + halfSpanY <= frontLipY + 2 * geom.scale;
+              const withinWalls =
+                item.x.value >= minPocketX - 8 * geom.scale &&
+                item.x.value <= maxPocketX + 8 * geom.scale;
+              if ((clearedLip && withinWalls) || time >= item.enterDeadline) {
+                item.entering = false;
+                item.elevated = false;
+                item.layer = 'inside';
+                state.receiveUntil = Math.max(state.receiveUntil, time + 0.22 / DEFAULT_SPEED);
+              } else {
+                busy = true;
+                target = {
+                  ...target,
+                  y: Math.min(target.y, frontLipY - halfSpanY - 6 * geom.scale),
+                };
+                omega = itemOmega * 1.35;
+                omegaX = omega;
+                item.layer = 'drag';
+                lift = 0.6;
+              }
+            }
           } else {
-            item.insertUntil = 0;
             item.elevated = false;
             item.layer = 'inside';
-            if (lead && activePhase === 'open') {
+            if (activePhase !== 'open') {
+              // Gather fanned-out outer cards over the folder mouth before dropping behind front flap
+              const outsideWalls =
+                item.x.value < minPocketX - 4 * geom.scale ||
+                item.x.value > maxPocketX + 4 * geom.scale;
+              if (outsideWalls) {
+                busy = true;
+                omegaX = itemOmega * 1.4;
+                target = {
+                  ...target,
+                  y: Math.min(target.y, frontLipY - halfSpanY - 4 * geom.scale),
+                };
+              }
+            } else if (lead && !isItemInFlight) {
               if (hover === index) {
                 target = {
                   ...target,
@@ -706,7 +810,7 @@ export default function Folder({
           }
         }
 
-        busy = integrateSpring(item.x, target.x, omega, damping, dt) || busy;
+        busy = integrateSpring(item.x, target.x, omegaX, damping, dt) || busy;
         busy = integrateSpring(item.y, target.y, omega, damping, dt) || busy;
         if (item.layer === 'inside') {
           const tiltVal = (item.r.value * Math.PI) / 180;
@@ -714,7 +818,7 @@ export default function Folder({
             ((geom.docW * Math.abs(Math.sin(tiltVal)) + geom.docH * Math.abs(Math.cos(tiltVal))) *
               item.s.value) /
             2;
-          const floor = geom.tabH + geom.h - 2 * geom.scale - reach;
+          const floor = geom.tabH + geom.h - 1.5 * geom.scale - reach;
           if (item.y.value > floor) {
             item.y.value = floor;
             if (item.y.velocity > 0) item.y.velocity *= -0.25;
@@ -753,7 +857,7 @@ export default function Folder({
         drag?.active &&
           item &&
           (item.place === 'out' || item.elevated) &&
-          overFolder(state.deskX, state.deskY)
+          overFolder(state.deskX, state.deskY, item)
       );
     };
 
@@ -781,14 +885,22 @@ export default function Folder({
       const time = performance.now() / 1000;
       const [vx, vy] = cancelled ? [0, 0] : velocityOf(drag.samples);
 
-      if (overFolder(state.deskX, state.deskY)) {
-        const entering = item.place === 'out' || item.elevated;
+      if (overFolder(state.deskX, state.deskY, item)) {
+        const wasOutsideOrElevated = item.place === 'out' || item.elevated;
         item.place = 'inside';
-        if (entering && !reduce) {
-          item.insertUntil = time + 0.24 / DEFAULT_SPEED;
-          state.receiveUntil = item.insertUntil + 0.14 / DEFAULT_SPEED;
+        state.hoveredItem = -1;
+        item.x.velocity = clamp(vx, -1400, 1400) * 0.35;
+        item.y.velocity = clamp(vy, -1400, 1400) * 0.35;
+        if (wasOutsideOrElevated && !reduce) {
+          item.entering = true;
+          item.enterDeadline = time + 0.55 / DEFAULT_SPEED;
+          if (!s.open) {
+            state.receiveUntil = Math.max(state.receiveUntil, time + 0.52 / DEFAULT_SPEED);
+          }
+        } else {
+          item.entering = false;
+          item.elevated = false;
         }
-        item.elevated = false;
         syncOutside();
         return;
       }
@@ -799,6 +911,7 @@ export default function Folder({
       const x = state.deskX + drag.grabX + clamp(vx, -2400, 2400) * 0.09;
       const y = state.deskY + drag.grabY + clamp(vy, -2400, 2400) * 0.09;
       item.place = 'out';
+      item.entering = false;
       item.elevated = true;
       const margin = 8 * s.g.scale;
       const reachX = halfW * 1.08 + margin;
@@ -970,6 +1083,38 @@ export default function Folder({
       state.focus = settingsRef.current.selectedIndex;
     }
 
+    const computeMouthSlot = (
+      rank: number,
+      insideCount: number,
+      geom: FolderGeometry
+    ): CardPlacement => {
+      const receiveSlot = placeFlapCard(rank, insideCount, 'receive', geom, null);
+      const receiveLipY =
+        geom.tabH + geom.h - geom.frontH * Math.cos((FLAP_ANGLES.receive * Math.PI) / 180);
+      const mouthScale = 0.92;
+      const mouthRot = receiveSlot.r * 0.5;
+      const rad = Math.abs((mouthRot * Math.PI) / 180);
+      const halfSpanY =
+        ((geom.docW * Math.sin(rad) + geom.docH * Math.cos(rad)) * mouthScale) / 2;
+      return {
+        x: receiveSlot.x,
+        y: Math.min(receiveSlot.y, receiveLipY - halfSpanY - 6 * geom.scale),
+        r: mouthRot,
+        s: mouthScale,
+      };
+    };
+
+    const syncInsideRanks = (): number => {
+      const insideIndices: number[] = [];
+      state.items.forEach((it, idx) => {
+        if (it.place === 'inside') insideIndices.push(idx);
+      });
+      insideIndices.forEach((idx, rnk) => {
+        state.items[idx].rank = rnk;
+      });
+      return insideIndices.length;
+    };
+
     const getItemSnapshot = (index: number): FolderItemSnapshot | null => {
       const node = itemRefs.current[index];
       const sim = state.items[index];
@@ -980,13 +1125,135 @@ export default function Folder({
       const rootBox = root.getBoundingClientRect();
       const scaleRatioX = root.offsetWidth > 0 ? rootBox.width / root.offsetWidth : 1;
       const scaleRatioY = root.offsetHeight > 0 ? rootBox.height / root.offsetHeight : 1;
+      const zoom =
+        (1 + state.lift.value * 0.012) * state.squash.value * (0.94 + 0.06 * state.appear);
+      const depth = Math.round(Math.max(s.g.w, s.g.h) * 5);
+      const z = (3 + sim.hover.value * 26) * s.g.scale;
+      const persp = depth > z ? depth / (depth - z) : 1;
       return {
         centerX: rect.left + rect.width / 2,
         centerY: rect.top + rect.height / 2,
-        width: s.g.docW * sim.s.value * scaleRatioX,
-        height: s.g.docH * sim.s.value * scaleRatioY,
+        width: s.g.docW * sim.s.value * zoom * persp * scaleRatioX,
+        height: s.g.docH * sim.s.value * zoom * persp * scaleRatioY,
         rotation: sim.r.value,
       };
+    };
+
+    const prepareItemReturn = (index: number): FolderItemTarget | null => {
+      const s = settingsRef.current;
+      ensureItems(s.count);
+      const sim = state.items[index];
+      if (!sim || index < 0 || index >= s.count) return null;
+
+      if (state.intro.phase !== 'done') {
+        observer?.disconnect();
+        state.intro.phase = 'done';
+        state.appear = 1;
+        root.style.opacity = '';
+        if (!state.ready) {
+          state.ready = true;
+          state.phase = s.open ? 'open' : 'rest';
+          state.previous = state.phase;
+          snapSpring(state.front, FLAP_ANGLES[state.phase]);
+        }
+      }
+
+      if (sim.place !== 'inside') {
+        sim.place = 'inside';
+        sim.elevated = false;
+        syncOutside();
+      }
+      sim.entering = false;
+      sim.enterDeadline = 0;
+
+      const insideCount = syncInsideRanks();
+      const rootBox = root.getBoundingClientRect();
+      if (rootBox.width === 0 || rootBox.height === 0) return null;
+      const depth = Math.round(Math.max(s.g.w, s.g.h) * 5);
+
+      if (s.open) {
+        const slot = placeFlapCard(sim.rank, insideCount, 'open', s.g, null);
+        snapSpring(sim.x, slot.x);
+        snapSpring(sim.y, slot.y);
+        snapSpring(sim.r, slot.r);
+        snapSpring(sim.s, slot.s);
+        snapSpring(sim.hover, 0.2);
+        snapSpring(sim.mx, 0);
+        snapSpring(sim.my, 0);
+        snapSpring(sim.alpha, 1);
+        sim.fresh = false;
+        sim.layer = 'inside';
+        write();
+        wake();
+
+        return {
+          ...projectFolderSlot(slot, 0.2, s.g, depth, rootBox),
+          intoPocket: false,
+        };
+      }
+
+      const nowSec = performance.now() / 1000;
+      state.receiveUntil = Math.max(state.receiveUntil, nowSec + 0.65 / DEFAULT_SPEED);
+      const mouthSlot = computeMouthSlot(sim.rank, insideCount, s.g);
+      snapSpring(sim.x, mouthSlot.x);
+      snapSpring(sim.y, mouthSlot.y);
+      snapSpring(sim.r, mouthSlot.r);
+      snapSpring(sim.s, mouthSlot.s);
+      snapSpring(sim.hover, 0.5);
+      snapSpring(sim.mx, 0);
+      snapSpring(sim.my, 0);
+      snapSpring(sim.alpha, 1);
+      sim.fresh = false;
+      sim.layer = 'inside';
+      write();
+      wake();
+
+      return {
+        ...projectFolderSlot(mouthSlot, 0.5, s.g, depth, rootBox),
+        intoPocket: true,
+      };
+    };
+
+    const completeItemReturn = (index: number, intoPocket = false) => {
+      const s = settingsRef.current;
+      const sim = state.items[index];
+      if (!sim) return;
+
+      if (intoPocket && !s.open) {
+        const insideCount = syncInsideRanks();
+        const mouthSlot = computeMouthSlot(sim.rank, insideCount, s.g);
+        snapSpring(sim.x, mouthSlot.x);
+        snapSpring(sim.y, mouthSlot.y);
+        snapSpring(sim.r, mouthSlot.r);
+        snapSpring(sim.s, mouthSlot.s);
+        snapSpring(sim.hover, 0.5);
+        snapSpring(sim.mx, 0);
+        snapSpring(sim.my, 0);
+        snapSpring(sim.alpha, 1);
+        sim.y.velocity = reduce ? 0 : 130 * s.g.scale;
+        sim.entering = false;
+        sim.elevated = false;
+        sim.layer = 'inside';
+        const nowSec = performance.now() / 1000;
+        state.receiveUntil = Math.max(state.receiveUntil, nowSec + 0.26 / DEFAULT_SPEED);
+      } else if (s.open) {
+        const insideCount = syncInsideRanks();
+        const slot = placeFlapCard(sim.rank, insideCount, 'open', s.g, null);
+        snapSpring(sim.x, slot.x);
+        snapSpring(sim.y, slot.y);
+        snapSpring(sim.r, slot.r);
+        snapSpring(sim.s, slot.s);
+        snapSpring(sim.hover, 0.2);
+        snapSpring(sim.mx, 0);
+        snapSpring(sim.my, 0);
+        snapSpring(sim.alpha, 1);
+        sim.entering = false;
+        sim.elevated = false;
+        sim.layer = 'inside';
+      }
+
+      write();
+      wake();
     };
 
     engineRef.current = {
@@ -1001,6 +1268,12 @@ export default function Folder({
       select: (index) => {
         const s = settingsRef.current;
         const snapshot = getItemSnapshot(index);
+        if (s.extractSelected && s.selectedIndex !== index && state.items[index]?.place === 'out') {
+          state.items[index].place = 'inside';
+          state.items[index].entering = false;
+          state.items[index].elevated = false;
+          syncOutside();
+        }
         if (s.selectedIndex === undefined && !s.extractSelected && s.zoomOnClick) {
           state.focus = state.focus === index ? -1 : index;
         }
@@ -1020,6 +1293,8 @@ export default function Folder({
         return true;
       },
       getItemSnapshot,
+      prepareItemReturn,
+      completeItemReturn,
     };
     wake();
 
@@ -1036,7 +1311,7 @@ export default function Folder({
     };
   }, []);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setOpenRef.current = setIsOpen;
     settingsRef.current = {
       open: isOpen,

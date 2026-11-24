@@ -12,12 +12,14 @@ import {
   multiplyMatrices,
   parseHexColor,
   placeFlapCard,
+  projectFolderSlot,
   rectToBox,
   rgbString,
   rotateXMatrix,
   rotateYMatrix,
   rotateZMatrix,
   scaleMatrix,
+  toLocalBox,
   translateMatrix,
 } from '../../lib/folderUtils';
 
@@ -128,6 +130,58 @@ describe('Folder utilities', () => {
       );
       expect(degenerate.sx).toBe(1);
       expect(degenerate.sy).toBe(1);
+
+      // Reverse card-to-file scale (> 4x when compact) must not be clamped prematurely
+      const reverseDelta = computeFlipDelta(
+        { centerX: 800, centerY: 375, width: 420, height: 350, rotation: 0 },
+        { centerX: 300, centerY: 325, width: 96, height: 117, rotation: -3 }
+      );
+      expect(reverseDelta.sx).toBeCloseTo(420 / 96, 4);
+      expect(reverseDelta.sy).toBeCloseTo(350 / 117, 4);
+    });
+
+    it('keeps rotated cards inside pocket side seams and above pocket floor in non-open phases', () => {
+      const geom = measureFolder(1.05, 95, true, 'left');
+      const phases = ['rest', 'peek', 'receive'] as const;
+
+      for (const phase of phases) {
+        for (let rank = 0; rank < 6; rank++) {
+          const slot = placeFlapCard(rank, 6, phase, geom, geom.w * 0.5);
+          const rad = Math.abs((slot.r * Math.PI) / 180);
+          const halfSpanX = ((geom.docW * Math.cos(rad) + geom.docH * Math.sin(rad)) * slot.s) / 2;
+          const reachY = ((geom.docW * Math.sin(rad) + geom.docH * Math.cos(rad)) * slot.s) / 2;
+          const pocketFloor = geom.tabH + geom.h - 1.5 * geom.scale - reachY;
+
+          expect(slot.x - halfSpanX).toBeGreaterThanOrEqual(4 * geom.scale - 1e-6);
+          expect(slot.x + halfSpanX).toBeLessThanOrEqual(geom.w - 4 * geom.scale + 1e-6);
+          expect(slot.y).toBeLessThan(pocketFloor);
+        }
+      }
+    });
+
+    it('projects canonical folder slots with 3D perspective and converts to section-local coordinates', () => {
+      const geom = measureFolder(1.05, 90, true, 'left');
+      const totalH = geom.tabH + geom.h;
+      const depth = Math.round(Math.max(geom.w, geom.h) * 5);
+      const slot = placeFlapCard(0, 4, 'open', geom, null);
+      const rootRect = { left: 220, top: 480, width: geom.w, height: totalH };
+
+      const projected = projectFolderSlot(slot, 0.2, geom, depth, rootRect);
+      const expectedZ = (3 + 0.2 * 26) * geom.scale;
+      const expectedPersp = depth / (depth - expectedZ);
+
+      expect(projected.width).toBeCloseTo(geom.docW * slot.s * expectedPersp, 4);
+      expect(projected.height).toBeCloseTo(geom.docH * slot.s * expectedPersp, 4);
+      expect(projected.rotation).toBe(slot.r);
+      expect(projected.unitScale).toBeCloseTo(geom.scale * slot.s * expectedPersp, 4);
+
+      const sectionRect = { left: 100, top: 360 };
+      const local = toLocalBox(projected, sectionRect);
+      expect(local.centerX).toBeCloseTo(projected.centerX - 100, 4);
+      expect(local.centerY).toBeCloseTo(projected.centerY - 360, 4);
+      expect(local.width).toBeCloseTo(projected.width, 4);
+      expect(local.height).toBeCloseTo(projected.height, 4);
+      expect(local.rotation).toBe(slot.r);
     });
   });
 });

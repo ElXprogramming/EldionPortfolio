@@ -234,26 +234,46 @@
   color: #faf5ff;
 }
 
-.folder-item[data-extracted] {
+.folder-item[data-extracted],
+.folder-root[data-open] .folder-item[data-in-flight] {
   background: rgba(168, 85, 247, 0.05);
-  border: 1.5px dashed rgba(168, 85, 247, 0.35);
   box-shadow: none;
+}
+
+.folder-item[data-extracted]::before,
+.folder-root[data-open] .folder-item[data-in-flight]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px dashed rgba(168, 85, 247, 0.35);
+  pointer-events: none;
+}
+
+.folder-item[data-extracted] {
   cursor: pointer;
-  transition: background 200ms ease, border-color 200ms ease;
 }
 
 .folder-item[data-extracted]:hover {
   background: rgba(168, 85, 247, 0.12);
+}
+
+.folder-item[data-extracted]:hover::before {
   border-color: rgba(192, 132, 252, 0.65);
 }
 
-.folder-item[data-extracted] .folder-photo {
+.folder-item[data-extracted] .folder-photo,
+.folder-item[data-in-flight] .folder-photo {
   opacity: 0;
   pointer-events: none;
 }
 
-.folder-root:not([data-open]) .folder-item[data-extracted],
 .folder-item[data-in-flight] {
+  pointer-events: none !important;
+}
+
+.folder-root:not([data-open]) .folder-item[data-extracted],
+.folder-root:not([data-open]) .folder-item[data-in-flight] {
   opacity: 0 !important;
   pointer-events: none !important;
 }

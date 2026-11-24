@@ -40,6 +40,15 @@ export interface FlipDelta {
   rotation: number;
 }
 
+export interface ProjectedSlot {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+  rotation: number;
+  unitScale: number;
+}
+
 const FLAP_REST = [
   { x: 0.16, rise: 0, r: 3 },
   { x: -0.17, rise: 0.05, r: -3.5 },
@@ -226,13 +235,14 @@ export function placeFlapCard(
   pointer: number | null
 ): CardPlacement {
   const rest = FLAP_REST[rank] ?? FLAP_REST[FLAP_REST.length - 1];
-  const floor = g.tabH + g.h - 5 * g.scale - g.docH / 2;
+  const floor = g.tabH + g.h - 6.5 * g.scale - g.docH / 2;
 
   if (phase === 'open') {
-    const mid = (count - 1) / 2;
+    const mid = Math.max(0, (count - 1) / 2);
+    const safeCount = Math.max(1, count);
     const lift = g.tabH - g.h * 0.02;
     const gap = 12 * g.scale;
-    const fit = Math.min(0.94, (g.w * 2.3 - gap * (count - 1)) / (count * g.docW));
+    const fit = Math.min(0.94, (g.w * 2.3 - gap * (safeCount - 1)) / (safeCount * g.docW));
     const step = g.docW * fit + gap;
     const dropOffset = SPREAD_DROP[rank % SPREAD_DROP.length] * g.h * 0.7;
     const turnOffset = SPREAD_TURN[rank % SPREAD_TURN.length] * 0.55;
@@ -245,9 +255,16 @@ export function placeFlapCard(
   }
 
   const part = phase === 'receive' ? 1.7 : phase === 'peek' ? 1.3 : 1;
-  const x = g.w / 2 + rest.x * g.w * part;
+  const cardR = phase === 'rest' ? rest.r : rest.r * 1.6;
+  const rad = Math.abs((cardR * Math.PI) / 180);
+  const halfSpanX = (g.docW * Math.cos(rad) + g.docH * Math.sin(rad)) / 2;
+  const wallPad = 4 * g.scale;
+  const minX = halfSpanX + wallPad;
+  const maxX = Math.max(minX, g.w - halfSpanX - wallPad);
+  const x = clamp(g.w / 2 + rest.x * g.w * part, minX, maxX);
+
   if (phase === 'rest') {
-    return { x, y: floor - rest.rise * g.h, r: rest.r, s: 1 };
+    return { x, y: floor - rest.rise * g.h, r: cardR, s: 1 };
   }
 
   const near =
@@ -258,7 +275,7 @@ export function placeFlapCard(
   return {
     x,
     y: floor - rise * g.h - near * near * g.h * 0.09,
-    r: rest.r * 1.6,
+    r: cardR,
     s: 1,
   };
 }
@@ -270,6 +287,50 @@ export function rectToBox(rect: Pick<DOMRectReadOnly, 'left' | 'top' | 'width' |
     width: rect.width,
     height: rect.height,
     rotation: 0,
+  };
+}
+
+export function toLocalBox(
+  box: RectBox,
+  containerRect: Pick<DOMRectReadOnly, 'left' | 'top'>
+): RectBox {
+  return {
+    centerX: box.centerX - containerRect.left,
+    centerY: box.centerY - containerRect.top,
+    width: box.width,
+    height: box.height,
+    rotation: box.rotation ?? 0,
+  };
+}
+
+export function projectFolderSlot(
+  slot: CardPlacement,
+  lift: number,
+  g: FolderGeometry,
+  folderDepth: number,
+  rootRect: Pick<DOMRectReadOnly, 'left' | 'top' | 'width' | 'height'>
+): ProjectedSlot {
+  const totalH = g.tabH + g.h;
+  const pivotX = g.w / 2;
+  const pivotY = g.tabH + g.h / 2;
+  const z = (3 + lift * 26) * g.scale;
+  const persp = folderDepth > z ? folderDepth / (folderDepth - z) : 1;
+
+  const localX = pivotX + (slot.x - pivotX) * persp;
+  const localY = pivotY + (slot.y - pivotY) * persp;
+  const scaleX = g.w > 0 && rootRect.width > 0 ? rootRect.width / g.w : 1;
+  const scaleY = totalH > 0 && rootRect.height > 0 ? rootRect.height / totalH : 1;
+
+  const width = g.docW * slot.s * persp * scaleX;
+  const height = g.docH * slot.s * persp * scaleY;
+
+  return {
+    centerX: rootRect.left + localX * scaleX,
+    centerY: rootRect.top + localY * scaleY,
+    width,
+    height,
+    rotation: slot.r,
+    unitScale: g.scale * slot.s * persp * ((scaleX + scaleY) / 2),
   };
 }
 
@@ -287,8 +348,8 @@ export function computeFlipDelta(from: RectBox, to: RectBox): FlipDelta {
   return {
     dx,
     dy,
-    sx: clamp(safeFromW / safeToW, 0.08, 4),
-    sy: clamp(safeFromH / safeToH, 0.08, 4),
+    sx: clamp(safeFromW / safeToW, 0.05, 12),
+    sy: clamp(safeFromH / safeToH, 0.05, 12),
     rotation,
   };
 }
